@@ -4,6 +4,13 @@
         <name>Pelo.Api</name>
     </assembly>
     <members>
+        <member name="M:Pelo.Api.Controllers.AccountController.LogOn(Pelo.Common.Dtos.Account.LogonRequest)">
+            <summary>
+                Đăng nhập
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Services.BaseServices.BaseService.Ok``1(``0,System.String)">
             <summary>
                 Ok
