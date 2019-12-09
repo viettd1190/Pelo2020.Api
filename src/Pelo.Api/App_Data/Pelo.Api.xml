@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Pelo.Api</name>
+    </assembly>
+    <members>
+        <member name="M:Pelo.Api.Services.BaseServices.BaseService.Ok``1(``0,System.String)">
+            <summary>
+                Ok
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="data"></param>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.BaseServices.BaseService.Fail``1(System.Exception)">
+            <summary>
+                Fail
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="ex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.BaseServices.BaseService.Fail``1(System.String)">
+            <summary>
+                Fail
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="message"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
