@@ -8,11 +8,11 @@ namespace Pelo.Api.Controllers
 {
     public class BaseController : ControllerBase
     {
-        protected IUserService UserService;
+        protected IAccountService AccountService;
 
-        public BaseController(IUserService userService)
+        public BaseController(IAccountService accountService)
         {
-            UserService = userService;
+            AccountService = accountService;
         }
 
         protected async Task<int> GetUserId()
@@ -20,7 +20,7 @@ namespace Pelo.Api.Controllers
             var token = GetToken();
             if (string.IsNullOrEmpty(token)) return 0;
 
-            var res = await UserService.CheckToken(token);
+            var res = await AccountService.CheckToken(token);
 
             if (res.IsSuccess)
             {

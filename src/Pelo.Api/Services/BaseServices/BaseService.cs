@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using NLog;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
@@ -10,15 +11,19 @@ namespace Pelo.Api.Services.BaseServices
     {
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
+        protected readonly IHttpContextAccessor Context;
+
         protected readonly IDapperReadOnlyRepository ReadOnlyRepository;
 
         protected readonly IDapperWriteRepository WriteRepository;
 
         public BaseService(IDapperReadOnlyRepository readOnlyRepository,
-            IDapperWriteRepository writeRepository)
+            IDapperWriteRepository writeRepository,
+            IHttpContextAccessor context)
         {
             ReadOnlyRepository = readOnlyRepository;
             WriteRepository = writeRepository;
+            Context = context;
         }
 
         /// <summary>

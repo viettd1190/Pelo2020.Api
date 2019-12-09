@@ -11,6 +11,13 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.UserController.GetByPaging(Pelo.Common.Dtos.User.GetUserPagingRequest)">
+            <summary>
+                Lấy danh sách user có phân trang
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Services.BaseServices.BaseService.Ok``1(``0,System.String)">
             <summary>
                 Ok

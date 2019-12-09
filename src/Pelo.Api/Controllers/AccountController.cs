@@ -13,7 +13,7 @@ namespace Pelo.Api.Controllers
     {
         private readonly IHttpContextAccessor _accessor;
 
-        public AccountController(IUserService userService, IHttpContextAccessor accessor) : base(userService)
+        public AccountController(IAccountService accountService, IHttpContextAccessor accessor) : base(accountService)
         {
             _accessor = accessor;
         }
@@ -31,7 +31,7 @@ namespace Pelo.Api.Controllers
             if (Request.Headers.ContainsKey("User-Agent")) userAgent = Request.Headers["User-Agent"];
 
             var ipAddress = _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
-            return Ok(await UserService.Logon(request, userAgent, ipAddress));
+            return Ok(await AccountService.Logon(request, userAgent, ipAddress));
         }
     }
 }

@@ -116,7 +116,7 @@ namespace Pelo.Api
                 .WithParameter("connectionString",
                     connectionString)
                 .InstancePerLifetimeScope();
-            builder.RegisterAssemblyTypes(typeof(UserService).Assembly)
+            builder.RegisterAssemblyTypes(typeof(AccountService).Assembly)
                 .Where(c => c.Name.EndsWith("Service"))
                 .AsImplementedInterfaces()
                 .WithParameter("secretKey",
