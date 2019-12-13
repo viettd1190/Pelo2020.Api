@@ -12,7 +12,8 @@ namespace Pelo.Api.Controllers
     {
         private readonly IUserService _userService;
 
-        public UserController(IAccountService accountService, IUserService userService) : base(accountService)
+        public UserController(IAccountService accountService,
+                              IUserService userService) : base(accountService)
         {
             _userService = userService;
         }
@@ -26,7 +27,21 @@ namespace Pelo.Api.Controllers
         [Route("api/user")]
         public async Task<ActionResult<GetUserPagingResponse>> GetByPaging([FromQuery] GetUserPagingRequest request)
         {
-            return Ok(await _userService.GetPaging(await GetUserId(), request));
+            return Ok(await _userService.GetPaging(await GetUserId(),
+                                                   request));
+        }
+
+        /// <summary>
+        ///     Xóa user
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("api/user/{id}")]
+        public async Task<ActionResult<bool>> Delete(int id)
+        {
+            return Ok(await _userService.Delete(await GetUserId(),
+                                                id));
         }
     }
 }

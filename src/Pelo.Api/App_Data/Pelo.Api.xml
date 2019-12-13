@@ -11,11 +11,37 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.BranchController.GetAll">
+            <summary>
+                Lấy tất cả chi nhánh
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.DepartmentController.GetAll">
+            <summary>
+                Lấy tất cả phòng ban
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RoleController.GetAll">
+            <summary>
+                Lấy tất cả nhóm người dùng
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.UserController.GetByPaging(Pelo.Common.Dtos.User.GetUserPagingRequest)">
             <summary>
                 Lấy danh sách user có phân trang
             </summary>
             <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.UserController.Delete(System.Int32)">
+            <summary>
+                Xóa user
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Services.BaseServices.BaseService.Ok``1(``0,System.String)">

@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Pelo.Api.Services.BaseServices;
 using Pelo.Common.Dtos.User;
+using Pelo.Common.Enums;
+using Pelo.Common.Extensions;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
@@ -11,47 +15,59 @@ namespace Pelo.Api.Services.UserServices
     public interface IUserService
     {
         Task<TResponse<PageResult<GetUserPagingResponse>>> GetPaging(int userId,
-            GetUserPagingRequest request);
+                                                                     GetUserPagingRequest request);
+
+        Task<TResponse<bool>> Insert(int userId,InsertUserRequest request);
+
+        Task<TResponse<bool>> Delete(int userId,
+                                     int id);
     }
 
-    public class UserService : BaseService, IUserService
+    public class UserService : BaseService,
+                               IUserService
     {
         private readonly IRoleService _roleService;
 
-        public UserService(IDapperReadOnlyRepository readOnlyRepository, IDapperWriteRepository writeRepository,
-            IRoleService roleService, IHttpContextAccessor contextAccessor) : base(
-            readOnlyRepository, writeRepository, contextAccessor)
+        public UserService(IDapperReadOnlyRepository readOnlyRepository,
+                           IDapperWriteRepository writeRepository,
+                           IRoleService roleService,
+                           IHttpContextAccessor contextAccessor) : base(readOnlyRepository,
+                                                                        writeRepository,
+                                                                        contextAccessor)
         {
             _roleService = roleService;
         }
 
-        public async Task<TResponse<PageResult<GetUserPagingResponse>>> GetPaging(int userId, GetUserPagingRequest request)
+        #region IUserService Members
+
+        public async Task<TResponse<PageResult<GetUserPagingResponse>>> GetPaging(int userId,
+                                                                                  GetUserPagingRequest request)
         {
             try
             {
                 var canGetPaging = await CanGetPaging(userId);
-                if (canGetPaging.IsSuccess)
+                if(canGetPaging.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetUserPagingResponse, int>(string.Format(
-                            SqlQuery.USER_GET_BY_PAGING,
-                            request.ColumnOrder,
-                            request.SortDir.ToUpper()),
-                        new
-                        {
-                            Username = $"%{request.Username}%",
-                            DisplayName = $"%{request.DisplayName}%",
-                            FullName = $"%{request.FullName}%",
-                            PhoneNumber = $"%{request.PhoneNumber}%",
-                            request.BranchId,
-                            request.RoleId,
-                            Skip = (request.Page - 1) * request.PageSize,
-                            Take = request.PageSize
-                        });
-                    if (result.IsSuccess)
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetUserPagingResponse, int>(string.Format(SqlQuery.USER_GET_BY_PAGING,
+                                                                                                                         request.ColumnOrder,
+                                                                                                                         request.SortDir.ToUpper()),
+                                                                                                           new
+                                                                                                           {
+                                                                                                                   Code = $"%{request.Code}%",
+                                                                                                                   FullName = $"%{request.FullName}%",
+                                                                                                                   PhoneNumber = $"%{request.PhoneNumber}%",
+                                                                                                                   request.BranchId,
+                                                                                                                   request.DepartmentId,
+                                                                                                                   request.RoleId,
+                                                                                                                   request.Status,
+                                                                                                                   Skip = (request.Page - 1) * request.PageSize,
+                                                                                                                   Take = request.PageSize
+                                                                                                           });
+                    if(result.IsSuccess)
                         return await Ok(new PageResult<GetUserPagingResponse>(request.Page,
-                            request.PageSize,
-                            result.Data.Item2,
-                            result.Data.Item1));
+                                                                              request.PageSize,
+                                                                              result.Data.Item2,
+                                                                              result.Data.Item1));
 
                     return await Fail<PageResult<GetUserPagingResponse>>(result.Message);
                 }
@@ -63,19 +79,263 @@ namespace Pelo.Api.Services.UserServices
                 return await Fail<PageResult<GetUserPagingResponse>>(exception);
             }
         }
+        
+        /// <summary>
+        /// Thêm mới 1 user. Các bước thực hiện
+        /// 1. Kiểm tra xem đủ điều kiện thêm mới không. Nếu đủ thì làm các bước tiếp theo
+        /// 2. Thêm các thông tin cơ bản vào db, ngoại trừ Code và Avatar. Nếu thêm thành công vào db thì thực hiện các bước tiếp theo
+        /// 3. Update code cho user đó, cáu trúc: NV{id:00000}. VD: NV00099
+        /// 4. Kiểm tra xem có file đính kèm không. Nếu không thì set Avatar="defaut.png" (file avatar mặc định). Nếu có thì thực hiện các bước tiếp theo
+        /// 5. Thực hiện đổi tên file đính kèm và lưu lại file đó vào thư mục Avatars, set Avatar = tên file sau khi được đổi.
+        /// 6. Update avatar cho user đó.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<TResponse<bool>> Insert(int userId,InsertUserRequest request)
+        {
+            try
+            {
+                var canInsert = await CanInsert(userId,
+                                                request);
+                if(canInsert.IsSuccess)
+                {
+                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.USER_INSERT,
+                                                                               new
+                                                                               {
+                                                                                       request.Username,
+                                                                                       Password = Sha512(request.Password),
+                                                                                       request.DisplayName,
+                                                                                       request.FullName,
+                                                                                       request.PhoneNumber,
+                                                                                       request.Email,
+                                                                                       request.BranchId,
+                                                                                       request.RoleId,
+                                                                                       request.DepartmentId,
+                                                                                       request.Description,
+                                                                                       UserCreated = userId,
+                                                                                       UserUpdated = userId
+                                                                               });
+                    if(result.IsSuccess)
+                    {
+                        if(result.Data==0)
+                        {
+                            return await Fail<bool>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(),
+                                                                  "USER_INSERT"));
+                        }
 
+                        int id = result.Data;
+
+                        await WriteRepository.ExecuteAsync(SqlQuery.USER_UPDATE_CODE,
+                                                           new
+                                                           {
+                                                                   Id = id,
+                                                                   Code = $"NV{id:00000}"
+                                                           });
+
+                    }
+
+                    return await Fail<bool>(result.Message);
+                }
+
+                return await Fail<bool>(canInsert.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        public async Task<TResponse<bool>> Delete(int userId,
+                                                  int id)
+        {
+            try
+            {
+                var canDelete = await CanDelete(userId,
+                                                id);
+                if(canDelete.IsSuccess)
+                {
+                    var result = await WriteRepository.ExecuteAsync(SqlQuery.USER_DELETE,
+                                                                    new
+                                                                    {
+                                                                            UserUpdated = userId,
+                                                                            Id = id
+                                                                    });
+                    if(result.IsSuccess)
+                    {
+                        if(result.Data > 0)
+                        {
+                            return await Ok(true);
+                        }
+
+                        return await Fail<bool>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(),
+                                                              "USER_DELETE"));
+                    }
+
+                    return await Fail<bool>(result.Message);
+                }
+
+                return await Fail<bool>(canDelete.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        ///     Kiểm tra user có quyền lấy danh sách người dùng hay không
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         private async Task<TResponse<bool>> CanGetPaging(int userId)
         {
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if (checkPermission.IsSuccess) return await Ok(true);
+                if(checkPermission.IsSuccess) return await Ok(true);
 
                 return await Fail<bool>(checkPermission.Message);
             }
             catch (Exception exception)
             {
                 return await Fail<bool>(exception);
+            }
+        }
+
+        /// <summary>
+        ///     Kiểm tra khi thêm người dùng phải thỏa mãn tất cả các điều kiện sau:
+        ///     1. User phải có quyền thêm người dùng
+        ///     2. Không được để trống tên đăng nhập, mật khẩu
+        ///     3. Tên đăng nhập không được trùng
+        ///     4. Nếu số điện thoại ko để trống, kiểm tra số điện thoại không được trùng
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private async Task<TResponse<bool>> CanInsert(int userId,
+                                                      InsertUserRequest request)
+        {
+            try
+            {
+                var checkPermission = await _roleService.CheckPermission(userId);
+                if(checkPermission.IsSuccess)
+                {
+                    if(string.IsNullOrEmpty(request.Username))
+                    {
+                        return await Fail<bool>(ErrorEnum.USERNAME_IS_NOT_EMPTY.GetStringValue());
+                    }
+
+                    if(string.IsNullOrEmpty(request.Password))
+                    {
+                        return await Fail<bool>(ErrorEnum.PASSWORD_IS_NOT_EMPTY.GetStringValue());
+                    }
+
+                    var checkUsername = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.USER_CHECK_USERNAME_INVALID,
+                                                                                               new
+                                                                                               {
+                                                                                                       request.Username
+                                                                                               });
+                    if(checkUsername.IsSuccess)
+                    {
+                        if(checkUsername.Data > 0)
+                        {
+                            return await Fail<bool>(ErrorEnum.USERNAME_HAS_EXIST.GetStringValue());
+                        }
+
+                        if(!string.IsNullOrEmpty(request.PhoneNumber))
+                        {
+                            var checkPhone = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.USER_CHECK_PHONE_INVALID,
+                                                                                                    new
+                                                                                                    {
+                                                                                                            request.PhoneNumber
+                                                                                                    });
+                            if(checkPhone.IsSuccess)
+                            {
+                                if(checkPhone.Data > 0)
+                                {
+                                    return await Fail<bool>(ErrorEnum.PHONE_NUMBER_HAS_EXIST.GetStringValue());
+                                }
+
+                                return await Ok(true);
+                            }
+
+                            return await Fail<bool>(checkPhone.Message);
+                        }
+
+                        return await Ok(true);
+                    }
+
+                    return await Fail<bool>(checkUsername.Message);
+                }
+
+                return await Fail<bool>(checkPermission.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        /// <summary>
+        ///     Kiểm tra khi xóa người dùng phải thỏa mãn tất cả các điều kiện sau:
+        ///     1. User phải có quyền xóa người dùng
+        ///     2. Người dùng cần xóa phải tồn tại
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private async Task<TResponse<bool>> CanDelete(int userId,
+                                                      int id)
+        {
+            try
+            {
+                var checkPermission = await _roleService.CheckPermission(userId);
+                if(checkPermission.IsSuccess)
+                {
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.USER_CHECK_INVALID_ID,
+                                                                                        new
+                                                                                        {
+                                                                                                Id = id
+                                                                                        });
+                    if(result.IsSuccess)
+                    {
+                        if(result.Data == 0)
+                        {
+                            return await Fail<bool>(ErrorEnum.USER_HAS_NOT_EXIST.GetStringValue());
+                        }
+
+                        return await Ok(true);
+                    }
+
+                    return await Fail<bool>(result.Message);
+                }
+
+                return await Fail<bool>(checkPermission.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        private string Sha512(string input)
+        {
+            input = $"123{input}xyz";
+
+            var bytes = Encoding.UTF8.GetBytes(input);
+            using (var hash = SHA512.Create())
+            {
+                var hashedInputBytes = hash.ComputeHash(bytes);
+
+                // Convert to text
+                // StringBuilder Capacity is 128, because 512 bits / 8 bits in byte * 2 symbols for byte 
+                var hashedInputStringBuilder = new StringBuilder(128);
+                foreach (var b in hashedInputBytes)
+                    hashedInputStringBuilder.Append(b.ToString("X2"));
+                return hashedInputStringBuilder.ToString();
             }
         }
     }
