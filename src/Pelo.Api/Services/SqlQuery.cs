@@ -380,5 +380,75 @@
                                              ORDER BY SortOrder;";
 
         #endregion
+
+        #region CustomerGroup
+
+        public const string CUSTOMER_GROUP_GET_BY_PAGING = @"SELECT Id,
+                                                                    Name
+                                                             FROM dbo.CustomerGroup
+                                                             WHERE Name LIKE @Name
+                                                                   AND IsDeleted = 0;
+                                                             ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+ 
+                                                             SELECT COUNT(*)
+                                                             FROM dbo.CustomerGroup
+                                                             WHERE Name LIKE @Name
+                                                                   AND IsDeleted = 0;";
+
+        public const string CUSTOMER_GROUP_INSERT = @"INSERT dbo.CustomerGroup
+                                                      (
+                                                          Name,
+                                                          UserCreated,
+                                                          DateCreated,
+                                                          UserUpdated,
+                                                          DateUpdated,
+                                                          IsDeleted
+                                                      )
+                                                      VALUES
+                                                      (   @Name,       -- Name - nvarchar(200)
+                                                          @UserCreated,         -- UserCreated - int
+                                                          GETDATE(), -- DateCreated - datetime
+                                                          @UserUpdated,         -- UserUpdated - int
+                                                          GETDATE(), -- DateUpdated - datetime
+                                                          0       -- IsDeleted - bit
+                                                          )";
+
+        public const string CUSTOMER_GROUP_GET_BY_ID = @"SELECT Id,
+                                                                Name
+                                                         FROM dbo.CustomerGroup
+                                                         WHERE Id = @Id
+                                                               AND IsDeleted = 0;";
+
+        public const string CUSTOMER_GROUP_CHECK_NAME_INVALID = @"SELECT Id
+                                                                  FROM dbo.CustomerGroup
+                                                                  WHERE Name = @Name
+                                                                        AND IsDeleted = 0;";
+
+        public const string CUSTOMER_GROUP_CHECK_NAME_INVALID_2 = @"SELECT Id
+                                                                    FROM dbo.CustomerGroup
+                                                                    WHERE Name = @Name
+                                                                          AND Id <> @Id
+                                                                          AND IsDeleted = 0;";
+
+        public const string CUSTOMER_GROUP_UPDATE = @"UPDATE dbo.CustomerGroup
+                                                      SET Name = @Name,
+                                                          UserUpdated = @UserUpdated,
+                                                          DateUpdated = GETDATE()
+                                                      WHERE Id = @Id
+                                                            AND IsDeleted = 0;";
+
+        public const string CUSTOMER_GROUP_CHECK_ID_INVALID = @"SELECT Id
+                                                                FROM dbo.CustomerGroup
+                                                                WHERE Id = @Id
+                                                                      AND IsDeleted = 0;";
+
+        public const string CUSTOMER_GROUP_DELETE = @"UPDATE dbo.CustomerGroup
+                                                      SET UserUpdated = @UserUpdated,
+                                                          DateUpdated = GETDATE(),
+                                                          IsDeleted = 1
+                                                      WHERE Id = @Id
+                                                            AND IsDeleted = 0;";
+
+        #endregion
     }
 }
