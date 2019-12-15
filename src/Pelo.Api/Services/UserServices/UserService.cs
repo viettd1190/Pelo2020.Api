@@ -177,6 +177,7 @@ namespace Pelo.Api.Services.UserServices
                                                                             request.BranchId,
                                                                             request.DepartmentId,
                                                                             request.RoleId,
+                                                                            request.IsActive,
                                                                             request.Description,
                                                                             request.Id,
                                                                             UserUpdated = userId

@@ -181,6 +181,7 @@
                                                     BranchId = @BranchId ,
                                                     DepartmentId = @DepartmentId ,
                                                     RoleId = @RoleId ,
+                                                    IsActive = @IsActive,
                                                     Description = @Description,
                                                     UserUpdated = @UserUpdated,
                                                     DateUpdated = GETDATE()
@@ -202,6 +203,7 @@
                                                        BranchId ,
                                                        DepartmentId ,
                                                        RoleId ,
+                                                       IsActive ,
                                                        Description
                                                FROM    dbo.[User]
                                                WHERE   Id = @Id
@@ -261,6 +263,92 @@
         public const string ROLE_GET_ALL = @"SELECT Id, Name
                                              FROM dbo.Role
                                              WHERE IsDeleted = 0;";
+
+        #endregion
+
+        #region AppConfig
+
+        public const string APP_CONFIG_GET_BY_PAGING = @"SELECT Id,
+                                                                Name,
+                                                                Value,
+                                                                Description
+                                                         FROM dbo.AppConfig
+                                                         WHERE ISNULL(Description, '') COLLATE Latin1_General_CI_AI LIKE @Description COLLATE Latin1_General_CI_AI
+                                                               AND Name LIKE @Name
+                                                               AND IsDeleted = 0
+                                                         ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+ 
+                                                         SELECT COUNT(*)
+                                                         FROM dbo.AppConfig
+                                                         WHERE ISNULL(Description, '') COLLATE Latin1_General_CI_AI LIKE @Description COLLATE Latin1_General_CI_AI
+                                                               AND Name LIKE @Name
+                                                               AND IsDeleted = 0;";
+
+        public const string APP_CONFIG_INSERT = @"INSERT dbo.AppConfig
+                                                  (
+                                                      Name,
+                                                      Value,
+                                                      Description,
+                                                      UserCreated,
+                                                      DateCreated,
+                                                      UserUpdated,
+                                                      DateUpdated,
+                                                      IsDeleted
+                                                  )
+                                                  VALUES
+                                                  (   @Name,       -- Name - nvarchar(100)
+                                                      @Value,       -- Value - nvarchar(max)
+                                                      @Description,       -- Description - nvarchar(max)
+                                                      @UserCreated,         -- UserCreated - int
+                                                      GETDATE(), -- DateCreated - datetime
+                                                      @UserUpdated,         -- UserUpdated - int
+                                                      GETDATE(), -- DateUpdated - datetime
+                                                      0       -- IsDeleted - bit
+                                                      )";
+
+        public const string APP_CONFIG_GET_BY_ID = @"SELECT Id,
+                                                            Name,
+                                                            Value,
+                                                            Description
+                                                     FROM dbo.AppConfig
+                                                     WHERE Id = @Id
+                                                           AND IsDeleted = 0;";
+
+        public const string APP_CONFIG_CHECK_NAME_INVALID = @"SELECT Id
+                                                              FROM dbo.AppConfig
+                                                              WHERE Name = @Name
+                                                                    AND IsDeleted = 0;";
+
+        public const string APP_CONFIG_CHECK_NAME_INVALID_2 = @"SELECT Id
+                                                                FROM dbo.AppConfig
+                                                                WHERE Name = @Name
+                                                                      AND Id <> @Id
+                                                                      AND IsDeleted = 0;";
+
+        public const string APP_CONFIG_UPDATE = @"UPDATE dbo.AppConfig
+                                                  SET Value = @Value,
+                                                      Description = @Description,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = GETDATE()
+                                                  WHERE Id = @Id
+                                                        AND IsDeleted = 0;";
+
+        public const string APP_CONFIG_CHECK_ID_INVALID = @"SELECT Id
+                                                            FROM dbo.AppConfig
+                                                            WHERE Id = @Id
+                                                                  AND IsDeleted = 0;";
+
+        public const string APP_CONFIG_DELETE = @"UPDATE dbo.AppConfig
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = GETDATE(),
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id
+                                                        AND IsDeleted = 0;";
+
+        public const string APP_CONFIG_GET_VALUE_BY_NAME = @"SELECT Value
+                                                             FROM dbo.AppConfig
+                                                             WHERE Name = @Name
+                                                                   AND IsDeleted = 0;";
 
         #endregion
     }

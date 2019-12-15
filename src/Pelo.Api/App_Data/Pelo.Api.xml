@@ -11,6 +11,41 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.AppConfigController.GetByPaging(Pelo.Common.Dtos.AppConfig.GetAppConfigPagingRequest)">
+            <summary>
+                Lấy danh sách app config có phân trang
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.AppConfigController.Insert(Pelo.Common.Dtos.AppConfig.InsertAppConfigRequest)">
+            <summary>
+                Thêm mới app config
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.AppConfigController.GetById(System.Int32)">
+            <summary>
+                Lấy thông tin app config
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.AppConfigController.Update(Pelo.Common.Dtos.AppConfig.UpdateAppConfigRequest)">
+            <summary>
+                Cập nhật thông tin app config
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.AppConfigController.Delete(System.Int32)">
+            <summary>
+                Xóa app config
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.BranchController.GetAll">
             <summary>
                 Lấy tất cả chi nhánh
