@@ -55,7 +55,7 @@ namespace Pelo.Api.Services.BaseServices
             _logger.Info(ex);
             return Task.FromResult(new TResponse<T>
             {
-                Data = default,
+                Data = default(T),
                 IsSuccess = false,
                 Message = ex.ToString()
             });
@@ -72,7 +72,7 @@ namespace Pelo.Api.Services.BaseServices
             _logger.Info(message);
             return Task.FromResult(new TResponse<T>
             {
-                Data = default,
+                Data = default(T),
                 IsSuccess = false,
                 Message = message
             });

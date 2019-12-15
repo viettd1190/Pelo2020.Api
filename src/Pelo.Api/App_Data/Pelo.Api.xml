@@ -37,6 +37,27 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.UserController.Insert(Pelo.Common.Dtos.User.InsertUserRequest)">
+            <summary>
+                Thêm mới nhân viên
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.UserController.GetById(System.Int32)">
+            <summary>
+                Lấy thông tin nhân viên
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.UserController.Update(Pelo.Common.Dtos.User.UpdateUserRequest)">
+            <summary>
+                Cập nhật thông tin nhân viên
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.UserController.Delete(System.Int32)">
             <summary>
                 Xóa user
@@ -67,6 +88,73 @@
             </summary>
             <typeparam name="T"></typeparam>
             <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.UserServices.UserService.Insert(System.Int32,Pelo.Common.Dtos.User.InsertUserRequest)">
+            <summary>
+                Thêm mới 1 user. Các bước thực hiện
+                1. Kiểm tra xem đủ điều kiện thêm mới không. Nếu đủ thì làm các bước tiếp theo
+                2. Thêm các thông tin cơ bản vào db, ngoại trừ Code. Nếu thêm thành công vào db thì thực hiện các bước tiếp theo
+                3. Update code cho user đó, cáu trúc: NV{id:00000}. VD: NV00099
+            </summary>
+            <param name="userId"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.UserServices.UserService.Update(System.Int32,Pelo.Common.Dtos.User.UpdateUserRequest)">
+            <summary>
+                Cập nhật thông tin nhân viên
+            </summary>
+            <param name="userId"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.UserServices.UserService.GetById(System.Int32,System.Int32)">
+            <summary>
+                Lấy thông tin nhân viên
+            </summary>
+            <param name="userId"></param>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.UserServices.UserService.CanGetPaging(System.Int32)">
+            <summary>
+                Kiểm tra user có quyền lấy danh sách người dùng hay không
+            </summary>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.UserServices.UserService.CanInsert(System.Int32,Pelo.Common.Dtos.User.InsertUserRequest)">
+            <summary>
+                Kiểm tra khi thêm người dùng phải thỏa mãn tất cả các điều kiện sau:
+                1. User phải có quyền thêm người dùng
+                2. Không được để trống tên đăng nhập, mật khẩu
+                3. Tên đăng nhập không được trùng
+                4. Nếu số điện thoại ko để trống, kiểm tra số điện thoại không được trùng
+            </summary>
+            <param name="userId"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.UserServices.UserService.CanUpdate(System.Int32,Pelo.Common.Dtos.User.UpdateUserRequest)">
+            <summary>
+                Kiểm tra khi cập nhật thông tin nhân viên phải thỏa mãn các điều kiện sau
+                1. User phải có quyền cập nhật thông tin người dùng
+                2. Id phải tồn tại
+                3. Nếu số điện thoại có điền, thì phải ko trùng
+            </summary>
+            <param name="userId"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.UserServices.UserService.CanDelete(System.Int32,System.Int32)">
+            <summary>
+                Kiểm tra khi xóa người dùng phải thỏa mãn tất cả các điều kiện sau:
+                1. User phải có quyền xóa người dùng
+                2. Người dùng cần xóa phải tồn tại
+            </summary>
+            <param name="userId"></param>
+            <param name="id"></param>
             <returns></returns>
         </member>
     </members>

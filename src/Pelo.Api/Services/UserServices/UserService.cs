@@ -17,7 +17,14 @@ namespace Pelo.Api.Services.UserServices
         Task<TResponse<PageResult<GetUserPagingResponse>>> GetPaging(int userId,
                                                                      GetUserPagingRequest request);
 
-        Task<TResponse<bool>> Insert(int userId,InsertUserRequest request);
+        Task<TResponse<bool>> Insert(int userId,
+                                     InsertUserRequest request);
+
+        Task<TResponse<bool>> Update(int userId,
+                                     UpdateUserRequest request);
+
+        Task<TResponse<GetUserByIdResponse>> GetById(int userId,
+                                                     int id);
 
         Task<TResponse<bool>> Delete(int userId,
                                      int id);
@@ -79,20 +86,18 @@ namespace Pelo.Api.Services.UserServices
                 return await Fail<PageResult<GetUserPagingResponse>>(exception);
             }
         }
-        
+
         /// <summary>
-        /// Thêm mới 1 user. Các bước thực hiện
-        /// 1. Kiểm tra xem đủ điều kiện thêm mới không. Nếu đủ thì làm các bước tiếp theo
-        /// 2. Thêm các thông tin cơ bản vào db, ngoại trừ Code và Avatar. Nếu thêm thành công vào db thì thực hiện các bước tiếp theo
-        /// 3. Update code cho user đó, cáu trúc: NV{id:00000}. VD: NV00099
-        /// 4. Kiểm tra xem có file đính kèm không. Nếu không thì set Avatar="defaut.png" (file avatar mặc định). Nếu có thì thực hiện các bước tiếp theo
-        /// 5. Thực hiện đổi tên file đính kèm và lưu lại file đó vào thư mục Avatars, set Avatar = tên file sau khi được đổi.
-        /// 6. Update avatar cho user đó.
+        ///     Thêm mới 1 user. Các bước thực hiện
+        ///     1. Kiểm tra xem đủ điều kiện thêm mới không. Nếu đủ thì làm các bước tiếp theo
+        ///     2. Thêm các thông tin cơ bản vào db, ngoại trừ Code. Nếu thêm thành công vào db thì thực hiện các bước tiếp theo
+        ///     3. Update code cho user đó, cáu trúc: NV{id:00000}. VD: NV00099
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<TResponse<bool>> Insert(int userId,InsertUserRequest request)
+        public async Task<TResponse<bool>> Insert(int userId,
+                                                  InsertUserRequest request)
         {
             try
             {
@@ -118,7 +123,7 @@ namespace Pelo.Api.Services.UserServices
                                                                                });
                     if(result.IsSuccess)
                     {
-                        if(result.Data==0)
+                        if(result.Data == 0)
                         {
                             return await Fail<bool>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(),
                                                                   "USER_INSERT"));
@@ -133,6 +138,7 @@ namespace Pelo.Api.Services.UserServices
                                                                    Code = $"NV{id:00000}"
                                                            });
 
+                        return await Ok(true);
                     }
 
                     return await Fail<bool>(result.Message);
@@ -143,6 +149,93 @@ namespace Pelo.Api.Services.UserServices
             catch (Exception exception)
             {
                 return await Fail<bool>(exception);
+            }
+        }
+
+        /// <summary>
+        ///     Cập nhật thông tin nhân viên
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<TResponse<bool>> Update(int userId,
+                                                  UpdateUserRequest request)
+        {
+            try
+            {
+                var canUpdate = await CanUpdate(userId,
+                                                request);
+                if(canUpdate.IsSuccess)
+                {
+                    var result = await WriteRepository.ExecuteAsync(SqlQuery.USER_UPDATE,
+                                                                    new
+                                                                    {
+                                                                            request.DisplayName,
+                                                                            request.FullName,
+                                                                            request.PhoneNumber,
+                                                                            request.Email,
+                                                                            request.BranchId,
+                                                                            request.DepartmentId,
+                                                                            request.RoleId,
+                                                                            request.Description,
+                                                                            request.Id,
+                                                                            UserUpdated = userId
+                                                                    });
+                    if(result.IsSuccess)
+                    {
+                        if(result.Data > 0)
+                        {
+                            return await Ok(true);
+                        }
+
+                        return await Fail<bool>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(),
+                                                              "USER_UPDATE"));
+                    }
+
+                    return await Fail<bool>(result.Message);
+                }
+
+                return await Fail<bool>(canUpdate.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        /// <summary>
+        ///     Lấy thông tin nhân viên
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<TResponse<GetUserByIdResponse>> GetById(int userId,
+                                                                  int id)
+        {
+            try
+            {
+                var canGetById = await CanGetById(userId,
+                                                  id);
+                if(canGetById.IsSuccess)
+                {
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetUserByIdResponse>(SqlQuery.USER_GET_BY_ID,
+                                                                                                        new
+                                                                                                        {
+                                                                                                                Id = id
+                                                                                                        });
+                    if(result.IsSuccess)
+                    {
+                        return await Ok(result.Data);
+                    }
+
+                    return await Fail<GetUserByIdResponse>(ErrorEnum.USER_HAS_NOT_EXIST.GetStringValue());
+                }
+
+                return await Fail<GetUserByIdResponse>(canGetById.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<GetUserByIdResponse>(exception);
             }
         }
 
@@ -269,6 +362,89 @@ namespace Pelo.Api.Services.UserServices
                     }
 
                     return await Fail<bool>(checkUsername.Message);
+                }
+
+                return await Fail<bool>(checkPermission.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        private async Task<TResponse<bool>> CanGetById(int userId,
+                                                       int id)
+        {
+            try
+            {
+                var checkPermission = await _roleService.CheckPermission(userId);
+                if(checkPermission.IsSuccess)
+                {
+                    return await Ok(true);
+                }
+
+                return await Fail<bool>(checkPermission.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        /// <summary>
+        ///     Kiểm tra khi cập nhật thông tin nhân viên phải thỏa mãn các điều kiện sau
+        ///     1. User phải có quyền cập nhật thông tin người dùng
+        ///     2. Id phải tồn tại
+        ///     3. Nếu số điện thoại có điền, thì phải ko trùng
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private async Task<TResponse<bool>> CanUpdate(int userId,
+                                                      UpdateUserRequest request)
+        {
+            try
+            {
+                var checkPermission = await _roleService.CheckPermission(userId);
+                if(checkPermission.IsSuccess)
+                {
+                    var checkInvalidId = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.USER_CHECK_INVALID_ID,
+                                                                                                new
+                                                                                                {
+                                                                                                        request.Id
+                                                                                                });
+                    if(checkInvalidId.IsSuccess)
+                    {
+                        if(checkInvalidId.Data > 0)
+                        {
+                            if(string.IsNullOrEmpty(request.PhoneNumber))
+                            {
+                                return await Ok(true);
+                            }
+
+                            var checkInvalidPhone = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.USER_CHECK_PHONE_INVALID_2,
+                                                                                                           new
+                                                                                                           {
+                                                                                                                   request.Id,
+                                                                                                                   request.PhoneNumber
+                                                                                                           });
+                            if(checkInvalidPhone.IsSuccess)
+                            {
+                                if(checkInvalidPhone.Data == 0)
+                                {
+                                    return await Ok(true);
+                                }
+
+                                return await Fail<bool>(ErrorEnum.PHONE_NUMBER_HAS_EXIST.GetStringValue());
+                            }
+
+                            return await Fail<bool>(checkInvalidPhone.Message);
+                        }
+
+                        return await Fail<bool>(ErrorEnum.USER_HAS_NOT_EXIST.GetStringValue());
+                    }
+
+                    return await Fail<bool>(checkInvalidId.Message);
                 }
 
                 return await Fail<bool>(checkPermission.Message);

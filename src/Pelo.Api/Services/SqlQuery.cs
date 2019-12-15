@@ -143,7 +143,7 @@
                                                 @FullName,       -- FullName - nvarchar(300)
                                                 @PhoneNumber,        -- PhoneNumber - varchar(20)
                                                 @Email,        -- Email - varchar(128)
-                                                '',        -- Avatar - varchar(128)
+                                                'default.png',        -- Avatar - varchar(128)
                                                 @BranchId,         -- BranchId - int
                                                 @RoleId,         -- RoleId - int
                                                 @DepartmentId,         -- DepartmentId - int
@@ -172,6 +172,40 @@
                                                  SET Code = @Code
                                                  WHERE Id = @Id
                                                        AND IsDeleted = 0;";
+
+        public const string USER_UPDATE = @"UPDATE  dbo.[User]
+                                            SET     DisplayName = @DisplayName ,
+                                                    FullName = @FullName ,
+                                                    PhoneNumber = @PhoneNumber ,
+                                                    Email = @Email ,
+                                                    BranchId = @BranchId ,
+                                                    DepartmentId = @DepartmentId ,
+                                                    RoleId = @RoleId ,
+                                                    Description = @Description,
+                                                    UserUpdated = @UserUpdated,
+                                                    DateUpdated = GETDATE()
+                                            WHERE   Id = @Id
+                                                    AND IsDeleted = 0";
+
+        public const string USER_CHECK_PHONE_INVALID_2 = @"SELECT Id
+                                                           FROM dbo.[User]
+                                                           WHERE PhoneNumber = @PhoneNumber
+                                                                 AND Id <> @Id
+                                                                 AND IsDeleted = 0;";
+
+        public const string USER_GET_BY_ID = @"SELECT  Id ,
+                                                       Username ,
+                                                       DisplayName ,
+                                                       FullName ,
+                                                       PhoneNumber ,
+                                                       Email ,
+                                                       BranchId ,
+                                                       DepartmentId ,
+                                                       RoleId ,
+                                                       Description
+                                               FROM    dbo.[User]
+                                               WHERE   Id = @Id
+                                                       AND IsDeleted = 0";
 
         #endregion
 

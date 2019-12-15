@@ -32,6 +32,45 @@ namespace Pelo.Api.Controllers
         }
 
         /// <summary>
+        ///     Thêm mới nhân viên
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/user")]
+        public async Task<ActionResult<bool>> Insert(InsertUserRequest request)
+        {
+            return Ok(await _userService.Insert(await GetUserId(),
+                                                request));
+        }
+
+        /// <summary>
+        ///     Lấy thông tin nhân viên
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/user/{id}")]
+        public async Task<ActionResult<GetUserByIdResponse>> GetById(int id)
+        {
+            return Ok(await _userService.GetById(await GetUserId(),
+                                                 id));
+        }
+
+        /// <summary>
+        ///     Cập nhật thông tin nhân viên
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("api/user")]
+        public async Task<ActionResult<bool>> Update(UpdateUserRequest request)
+        {
+            return Ok(await _userService.Update(await GetUserId(),
+                                                request));
+        }
+
+        /// <summary>
         ///     Xóa user
         /// </summary>
         /// <param name="id"></param>
