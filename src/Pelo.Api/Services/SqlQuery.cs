@@ -319,12 +319,6 @@
                                                               WHERE Name = @Name
                                                                     AND IsDeleted = 0;";
 
-        public const string APP_CONFIG_CHECK_NAME_INVALID_2 = @"SELECT Id
-                                                                FROM dbo.AppConfig
-                                                                WHERE Name = @Name
-                                                                      AND Id <> @Id
-                                                                      AND IsDeleted = 0;";
-
         public const string APP_CONFIG_UPDATE = @"UPDATE dbo.AppConfig
                                                   SET Value = @Value,
                                                       Description = @Description,
@@ -349,6 +343,41 @@
                                                              FROM dbo.AppConfig
                                                              WHERE Name = @Name
                                                                    AND IsDeleted = 0;";
+
+        #endregion
+
+        #region Province
+
+        public const string PROVINCE_GET_ALL = @"SELECT Id,
+                                                        Type,
+                                                        Name
+                                                 FROM dbo.Province
+                                                 WHERE IsDeleted = 0
+                                                 ORDER BY SortOrder;";
+
+        #endregion
+
+        #region District
+
+        public const string DISTRICT_GET_ALL = @"SELECT Id,
+                                                        Type,
+                                                        Name
+                                                 FROM dbo.District
+                                                 WHERE IsDeleted = 0
+                                                       AND ProvinceId = @ProvinceId
+                                                 ORDER BY SortOrder;";
+
+        #endregion
+
+        #region Ward
+
+        public const string WARD_GET_ALL = @"SELECT Id,
+                                                    Type,
+                                                    Name
+                                             FROM dbo.Ward
+                                             WHERE IsDeleted = 0
+                                                   AND DistrictId = @DistrictId
+                                             ORDER BY SortOrder;";
 
         #endregion
     }

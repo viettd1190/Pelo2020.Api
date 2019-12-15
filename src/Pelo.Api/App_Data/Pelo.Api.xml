@@ -58,6 +58,19 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.DistrictController.GetAll(System.Int32)">
+            <summary>
+                Lấy tất cả quận huyện của tỉnh thành
+            </summary>
+            <param name="id">Id tỉnh thành</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProvinceController.GetAll">
+            <summary>
+                Lấy tất cả tỉnh thành
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.RoleController.GetAll">
             <summary>
                 Lấy tất cả nhóm người dùng
@@ -98,6 +111,13 @@
                 Xóa user
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WardController.GetAll(System.Int32)">
+            <summary>
+                Lấy tất cả phường xã của quận huyện
+            </summary>
+            <param name="id">Id tỉnh thành</param>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Services.BaseServices.BaseService.Ok``1(``0,System.String)">
