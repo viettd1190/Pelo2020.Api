@@ -1,4 +1,7 @@
-﻿namespace Pelo.Api.Services
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal;
+
+namespace Pelo.Api.Services
 {
     public class SqlQuery
     {
@@ -387,7 +390,7 @@
                                                                     Name
                                                              FROM dbo.CustomerGroup
                                                              WHERE Name LIKE @Name
-                                                                   AND IsDeleted = 0;
+                                                                   AND IsDeleted = 0
                                                              ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
  
                                                              SELECT COUNT(*)
@@ -448,6 +451,95 @@
                                                           IsDeleted = 1
                                                       WHERE Id = @Id
                                                             AND IsDeleted = 0;";
+
+        #endregion
+
+        #region CustomerVip
+
+        public const string CUSTOMER_VIP_GET_BY_PAGING = @"SELECT Id,
+                                                                  Name,
+                                                                  Color,
+                                                                  Profit
+                                                           FROM dbo.CustomerVip
+                                                           WHERE IsDeleted = 0
+                                                           ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                           SELECT COUNT(*)
+                                                           FROM dbo.CustomerVip
+                                                           WHERE IsDeleted = 0;";
+
+        public const string CUSTOMER_VIP_GET_BY_ID = @"SELECT Id,
+                                                              Name,
+                                                              Color,
+                                                              Profit
+                                                       FROM dbo.CustomerVip
+                                                       WHERE Id = @Id
+                                                             AND IsDeleted = 0;";
+
+        public const string CUSTOMER_VIP_CHECK_PROFIT_INVALID = @"SELECT Id
+                                                                  FROM dbo.CustomerVip
+                                                                  WHERE Profit = @Profit
+                                                                        AND IsDeleted = 0;";
+
+        public const string CUSTOMER_VIP_CHJECK_NAME_INVALID = @"SELECT Id
+                                                                 FROM dbo.CustomerVip
+                                                                 WHERE Name = @Name
+                                                                       AND IsDeleted = 0;";
+
+        public const string CUSTOMER_VIP_CHECK_PROFIT_INVALID_2 = @"SELECT Id
+                                                                    FROM dbo.CustomerVip
+                                                                    WHERE Profit = @Profit
+                                                                          AND Id <> @Id
+                                                                          AND IsDeleted = 0;";
+
+        public const string CUSTOMER_VIP_CHJECK_NAME_INVALID_2 = @"SELECT Id
+                                                                   FROM dbo.CustomerVip
+                                                                   WHERE Name = @Name
+                                                                         AND Id <> @Id
+                                                                         AND IsDeleted = 0;";
+
+        public const string CUSTOMER_VIP_INSERT = @"INSERT dbo.CustomerVip
+                                                    (
+                                                        Name,
+                                                        Color,
+                                                        Profit,
+                                                        UserCreated,
+                                                        DateCreated,
+                                                        UserUpdated,
+                                                        DateUpdated,
+                                                        IsDeleted
+                                                    )
+                                                    VALUES
+                                                    (   @Name,       -- Name - nvarchar(200)
+                                                        @Color,       -- Color - nvarchar(10)
+                                                        @Profit,         -- Profit - int
+                                                        @UserCreated,         -- UserCreated - int
+                                                        GETDATE(), -- DateCreated - datetime
+                                                        @UserUpdated,         -- UserUpdated - int
+                                                        GETDATE(), -- DateUpdated - datetime
+                                                        0       -- IsDeleted - bit
+                                                        )";
+
+        public const string CUSTOMER_VIP_UPDATE = @"UPDATE dbo.CustomerVip
+                                                    SET Name = @Name,
+                                                        Color = @Color,
+                                                        Profit = @Profit,
+                                                        UserUpdated = @UserUpdated,
+                                                        DateUpdated = GETDATE()
+                                                    WHERE Id = @Id
+                                                          AND IsDeleted = 0;";
+
+        public const string CUSTOMER_VIP_DELETE = @"UPDATE dbo.CustomerVip
+                                                    SET UserUpdated = @UserUpdated,
+                                                        DateUpdated = GETDATE(),
+                                                        IsDeleted = 1
+                                                    WHERE Id = @Id
+                                                          AND IsDeleted = 0;";
+
+        public const string CUSTOMER_VIP_CHECK_ID_INVALID = @"SELECT Id
+                                                              FROM dbo.CustomerVip
+                                                              WHERE Id = @Id
+                                                                    AND IsDeleted = 0;";
 
         #endregion
     }
