@@ -11,12 +11,12 @@ namespace Pelo.Api.Controllers
     [ApiController]
     public class CustomerVipController : BaseController
     {
-        private readonly ICustomerVipService _appConfigService;
+        private readonly ICustomerVipService _customerVipService;
 
         public CustomerVipController(IAccountService accountService,
-                                       ICustomerVipService appConfigService) : base(accountService)
+                                     ICustomerVipService customerVipService) : base(accountService)
         {
-            _appConfigService = appConfigService;
+            _customerVipService = customerVipService;
         }
 
         /// <summary>
@@ -28,8 +28,8 @@ namespace Pelo.Api.Controllers
         [Route("api/customer_vip")]
         public async Task<ActionResult<GetCustomerVipPagingResponse>> GetByPaging([FromQuery] GetCustomerVipPagingRequest request)
         {
-            return Ok(await _appConfigService.GetPaging(await GetUserId(),
-                                                        request));
+            return Ok(await _customerVipService.GetPaging(await GetUserId(),
+                                                          request));
         }
 
         /// <summary>
@@ -41,8 +41,8 @@ namespace Pelo.Api.Controllers
         [Route("api/customer_vip")]
         public async Task<ActionResult<bool>> Insert(InsertCustomerVipRequest request)
         {
-            return Ok(await _appConfigService.Insert(await GetUserId(),
-                                                     request));
+            return Ok(await _customerVipService.Insert(await GetUserId(),
+                                                       request));
         }
 
         /// <summary>
@@ -54,12 +54,12 @@ namespace Pelo.Api.Controllers
         [Route("api/customer_vip/{id}")]
         public async Task<ActionResult<GetCustomerVipByIdResponse>> GetById(int id)
         {
-            return Ok(await _appConfigService.GetById(await GetUserId(),
-                                                      id));
+            return Ok(await _customerVipService.GetById(await GetUserId(),
+                                                        id));
         }
 
         /// <summary>
-        ///     Cập nhật thông tin nhóm khách hàng
+        ///     Cập nhật thông tin nhóm khách hàng thân thiết
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -67,12 +67,12 @@ namespace Pelo.Api.Controllers
         [Route("api/customer_vip")]
         public async Task<ActionResult<bool>> Update(UpdateCustomerVipRequest request)
         {
-            return Ok(await _appConfigService.Update(await GetUserId(),
-                                                     request));
+            return Ok(await _customerVipService.Update(await GetUserId(),
+                                                       request));
         }
 
         /// <summary>
-        ///     Xóa nhóm khách hàng
+        ///     Xóa nhóm khách hàng thân thiết
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -80,8 +80,8 @@ namespace Pelo.Api.Controllers
         [Route("api/customer_vip/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {
-            return Ok(await _appConfigService.Delete(await GetUserId(),
-                                                     id));
+            return Ok(await _customerVipService.Delete(await GetUserId(),
+                                                       id));
         }
     }
 }

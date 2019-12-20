@@ -11,12 +11,12 @@ namespace Pelo.Api.Controllers
     [ApiController]
     public class CustomerGroupController : BaseController
     {
-        private readonly ICustomerGroupService _appConfigService;
+        private readonly ICustomerGroupService _customerGroupService;
 
         public CustomerGroupController(IAccountService accountService,
-                                       ICustomerGroupService appConfigService) : base(accountService)
+                                       ICustomerGroupService customerGroupService) : base(accountService)
         {
-            _appConfigService = appConfigService;
+            _customerGroupService = customerGroupService;
         }
 
         /// <summary>
@@ -28,8 +28,8 @@ namespace Pelo.Api.Controllers
         [Route("api/customer_group")]
         public async Task<ActionResult<GetCustomerGroupPagingResponse>> GetByPaging([FromQuery] GetCustomerGroupPagingRequest request)
         {
-            return Ok(await _appConfigService.GetPaging(await GetUserId(),
-                                                        request));
+            return Ok(await _customerGroupService.GetPaging(await GetUserId(),
+                                                            request));
         }
 
         /// <summary>
@@ -41,8 +41,8 @@ namespace Pelo.Api.Controllers
         [Route("api/customer_group")]
         public async Task<ActionResult<bool>> Insert(InsertCustomerGroupRequest request)
         {
-            return Ok(await _appConfigService.Insert(await GetUserId(),
-                                                     request));
+            return Ok(await _customerGroupService.Insert(await GetUserId(),
+                                                         request));
         }
 
         /// <summary>
@@ -54,8 +54,8 @@ namespace Pelo.Api.Controllers
         [Route("api/customer_group/{id}")]
         public async Task<ActionResult<GetCustomerGroupByIdResponse>> GetById(int id)
         {
-            return Ok(await _appConfigService.GetById(await GetUserId(),
-                                                      id));
+            return Ok(await _customerGroupService.GetById(await GetUserId(),
+                                                          id));
         }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace Pelo.Api.Controllers
         [Route("api/customer_group")]
         public async Task<ActionResult<bool>> Update(UpdateCustomerGroupRequest request)
         {
-            return Ok(await _appConfigService.Update(await GetUserId(),
-                                                     request));
+            return Ok(await _customerGroupService.Update(await GetUserId(),
+                                                         request));
         }
 
         /// <summary>
@@ -80,8 +80,8 @@ namespace Pelo.Api.Controllers
         [Route("api/customer_group/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {
-            return Ok(await _appConfigService.Delete(await GetUserId(),
-                                                     id));
+            return Ok(await _customerGroupService.Delete(await GetUserId(),
+                                                         id));
         }
     }
 }

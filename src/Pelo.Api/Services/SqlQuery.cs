@@ -1,7 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal;
-
-namespace Pelo.Api.Services
+﻿namespace Pelo.Api.Services
 {
     public class SqlQuery
     {
@@ -20,6 +17,41 @@ namespace Pelo.Api.Services
                                                           Name
                                                    FROM dbo.Department
                                                    WHERE IsDeleted = 0;";
+
+        #endregion
+
+        #region Province
+
+        public const string PROVINCE_GET_ALL = @"SELECT Id,
+                                                        Type,
+                                                        Name
+                                                 FROM dbo.Province
+                                                 WHERE IsDeleted = 0
+                                                 ORDER BY SortOrder;";
+
+        #endregion
+
+        #region District
+
+        public const string DISTRICT_GET_ALL = @"SELECT Id,
+                                                        Type,
+                                                        Name
+                                                 FROM dbo.District
+                                                 WHERE IsDeleted = 0
+                                                       AND ProvinceId = @ProvinceId
+                                                 ORDER BY SortOrder;";
+
+        #endregion
+
+        #region Ward
+
+        public const string WARD_GET_ALL = @"SELECT Id,
+                                                    Type,
+                                                    Name
+                                             FROM dbo.Ward
+                                             WHERE IsDeleted = 0
+                                                   AND DistrictId = @DistrictId
+                                             ORDER BY SortOrder;";
 
         #endregion
 
@@ -349,41 +381,6 @@ namespace Pelo.Api.Services
 
         #endregion
 
-        #region Province
-
-        public const string PROVINCE_GET_ALL = @"SELECT Id,
-                                                        Type,
-                                                        Name
-                                                 FROM dbo.Province
-                                                 WHERE IsDeleted = 0
-                                                 ORDER BY SortOrder;";
-
-        #endregion
-
-        #region District
-
-        public const string DISTRICT_GET_ALL = @"SELECT Id,
-                                                        Type,
-                                                        Name
-                                                 FROM dbo.District
-                                                 WHERE IsDeleted = 0
-                                                       AND ProvinceId = @ProvinceId
-                                                 ORDER BY SortOrder;";
-
-        #endregion
-
-        #region Ward
-
-        public const string WARD_GET_ALL = @"SELECT Id,
-                                                    Type,
-                                                    Name
-                                             FROM dbo.Ward
-                                             WHERE IsDeleted = 0
-                                                   AND DistrictId = @DistrictId
-                                             ORDER BY SortOrder;";
-
-        #endregion
-
         #region CustomerGroup
 
         public const string CUSTOMER_GROUP_GET_BY_PAGING = @"SELECT Id,
@@ -540,6 +537,229 @@ namespace Pelo.Api.Services
                                                               FROM dbo.CustomerVip
                                                               WHERE Id = @Id
                                                                     AND IsDeleted = 0;";
+
+        /// <summary>
+        ///     Lấy mức độ khách hàng thân thiết có lợi nhuận thấp nhất để tự động gán cho khách hàng khi thêm khách hàng mới
+        /// </summary>
+        public const string CUSTOMER_VIP_GET_DEFAULT = @"SELECT TOP 1
+                                                                Id
+                                                         FROM dbo.CustomerVip
+                                                         ORDER BY Profit;";
+
+        #endregion
+
+        #region Customer
+
+        public const string CUSTOMER_GET_BY_PAGING = @"SELECT c.Id,
+                                                              c.Code,
+                                                              c.Name,
+                                                              c.Phone,
+                                                              c.Phone2,
+                                                              c.Phone3,
+                                                              c.Email,
+                                                              p.Name AS Province,
+                                                              d.Name AS District,
+                                                              w.Name AS Ward,
+                                                              c.Address,
+                                                              c.Description,
+                                                              cg.Name AS CustomerGroup,
+                                                              cv.Name AS CustomerVip,
+                                                              c.DateUpdated
+                                                       FROM dbo.Customer c
+                                                           LEFT JOIN dbo.Province p
+                                                               ON p.Id = c.ProvinceId
+                                                           LEFT JOIN dbo.District d
+                                                               ON d.Id = c.DistrictId
+                                                           LEFT JOIN dbo.Ward w
+                                                               ON w.Id = c.WardId
+                                                           LEFT JOIN dbo.CustomerGroup cg
+                                                               ON cg.Id = c.CustomerGroupId
+                                                           LEFT JOIN dbo.CustomerVip cv
+                                                               ON cv.Id = c.CustomerVipId
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(c.Code, '') LIKE @Code
+                                                             AND
+                                                             (
+                                                                 ISNULL(c.Phone, '') LIKE @Phone
+                                                                 OR ISNULL(c.Phone2, '') LIKE @Phone
+                                                                 OR ISNULL(c.Phone3, '') LIKE @Phone
+                                                             )
+                                                             AND ISNULL(c.Email, '') LIKE @Email
+                                                             AND ISNULL(c.Address, '') COLLATE Latin1_General_CI_AI LIKE @Address COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @ProvinceId = 0
+                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @DistrictId = 0
+                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @WardId = 0
+                                                                 OR ISNULL(c.WardId, 0) = @WardId
+                                                             )
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} ASC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                       SELECT COUNT(*)
+                                                       FROM dbo.Customer c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 ISNULL(c.Phone, '') LIKE @Phone
+                                                                 OR ISNULL(c.Phone2, '') LIKE @Phone
+                                                                 OR ISNULL(c.Phone3, '') LIKE @Phone
+                                                             )
+                                                             AND ISNULL(c.Email, '') LIKE @Email
+                                                             AND ISNULL(c.Address, '') COLLATE Latin1_General_CI_AI LIKE @Address COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(c.Description, '') COLLATE Latin1_General_CI_AI LIKE @Description COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @ProvinceId = 0
+                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @DistrictId = 0
+                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @WardId = 0
+                                                                 OR ISNULL(c.WardId, 0) = @WardId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @CustomerGroupId = 0
+                                                                 OR ISNULL(c.CustomerGroupId, 0) = @CustomerGroupId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @CustomerVipId = 0
+                                                                 OR ISNULL(c.CustomerVipId, 0) = @CustomerVipId
+                                                             )
+                                                             AND c.IsDeleted = 0;";
+
+        public const string CUSTOMER_CHECK_PHONE_INVALID = @"SELECT Id
+                                                             FROM dbo.Customer
+                                                             WHERE (
+                                                                       Phone = @Phone
+                                                                       OR Phone2 = @Phone2
+                                                                       OR Phone3 = @Phone3
+                                                                   )
+                                                                   AND IsDeleted = 0;";
+
+        public const string CUSTOMER_CHECK_PHONE_INVALID_2 = @"SELECT Id
+                                                             FROM dbo.Customer
+                                                             WHERE (
+                                                                       Phone = @Phone
+                                                                       OR Phone2 = @Phone2
+                                                                       OR Phone3 = @Phone3
+                                                                   )
+                                                                   AND Id <> @Id
+                                                                   AND IsDeleted = 0;";
+
+        public const string CUSTOMER_CHECK_ID_INVALID = @"SELECT Id
+                                                          FROM dbo.Customer
+                                                          WHERE Id = @Id
+                                                                AND IsDeleted = 0;";
+
+        public const string CUSTOMER_COUNT_BY_DATE_CREATED = @"SELECT COUNT(Id)
+                                                               FROM dbo.Customer
+                                                               WHERE CAST(DateCreated AS DATE) = @DateCreated;";
+
+        public const string CUSTOMER_INSERT = @"INSERT dbo.Customer
+                                                (
+                                                    Code,
+                                                    Name,
+                                                    Phone,
+                                                    Email,
+                                                    WardId,
+                                                    Address,
+                                                    Description,
+                                                    UserCreated,
+                                                    DateCreated,
+                                                    UserUpdated,
+                                                    DateUpdated,
+                                                    IsDeleted,
+                                                    ProvinceId,
+                                                    DistrictId,
+                                                    CustomerGroupId,
+                                                    Phone2,
+                                                    Phone3,
+                                                    CustomerVipId,
+                                                    Profit,
+                                                    ProfitUpdate
+                                                )
+                                                VALUES
+                                                (   @Code,       -- Code - nvarchar(50)
+                                                    @Name,       -- Name - nvarchar(200)
+                                                    @Phone,       -- Phone - nvarchar(50)
+                                                    @Email,       -- Email - nvarchar(200)
+                                                    @WardId,         -- WardId - int
+                                                    @Address,       -- Address - nvarchar(max)
+                                                    @Description,       -- Description - nvarchar(max)
+                                                    @UserCreated,         -- UserCreated - int
+                                                    GETDATE(), -- DateCreated - datetime
+                                                    @UserUpdated,         -- UserUpdated - int
+                                                    GETDATE(), -- DateUpdated - datetime
+                                                    0,      -- IsDeleted - bit
+                                                    @ProvinceId,         -- ProvinceId - int
+                                                    @DistrictId,         -- DistrictId - int
+                                                    @CustomerGroupId,         -- CustomerGroupId - int
+                                                    @Phone2,       -- Phone2 - nvarchar(20)
+                                                    @Phone3,       -- Phone3 - nvarchar(20)
+                                                    @CustomerVipId,         -- CustomerVipId - int
+                                                    0,         -- Profit - int
+                                                    0          -- ProfitUpdate - int
+                                                    )";
+
+        public const string CUSTOMER_UPDATE = @"UPDATE dbo.Customer
+                                                SET Name = @Name,
+                                                    Phone = @Phone,
+                                                    Phone2 = @Phone2,
+                                                    Phone3 = @Phone3,
+                                                    Email = @Email,
+                                                    ProvinceId = @ProvinceId,
+                                                    DistrictId = @DistrictId,
+                                                    WardId = @WardId,
+                                                    Address = @Address,
+                                                    CustomerGroupId = @CustomerGroupId,
+                                                    Description = @Description,
+                                                    UserUpdated = @UserUpdated,
+                                                    DateUpdated = GETDATE()
+                                                WHERE Id = @Id
+                                                      AND IsDeleted = 0;";
+
+        public const string CUSTOMER_GET_BY_ID = @"SELECT Id,
+                                                          Code,
+                                                          Name,
+                                                          Phone,
+                                                          Phone2,
+                                                          Phone3,
+                                                          Email,
+                                                          ProvinceId,
+                                                          DistrictId,
+                                                          WardId,
+                                                          Address,
+                                                          CustomerGroupId,
+                                                          CustomerVipId,
+                                                          Profit,
+                                                          ProfitUpdate,
+                                                          Description
+                                                   FROM dbo.Customer
+                                                   WHERE Id = @Id
+                                                         AND IsDeleted = 0;";
+
+        public const string CUSTOMER_DELETE = @"UPDATE dbo.Customer
+                                                SET UserUpdated = @UserUpdated,
+                                                    DateUpdated = GETDATE(),
+                                                    IsDeleted = 1
+                                                WHERE Id = @Id
+                                                      AND IsDeleted = 0;";
 
         #endregion
     }

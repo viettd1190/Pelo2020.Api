@@ -52,6 +52,41 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CustomerController.GetByPaging(Pelo.Common.Dtos.Customer.GetCustomerPagingRequest)">
+            <summary>
+                Lấy danh sách khách hàng có phân trang
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CustomerController.Insert(Pelo.Common.Dtos.Customer.InsertCustomerRequest)">
+            <summary>
+                Thêm mới khách hàng
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CustomerController.GetById(System.Int32)">
+            <summary>
+                Lấy thông tin khách hàng
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CustomerController.Update(Pelo.Common.Dtos.Customer.UpdateCustomerRequest)">
+            <summary>
+                Cập nhật thông tin khách hàng
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CustomerController.Delete(System.Int32)">
+            <summary>
+                Xóa khách hàng
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CustomerGroupController.GetByPaging(Pelo.Common.Dtos.CustomerGroup.GetCustomerGroupPagingRequest)">
             <summary>
                 Lấy danh sách nhóm khách hàng có phân trang
@@ -110,14 +145,14 @@
         </member>
         <member name="M:Pelo.Api.Controllers.CustomerVipController.Update(Pelo.Common.Dtos.CustomerVip.UpdateCustomerVipRequest)">
             <summary>
-                Cập nhật thông tin nhóm khách hàng
+                Cập nhật thông tin nhóm khách hàng thân thiết
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.CustomerVipController.Delete(System.Int32)">
             <summary>
-                Xóa nhóm khách hàng
+                Xóa nhóm khách hàng thân thiết
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -214,6 +249,11 @@
             <typeparam name="T"></typeparam>
             <param name="message"></param>
             <returns></returns>
+        </member>
+        <member name="F:Pelo.Api.Services.SqlQuery.CUSTOMER_VIP_GET_DEFAULT">
+            <summary>
+                Lấy mức độ khách hàng thân thiết có lợi nhuận thấp nhất để tự động gán cho khách hàng khi thêm khách hàng mới
+            </summary>
         </member>
         <member name="M:Pelo.Api.Services.UserServices.UserService.Insert(System.Int32,Pelo.Common.Dtos.User.InsertUserRequest)">
             <summary>

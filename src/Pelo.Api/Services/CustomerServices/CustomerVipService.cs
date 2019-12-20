@@ -27,6 +27,8 @@ namespace Pelo.Api.Services.CustomerServices
 
         Task<TResponse<bool>> Delete(int userId,
                                      int id);
+
+        Task<TResponse<int>> GetDefault();
     }
 
     public class CustomerVipService : BaseService,
@@ -228,6 +230,25 @@ namespace Pelo.Api.Services.CustomerServices
             catch (Exception exception)
             {
                 return await Fail<bool>(exception);
+            }
+        }
+
+        public async Task<TResponse<int>> GetDefault()
+        {
+            try
+            {
+                var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_VIP_GET_DEFAULT,
+                                                                                    null);
+                if(result.IsSuccess)
+                {
+                    return await Ok(result.Data);
+                }
+
+                return await Fail<int>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<int>(exception);
             }
         }
 
