@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Pelo.Api.Services.CustomerServices;
 using Pelo.Api.Services.UserServices;
@@ -17,6 +18,17 @@ namespace Pelo.Api.Controllers
                                        ICustomerGroupService customerGroupService) : base(accountService)
         {
             _customerGroupService = customerGroupService;
+        }
+
+        /// <summary>
+        ///     Lấy tất cả nhóm khách hàng
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/customer_group/all")]
+        public async Task<ActionResult<IEnumerable<CustomerGroupSimpleModel>>> GetAll()
+        {
+            return Ok(await _customerGroupService.GetAll(await GetUserId()));
         }
 
         /// <summary>

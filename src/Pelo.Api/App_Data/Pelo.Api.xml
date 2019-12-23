@@ -87,6 +87,12 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CustomerGroupController.GetAll">
+            <summary>
+                Lấy tất cả nhóm khách hàng
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CustomerGroupController.GetByPaging(Pelo.Common.Dtos.CustomerGroup.GetCustomerGroupPagingRequest)">
             <summary>
                 Lấy danh sách nhóm khách hàng có phân trang
@@ -120,6 +126,12 @@
                 Xóa nhóm khách hàng
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CustomerVipController.GetAll">
+            <summary>
+                Lấy tất cả khách hàng thân thiết
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.CustomerVipController.GetByPaging(Pelo.Common.Dtos.CustomerVip.GetCustomerVipPagingRequest)">

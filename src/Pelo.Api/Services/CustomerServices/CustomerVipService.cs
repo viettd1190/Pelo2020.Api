@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Pelo.Api.Services.BaseServices;
@@ -29,6 +30,8 @@ namespace Pelo.Api.Services.CustomerServices
                                      int id);
 
         Task<TResponse<int>> GetDefault();
+
+        Task<TResponse<IEnumerable<CustomerVipSimpleModel>>> GetAll(int userId);
     }
 
     public class CustomerVipService : BaseService,
@@ -252,6 +255,30 @@ namespace Pelo.Api.Services.CustomerServices
             }
         }
 
+        public async Task<TResponse<IEnumerable<CustomerVipSimpleModel>>> GetAll(int userId)
+        {
+            try
+            {
+                var canGetAll = await CanGetAll(userId);
+                if(canGetAll.IsSuccess)
+                {
+                    var result = await ReadOnlyRepository.QueryAsync<CustomerVipSimpleModel>(SqlQuery.CUSTOMER_VIP_GET_ALL);
+                    if(result.IsSuccess)
+                    {
+                        return await Ok(result.Data);
+                    }
+
+                    return await Fail<IEnumerable<CustomerVipSimpleModel>>(result.Message);
+                }
+
+                return await Fail<IEnumerable<CustomerVipSimpleModel>>(canGetAll.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<IEnumerable<CustomerVipSimpleModel>>(exception);
+            }
+        }
+
         #endregion
 
         private async Task<TResponse<bool>> CanGetPaging(int userId)
@@ -425,6 +452,24 @@ namespace Pelo.Api.Services.CustomerServices
                     }
 
                     return await Fail<bool>(checkIdInvalid.Message);
+                }
+
+                return await Fail<bool>(checkPermission.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        private async Task<TResponse<bool>> CanGetAll(int userId)
+        {
+            try
+            {
+                var checkPermission = await _roleService.CheckPermission(userId);
+                if(checkPermission.IsSuccess)
+                {
+                    return await Ok(true);
                 }
 
                 return await Fail<bool>(checkPermission.Message);

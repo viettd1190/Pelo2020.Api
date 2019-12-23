@@ -449,6 +449,12 @@
                                                       WHERE Id = @Id
                                                             AND IsDeleted = 0;";
 
+        public const string CUSTOMER_GROUP_GET_ALL = @"SELECT Id,
+                                                              Name
+                                                       FROM dbo.CustomerGroup
+                                                       WHERE IsDeleted = 0
+                                                       ORDER BY Id;";
+
         #endregion
 
         #region CustomerVip
@@ -546,6 +552,12 @@
                                                          FROM dbo.CustomerVip
                                                          ORDER BY Profit;";
 
+        public const string CUSTOMER_VIP_GET_ALL = @"SELECT Id,
+                                                            Name
+                                                     FROM dbo.CustomerVip
+                                                     WHERE IsDeleted = 0
+                                                     ORDER BY Profit;";
+
         #endregion
 
         #region Customer
@@ -584,7 +596,7 @@
                                                                  OR ISNULL(c.Phone2, '') LIKE @Phone
                                                                  OR ISNULL(c.Phone3, '') LIKE @Phone
                                                              )
-                                                             AND ISNULL(c.Email, '') LIKE @Email
+                                                             -- AND ISNULL(c.Email, '') LIKE @Email
                                                              AND ISNULL(c.Address, '') COLLATE Latin1_General_CI_AI LIKE @Address COLLATE Latin1_General_CI_AI
                                                              AND
                                                              (
@@ -601,21 +613,31 @@
                                                                  @WardId = 0
                                                                  OR ISNULL(c.WardId, 0) = @WardId
                                                              )
+	                                                         AND
+                                                             (
+                                                                 @CustomerGroupId = 0
+                                                                 OR ISNULL(c.CustomerGroupId, 0) = @CustomerGroupId
+                                                             )
+	                                                         AND
+                                                             (
+                                                                 @CustomerVipId = 0
+                                                                 OR ISNULL(c.CustomerVipId, 0) = @CustomerVipId
+                                                             )
                                                              AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} ASC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
-
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                 
                                                        SELECT COUNT(*)
                                                        FROM dbo.Customer c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(c.Code, '') LIKE @Code
                                                              AND
                                                              (
                                                                  ISNULL(c.Phone, '') LIKE @Phone
                                                                  OR ISNULL(c.Phone2, '') LIKE @Phone
                                                                  OR ISNULL(c.Phone3, '') LIKE @Phone
                                                              )
-                                                             AND ISNULL(c.Email, '') LIKE @Email
+                                                             -- AND ISNULL(c.Email, '') LIKE @Email
                                                              AND ISNULL(c.Address, '') COLLATE Latin1_General_CI_AI LIKE @Address COLLATE Latin1_General_CI_AI
-                                                             AND ISNULL(c.Description, '') COLLATE Latin1_General_CI_AI LIKE @Description COLLATE Latin1_General_CI_AI
                                                              AND
                                                              (
                                                                  @ProvinceId = 0
@@ -631,12 +653,12 @@
                                                                  @WardId = 0
                                                                  OR ISNULL(c.WardId, 0) = @WardId
                                                              )
-                                                             AND
+	                                                         AND
                                                              (
                                                                  @CustomerGroupId = 0
                                                                  OR ISNULL(c.CustomerGroupId, 0) = @CustomerGroupId
                                                              )
-                                                             AND
+	                                                         AND
                                                              (
                                                                  @CustomerVipId = 0
                                                                  OR ISNULL(c.CustomerVipId, 0) = @CustomerVipId

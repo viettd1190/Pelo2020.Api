@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Pelo.Api.Services.CustomerServices;
 using Pelo.Api.Services.UserServices;
@@ -17,6 +18,17 @@ namespace Pelo.Api.Controllers
                                      ICustomerVipService customerVipService) : base(accountService)
         {
             _customerVipService = customerVipService;
+        }
+
+        /// <summary>
+        ///     Lấy tất cả khách hàng thân thiết
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/customer_vip/all")]
+        public async Task<ActionResult<IEnumerable<CustomerVipSimpleModel>>> GetAll()
+        {
+            return Ok(await _customerVipService.GetAll(await GetUserId()));
         }
 
         /// <summary>
