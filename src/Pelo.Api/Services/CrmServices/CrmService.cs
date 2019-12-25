@@ -161,7 +161,7 @@ namespace Pelo.Api.Services.CrmServices
                         foreach (var crm in result.Data.Item1)
                         {
                             crm.UserCares = new List<UserDisplaySimpleModel>();
-                            var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_GET_BY_CRM_ID,
+                            var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
                                                                                                      new
                                                                                                      {
                                                                                                              CrmId = crm.Id
