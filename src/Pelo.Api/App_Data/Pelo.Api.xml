@@ -52,6 +52,31 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CrmController.GetByPaging(Pelo.Common.Dtos.Crm.GetCrmPagingRequest)">
+            <summary>
+                Lấy danh sách CRM có phân trang
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmPriorityController.GetAll">
+            <summary>
+                Lấy tất cả mức độ khẩn cấp CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmStatusController.GetAll">
+            <summary>
+                Lấy tất cả trạng thái CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmTypeController.GetAll">
+            <summary>
+                Lấy tất cả kiểu chốt CRM
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CustomerController.GetByPaging(Pelo.Common.Dtos.Customer.GetCustomerPagingRequest)">
             <summary>
                 Lấy danh sách khách hàng có phân trang
@@ -128,6 +153,12 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CustomerSourceController.GetAll">
+            <summary>
+                Lấy tất cả nhóm sản phẩm
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CustomerVipController.GetAll">
             <summary>
                 Lấy tất cả khách hàng thân thiết
@@ -180,6 +211,12 @@
                 Lấy tất cả quận huyện của tỉnh thành
             </summary>
             <param name="id">Id tỉnh thành</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductGroupController.GetAll">
+            <summary>
+                Lấy tất cả nhóm sản phẩm
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.ProvinceController.GetAll">
@@ -262,9 +299,37 @@
             <param name="message"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Services.CrmServices.ICrmService.GetPaging(System.Int32,Pelo.Common.Dtos.Crm.GetCrmPagingRequest)">
+            <summary>
+                Kiểm tra xem user đó có quyền xem hết các CRM hay không.
+                Nếu ko thì gán lại UserCreated = userId
+            </summary>
+            <param name="userId"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.CrmServices.CrmService.GetPaging(System.Int32,Pelo.Common.Dtos.Crm.GetCrmPagingRequest)">
+            <summary>
+                Kiểm tra xem user đó có quyền xem hết các CRM hay không.
+                Nếu ko thì gán lại UserCreated = userId
+            </summary>
+            <param name="userId"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="F:Pelo.Api.Services.SqlQuery.CUSTOMER_VIP_GET_DEFAULT">
             <summary>
                 Lấy mức độ khách hàng thân thiết có lợi nhuận thấp nhất để tự động gán cho khách hàng khi thêm khách hàng mới
+            </summary>
+        </member>
+        <member name="F:Pelo.Api.Services.SqlQuery.CRM_GET_BY_PAGING">
+            <summary>
+            Lấy danh sách CRM ko có điều kiện UserCareId
+            </summary>
+        </member>
+        <member name="F:Pelo.Api.Services.SqlQuery.CRM_GET_BY_PAGING_2">
+            <summary>
+            Lấy danh sách CRM có điều kiện UserCareId
             </summary>
         </member>
         <member name="M:Pelo.Api.Services.UserServices.UserService.Insert(System.Int32,Pelo.Common.Dtos.User.InsertUserRequest)">
