@@ -238,7 +238,7 @@ namespace Pelo.Api.Services.CustomerServices
                 var canGetAll = await CanGetAll(userId);
                 if(canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryAsync<CustomerGroupSimpleModel>(SqlQuery.CUSTOMER_VIP_GET_ALL);
+                    var result = await ReadOnlyRepository.QueryAsync<CustomerGroupSimpleModel>(SqlQuery.CUSTOMER_GROUP_GET_ALL);
                     if(result.IsSuccess)
                     {
                         return await Ok(result.Data);

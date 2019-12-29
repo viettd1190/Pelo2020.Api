@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Pelo.Api.Services.BaseServices;
+using Pelo.Api.Services.MasterServices;
 using Pelo.Common.Dtos.User;
 using Pelo.Common.Enums;
 using Pelo.Common.Extensions;
@@ -28,6 +31,10 @@ namespace Pelo.Api.Services.UserServices
 
         Task<TResponse<bool>> Delete(int userId,
                                      int id);
+
+        Task<TResponse<IEnumerable<UserDisplaySimpleModel>>> GetAll();
+
+        Task<TResponse<bool>> IsBelongDefaultCrmRole(int userId);
     }
 
     public class UserService : BaseService,
@@ -35,14 +42,18 @@ namespace Pelo.Api.Services.UserServices
     {
         private readonly IRoleService _roleService;
 
+        private IAppConfigService _appConfigService;
+
         public UserService(IDapperReadOnlyRepository readOnlyRepository,
                            IDapperWriteRepository writeRepository,
+                           IAppConfigService appConfigService,
                            IRoleService roleService,
                            IHttpContextAccessor contextAccessor) : base(readOnlyRepository,
                                                                         writeRepository,
                                                                         contextAccessor)
         {
             _roleService = roleService;
+            _appConfigService = appConfigService;
         }
 
         #region IUserService Members
@@ -270,6 +281,49 @@ namespace Pelo.Api.Services.UserServices
                 }
 
                 return await Fail<bool>(canDelete.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        public async Task<TResponse<IEnumerable<UserDisplaySimpleModel>>> GetAll()
+        {
+            try
+            {
+                var result = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.USER_GET_ALL);
+                if(result.IsSuccess)
+                {
+                    return await Ok(result.Data);
+                }
+
+                return await Fail<IEnumerable<UserDisplaySimpleModel>>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<IEnumerable<UserDisplaySimpleModel>>(exception);
+            }
+        }
+
+        public async Task<TResponse<bool>> IsBelongDefaultCrmRole(int userId)
+        {
+            try
+            {
+                var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
+                if (canGetAllCrm.IsSuccess)
+                {
+                    var defaultRoles = canGetAllCrm.Message.Split(" ");
+                    var currentRole = await _roleService.GetNameByUserId(userId);
+                    if (currentRole.IsSuccess
+                        && !string.IsNullOrEmpty(currentRole.Data)
+                        && defaultRoles.Contains(currentRole.Data))
+                    {
+                        return await Ok(true);
+                    }
+                }
+                return await Fail<bool>(string.Empty);
+
             }
             catch (Exception exception)
             {

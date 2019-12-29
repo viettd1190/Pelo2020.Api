@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.User;
@@ -81,6 +82,28 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _userService.Delete(await GetUserId(),
                                                 id));
+        }
+
+        /// <summary>
+        ///     Lấy danh sách tất cả user
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/user/all")]
+        public async Task<ActionResult<IEnumerable<UserDisplaySimpleModel>>> GetAll()
+        {
+            return Ok(await _userService.GetAll());
+        }
+
+        /// <summary>
+        ///     Kiểm tra xem user có thuộc quyền được xem tất cả crm hay không
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/user/crm_default")]
+        public async Task<ActionResult<bool>> IsBelongCrmDefaultRole()
+        {
+            return Ok(await _userService.IsBelongDefaultCrmRole(await GetUserId()));
         }
     }
 }

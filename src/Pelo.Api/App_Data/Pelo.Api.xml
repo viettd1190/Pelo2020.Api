@@ -267,6 +267,18 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.UserController.GetAll">
+            <summary>
+                Lấy danh sách tất cả user
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.UserController.IsBelongCrmDefaultRole">
+            <summary>
+                Kiểm tra xem user có thuộc quyền được xem tất cả crm hay không
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.WardController.GetAll(System.Int32)">
             <summary>
                 Lấy tất cả phường xã của quận huyện

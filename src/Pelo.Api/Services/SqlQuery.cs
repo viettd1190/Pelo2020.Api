@@ -244,6 +244,11 @@
                                                WHERE   Id = @Id
                                                        AND IsDeleted = 0";
 
+        public const string USER_GET_ALL = @"SELECT Id,
+                                                    DisplayName
+                                             FROM   dbo.[User]
+                                             WHERE  IsDeleted = 0;";
+
         #endregion
 
         #region Account
