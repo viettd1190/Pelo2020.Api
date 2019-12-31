@@ -27,6 +27,9 @@ namespace Pelo.Api.Services.CustomerServices
 
         Task<TResponse<bool>> Delete(int userId,
                                      int id);
+
+        Task<TResponse<CustomerByPhoneResponse>> GetByPhone(int userId,
+                                                            string phone);
     }
 
     public class CustomerService : BaseService,
@@ -63,14 +66,14 @@ namespace Pelo.Api.Services.CustomerServices
                                                                                                                              request.SortDir.ToUpper()),
                                                                                                                new
                                                                                                                {
-                                                                                                                       Code = $"%{request.Code+""}%",
-                                                                                                                       Name = $"%{request.Name+""}%",
-                                                                                                                       ProvinceId=request.ProvinceId??0,
-                                                                                                                       DistrictId=request.DistrictId??0,
-                                                                                                                       WardId=request.WardId??0,
-                                                                                                                       Address = $"%{request.Address+""}%",
-                                                                                                                       Phone = $"%{request.Phone+""}%",
-                                                                                                                       Email = $"%{request.Email+""}%",
+                                                                                                                       Code = $"%{request.Code + ""}%",
+                                                                                                                       Name = $"%{request.Name + ""}%",
+                                                                                                                       ProvinceId = request.ProvinceId ?? 0,
+                                                                                                                       DistrictId = request.DistrictId ?? 0,
+                                                                                                                       WardId = request.WardId ?? 0,
+                                                                                                                       Address = $"%{request.Address + ""}%",
+                                                                                                                       Phone = $"%{request.Phone + ""}%",
+                                                                                                                       Email = $"%{request.Email + ""}%",
                                                                                                                        request.CustomerGroupId,
                                                                                                                        request.CustomerVipId,
                                                                                                                        Skip = (request.Page - 1) * request.PageSize,
@@ -275,7 +278,59 @@ namespace Pelo.Api.Services.CustomerServices
             }
         }
 
+        public async Task<TResponse<CustomerByPhoneResponse>> GetByPhone(int userId,
+                                                                         string phone)
+        {
+            try
+            {
+                var canGetByPhone = await CanGetByPhone(userId);
+                if(canGetByPhone.IsSuccess)
+                {
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CustomerByPhoneResponse>(SqlQuery.CUSTOMER_GET_BY_PHONE,
+                                                                                                            new
+                                                                                                            {
+                                                                                                                    Phone = phone
+                                                                                                            });
+                    if(result.IsSuccess)
+                    {
+                        if(result.Data != null)
+                        {
+                            return await Ok(result.Data);
+                        }
+
+                        return await Fail<CustomerByPhoneResponse>(ErrorEnum.CUSTOMER_HAS_NOT_EXIST.GetStringValue());
+                    }
+
+                    return await Fail<CustomerByPhoneResponse>(result.Message);
+                }
+
+                return await Fail<CustomerByPhoneResponse>(canGetByPhone.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<CustomerByPhoneResponse>(exception);
+            }
+        }
+
         #endregion
+
+        private async Task<TResponse<bool>> CanGetByPhone(int userId)
+        {
+            try
+            {
+                var checkPermission = await _roleService.CheckPermission(userId);
+                if(checkPermission.IsSuccess)
+                {
+                    return await Ok(true);
+                }
+
+                return await Fail<bool>(checkPermission.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
 
         private async Task<TResponse<bool>> CanGetPaging(int userId)
         {

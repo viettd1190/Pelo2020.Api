@@ -83,5 +83,18 @@ namespace Pelo.Api.Controllers
             return Ok(await _customerService.Delete(await GetUserId(),
                                                     id));
         }
+
+        /// <summary>
+        ///     Tìm kiếm khách hàng theo số điện thoại
+        /// </summary>
+        /// <param name="phone"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/customer/get_by_phone")]
+        public async Task<ActionResult<CustomerByPhoneResponse>> GetByPhone(string phone)
+        {
+            return Ok(await _customerService.GetByPhone(await GetUserId(),
+                                                        phone));
+        }
     }
 }

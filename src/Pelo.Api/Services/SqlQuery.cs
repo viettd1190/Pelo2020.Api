@@ -796,6 +796,40 @@
                                                 WHERE Id = @Id
                                                       AND IsDeleted = 0;";
 
+        public const string CUSTOMER_GET_BY_PHONE = @"SELECT c.Id,
+                                                             c.Code,
+                                                             c.Name,
+                                                             c.Address,
+                                                             p.Type AS ProvinceType,
+                                                             p.Name AS Province,
+                                                             d.Type AS DistrictType,
+                                                             d.Name AS District,
+                                                             w.Type AS WardType,
+                                                             w.Name AS Ward,
+                                                             c.Description,
+                                                             cg.Name AS CustomerGroup,
+                                                             cv.Name AS CustomerVip,
+                                                             c.Phone,
+                                                             c.Phone2,
+                                                             c.Phone3
+                                                      FROM dbo.Customer c
+                                                          LEFT JOIN dbo.Province p
+                                                              ON p.Id = c.ProvinceId
+                                                          LEFT JOIN dbo.District d
+                                                              ON d.Id = c.DistrictId
+                                                          LEFT JOIN dbo.Ward w
+                                                              ON w.Id = c.WardId
+                                                          LEFT JOIN dbo.CustomerGroup cg
+                                                              ON cg.Id = c.CustomerGroupId
+                                                          LEFT JOIN dbo.CustomerVip cv
+                                                              ON cv.Id = c.CustomerVipId
+                                                      WHERE (
+                                                                c.Phone = @Phone
+                                                                OR c.Phone2 = @Phone
+                                                                OR c.Phone3 = @Phone
+                                                            )
+                                                            AND c.IsDeleted = 0;";
+
         #endregion
 
         #region CrmType
