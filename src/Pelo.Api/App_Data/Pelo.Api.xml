@@ -119,6 +119,13 @@
             <param name="phone"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CustomerController.GetDetail(System.Int32)">
+            <summary>
+                Lấy thông tin chi tiết khách hàng
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CustomerGroupController.GetAll">
             <summary>
                 Lấy tất cả nhóm khách hàng

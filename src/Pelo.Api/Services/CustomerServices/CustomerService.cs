@@ -30,6 +30,9 @@ namespace Pelo.Api.Services.CustomerServices
 
         Task<TResponse<CustomerByPhoneResponse>> GetByPhone(int userId,
                                                             string phone);
+
+        Task<TResponse<GetCustomerDetailResponse>> GetDetail(int userId,
+                                                             int id);
     }
 
     public class CustomerService : BaseService,
@@ -312,6 +315,40 @@ namespace Pelo.Api.Services.CustomerServices
             }
         }
 
+        public async Task<TResponse<GetCustomerDetailResponse>> GetDetail(int userId,
+                                                                          int id)
+        {
+            try
+            {
+                var canGetDetail = await CanGetDetail(userId);
+                if(canGetDetail.IsSuccess)
+                {
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCustomerDetailResponse>(SqlQuery.CUSTOMER_GET_DETAIL,
+                                                                                                              new
+                                                                                                              {
+                                                                                                                      Id = id
+                                                                                                              });
+                    if(result.IsSuccess)
+                    {
+                        if(result.Data!=null)
+                        {
+                            return await Ok(result.Data);
+                        }
+
+                        return await Fail<GetCustomerDetailResponse>(ErrorEnum.CUSTOMER_HAS_NOT_EXIST.GetStringValue());
+                    }
+
+                    return await Fail<GetCustomerDetailResponse>(result.Message);
+                }
+
+                return await Fail<GetCustomerDetailResponse>(canGetDetail.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<GetCustomerDetailResponse>(exception);
+            }
+        }
+
         #endregion
 
         private async Task<TResponse<bool>> CanGetByPhone(int userId)
@@ -414,7 +451,9 @@ namespace Pelo.Api.Services.CustomerServices
                     var checkPhoneInvalid = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_CHECK_PHONE_INVALID,
                                                                                                    new
                                                                                                    {
-                                                                                                           request.Phone
+                                                                                                           request.Phone,
+                                                                                                           request.Phone2,
+                                                                                                           request.Phone3
                                                                                                    });
                     if(checkPhoneInvalid.IsSuccess)
                     {
@@ -470,6 +509,8 @@ namespace Pelo.Api.Services.CustomerServices
                                                                                                            new
                                                                                                            {
                                                                                                                    request.Phone,
+                                                                                                                   request.Phone2,
+                                                                                                                   request.Phone3,
                                                                                                                    request.Id
                                                                                                            });
                             if(checkPhoneInvalid.IsSuccess)
@@ -523,6 +564,24 @@ namespace Pelo.Api.Services.CustomerServices
                     }
 
                     return await Fail<bool>(checkIdInvalid.Message);
+                }
+
+                return await Fail<bool>(checkPermission.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        private async Task<TResponse<bool>> CanGetDetail(int userId)
+        {
+            try
+            {
+                var checkPermission = await _roleService.CheckPermission(userId);
+                if (checkPermission.IsSuccess)
+                {
+                    return await Ok(true);
                 }
 
                 return await Fail<bool>(checkPermission.Message);

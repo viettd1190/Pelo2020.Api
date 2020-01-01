@@ -830,6 +830,59 @@
                                                             )
                                                             AND c.IsDeleted = 0;";
 
+        public const string CUSTOMER_GET_DETAIL = @"SELECT c.Id,
+                                                           c.Code,
+                                                           c.Name,
+                                                           c.Phone,
+                                                           c.Phone2,
+                                                           c.Phone3,
+                                                           c.Email,
+                                                           c.Address,
+                                                           p.Type AS ProvinceType,
+                                                           p.Name AS Province,
+                                                           d.Type AS DistrictType,
+                                                           d.Name AS District,
+                                                           w.Type AS WardType,
+                                                           w.Name AS Ward,
+                                                           cg.Name AS CustomerGroup,
+                                                           cv.Name AS CustomerVip,
+                                                           c.Profit,
+                                                           c.ProfitUpdate,
+                                                           u1.DisplayName AS UserCare,
+                                                           u1.PhoneNumber AS UserCarePhone,
+                                                           u2.DisplayName AS UserFirst,
+                                                           u2.PhoneNumber AS UserFirstPhone,
+                                                           c.Description,
+                                                           u3.DisplayName AS UserCreated,
+                                                           u3.PhoneNumber AS UserCreatedPhone,
+                                                           c.DateCreated,
+                                                           c.DateUpdated
+                                                    FROM dbo.Customer c
+                                                        LEFT JOIN dbo.Province p
+                                                            ON p.Id = c.ProvinceId
+                                                        LEFT JOIN dbo.District d
+                                                            ON d.Id = c.DistrictId
+                                                        LEFT JOIN dbo.Ward w
+                                                            ON w.Id = c.WardId
+                                                        LEFT JOIN dbo.CustomerGroup cg
+                                                            ON cg.Id = c.CustomerGroupId
+                                                        LEFT JOIN dbo.CustomerVip cv
+                                                            ON cv.Id = c.CustomerVipId
+                                                        LEFT JOIN dbo.CustomerUser cu1
+                                                            ON cu1.CustomerId = c.Id
+                                                               AND cu1.Type = 1 --ban dang phu trach
+                                                        LEFT JOIN dbo.CustomerUser cu2
+                                                            ON cu2.CustomerId = c.Id
+                                                               AND cu2.Type = 2 --nguon giup quen biet khach lan dau
+                                                        LEFT JOIN dbo.[User] u1
+                                                            ON u1.Id = cu1.UserId
+                                                        LEFT JOIN dbo.[User] u2
+                                                            ON u2.Id = cu2.UserId
+                                                        LEFT JOIN dbo.[User] u3
+                                                            ON u3.Id = c.UserCreated
+                                                    WHERE c.Id = @Id
+                                                          AND c.IsDeleted = 0;";
+
         #endregion
 
         #region CrmType
