@@ -23,4 +23,10 @@
     <ProjectReference Include="..\..\..\Pelo.Common\src\Pelo.Common\Pelo.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="App_Data\Pelo.Api.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
