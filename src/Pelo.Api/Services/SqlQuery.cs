@@ -812,7 +812,8 @@
                                                              cv.Name AS CustomerVip,
                                                              c.Phone,
                                                              c.Phone2,
-                                                             c.Phone3
+                                                             c.Phone3,
+                                                             u.DisplayName AS UserCreated
                                                       FROM dbo.Customer c
                                                           LEFT JOIN dbo.Province p
                                                               ON p.Id = c.ProvinceId
@@ -824,6 +825,8 @@
                                                               ON cg.Id = c.CustomerGroupId
                                                           LEFT JOIN dbo.CustomerVip cv
                                                               ON cv.Id = c.CustomerVipId
+                                                          LEFT JOIN dbo.User u
+                                                              ON u.Id = c.UserCreated
                                                       WHERE (
                                                                 c.Phone = @Phone
                                                                 OR c.Phone2 = @Phone
