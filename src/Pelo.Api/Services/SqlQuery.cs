@@ -825,7 +825,7 @@
                                                               ON cg.Id = c.CustomerGroupId
                                                           LEFT JOIN dbo.CustomerVip cv
                                                               ON cv.Id = c.CustomerVipId
-                                                          LEFT JOIN dbo.User u
+                                                          LEFT JOIN dbo.[User] u
                                                               ON u.Id = c.UserCreated
                                                       WHERE (
                                                                 c.Phone = @Phone
