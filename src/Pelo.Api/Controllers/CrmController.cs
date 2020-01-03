@@ -31,5 +31,18 @@ namespace Pelo.Api.Controllers
             return Ok(await _crmService.GetPaging(await GetUserId(),
                                                   request));
         }
+
+        /// <summary>
+        ///     Them CRM
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/crm")]
+        public async Task<ActionResult<InsertCrmResponse>> InsertCrm([FromQuery] InsertCrmRequest request)
+        {
+            return Ok(await _crmService.InsertCrm(await GetUserId(),
+                                                  request));
+        }
     }
 }

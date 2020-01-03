@@ -56,6 +56,7 @@
         #endregion
 
         #region User
+        public const string USER_FIND_BY_USERNAME = @"SELECT Id FROM dbo.[User] WHERE Username = @Username AND IsDeleted = 0";
 
         public const string USER_GET_BY_PAGING = @"SELECT u.Id,
                                                           u.Code,
@@ -935,6 +936,29 @@
         #endregion
 
         #region Crm
+        public const string CRM_USER_INSERT = @"INSERT dbo.CrmUser
+                                                        (
+                                                            CrmId,
+                                                            UserId,
+                                                            Type,
+                                                            UserCreated,
+                                                            DateCreated,
+                                                            UserUpdated,
+                                                            DateUpdated,
+                                                            IsDeleted
+                                                        )
+                                                        VALUES
+                                                        (   @CrmId,
+                                                            @UserId,
+                                                            @Type,
+                                                            @UserCreated,
+                                                            @DateCreated,
+                                                            @UserUpdated,
+                                                            @DateUpdated,
+                                                            0 );
+                                                        SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string CRM_COUNT_BY_DATE = @"SELECT COUNT(*) FROM dbo.Crm WHERE Code LIKE @Code";
 
         /// <summary>
         /// Lấy danh sách CRM ko có điều kiện UserCareId
@@ -1266,7 +1290,44 @@
                                                                   AND cu.Type = 0
                                                                   AND cu.IsDeleted = 0
                                                                   AND u.IsDeleted = 0;";
-
+        public const string CRM_INSERT = @"INSERT dbo.Crm
+                                                    (
+                                                        CustomerId,
+                                                        CrmStatusId,
+                                                        ContactDate,
+                                                        ProductGroupId,
+                                                        CrmPriorityId,
+                                                        CrmTypeId,
+                                                        Need,
+                                                        Description,
+                                                        CustomerSourceId,
+                                                        Code,
+                                                        Visit,
+                                                        UserCreated,
+                                                        DateCreated,
+                                                        UserUpdated,
+                                                        DateUpdated,
+                                                        IsDeleted
+                                                    )
+                                                    VALUES
+                                                    (   @CustomerId,         -- CustomerId - int
+                                                        @CrmStatusId,         -- CrmStatusId - int
+                                                        @ContactDate, -- ContactDate - datetime
+                                                        @ProductGroupId,         -- ProductGroupId - int
+                                                        @CrmPriorityId,         -- CrmPriorityId - int
+                                                        @CrmTypeId,         -- CrmPriorityId - int
+                                                        @Need,        -- Need - text
+                                                        @Description,       -- Description - nvarchar(300)
+                                                        @CustomerSourceId,         -- CustomerSourceId - int
+                                                        @Code,       -- Code - nvarchar(20)
+                                                        @Visit,         -- Visit - int
+                                                        @UserCreated,         -- UserCreated - int
+                                                        @DateCreated, -- DateCreated - datetime
+                                                        @UserUpdated,         -- UserUpdated - int
+                                                        @DateUpdated, -- DateUpdated - datetime
+                                                        0       -- IsDeleted - bit
+                                                        );
+                                            SELECT CAST(SCOPE_IDENTITY() as int);";
         #endregion
     }
 }

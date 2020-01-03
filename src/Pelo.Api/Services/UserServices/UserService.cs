@@ -35,6 +35,7 @@ namespace Pelo.Api.Services.UserServices
         Task<TResponse<IEnumerable<UserDisplaySimpleModel>>> GetAll();
 
         Task<TResponse<bool>> IsBelongDefaultCrmRole(int userId);
+        Task<TResponse<UserDisplaySimpleModel>> GetByUsername(string name);
     }
 
     public class UserService : BaseService,
@@ -567,6 +568,33 @@ namespace Pelo.Api.Services.UserServices
                 foreach (var b in hashedInputBytes)
                     hashedInputStringBuilder.Append(b.ToString("X2"));
                 return hashedInputStringBuilder.ToString();
+            }
+        }
+
+        public async Task<TResponse<UserDisplaySimpleModel>> GetByUsername(string username)
+        {
+            try
+            {
+                var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<UserDisplaySimpleModel>(SqlQuery.USER_FIND_BY_USERNAME,
+                                                                                          new
+                                                                                          {
+                                                                                              Username = username
+                                                                                          });
+                if (result.IsSuccess)
+                {
+                    if (result.Data != null)
+                    {
+                        return await Ok(result.Data);
+                    }
+
+                    return await Fail<UserDisplaySimpleModel>(ErrorEnum.USER_HAS_NOT_EXIST.GetStringValue());
+                }
+
+                return await Fail<UserDisplaySimpleModel>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<UserDisplaySimpleModel>(exception);
             }
         }
     }

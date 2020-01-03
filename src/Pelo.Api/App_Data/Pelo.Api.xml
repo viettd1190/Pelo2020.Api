@@ -59,6 +59,13 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CrmController.InsertCrm(Pelo.Common.Dtos.Crm.InsertCrmRequest)">
+            <summary>
+                Them CRM
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CrmPriorityController.GetAll">
             <summary>
                 Lấy tất cả mức độ khẩn cấp CRM
@@ -334,7 +341,25 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Services.CrmServices.ICrmService.InsertCrm(System.Int32,Pelo.Common.Dtos.Crm.InsertCrmRequest)">
+            <summary>
+                Kiểm tra xem user đó có quyền add CRM hay không.
+                Nếu ko thì gán lại UserCreated = userId
+            </summary>
+            <param name="userId"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Services.CrmServices.CrmService.GetPaging(System.Int32,Pelo.Common.Dtos.Crm.GetCrmPagingRequest)">
+            <summary>
+                Kiểm tra xem user đó có quyền xem hết các CRM hay không.
+                Nếu ko thì gán lại UserCreated = userId
+            </summary>
+            <param name="userId"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.CrmServices.CrmService.InsertCrm(System.Int32,Pelo.Common.Dtos.Crm.InsertCrmRequest)">
             <summary>
                 Kiểm tra xem user đó có quyền xem hết các CRM hay không.
                 Nếu ko thì gán lại UserCreated = userId
