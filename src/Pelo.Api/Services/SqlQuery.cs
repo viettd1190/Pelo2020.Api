@@ -813,7 +813,8 @@
                                                              c.Phone,
                                                              c.Phone2,
                                                              c.Phone3,
-                                                             u.DisplayName AS UserCreated
+                                                             u.DisplayName AS UserCreated,
+                                                             c.DateCreated
                                                       FROM dbo.Customer c
                                                           LEFT JOIN dbo.Province p
                                                               ON p.Id = c.ProvinceId
