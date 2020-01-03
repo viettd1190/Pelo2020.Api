@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pelo.Api.Services.CrmServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.Crm;
+using Pelo.Common.Models;
 
 namespace Pelo.Api.Controllers
 {
@@ -43,6 +44,18 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _crmService.InsertCrm(await GetUserId(),
                                                   request));
+        }
+
+        [HttpGet]
+        [Route("api/crm/get_by_customer")]
+        public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> GetByCustomerId(int customerId,
+                                                                                          int page,
+                                                                                          int pageSize)
+        {
+            return Ok(await _crmService.GetByCustomerId(await GetUserId(),
+                                                        customerId,
+                                                        page,
+                                                        pageSize));
         }
     }
 }

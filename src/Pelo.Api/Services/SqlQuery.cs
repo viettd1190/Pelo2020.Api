@@ -928,6 +928,16 @@
 
         #endregion
 
+        #region ProductUnit
+
+        public const string PRODUCT_UNIT_GET_ALL = @"SELECT Id,
+                                                            Name
+                                                     FROM dbo.ProductUnit
+                                                     WHERE IsDeleted = 0
+                                                     ORDER BY Id;";
+
+        #endregion
+
         #region CrmPriority
 
         public const string CRM_PRIORITY_GET_ALL = @"SELECT Id,
@@ -1221,8 +1231,8 @@
                                                               @UserCreatedId = 0
                                                               OR ISNULL(c.UserCreated, 0) = @UserCreatedId
                                                           )
-                                                          AND crm.UserId = @UserCareId
-                                                          AND crm.IsDeleted = 0
+                                                          AND cru.UserId = @UserCareId
+                                                          AND cru.IsDeleted = 0
                                                           AND c.IsDeleted = 0;
       
                                                     SELECT c.Id,
@@ -1293,6 +1303,7 @@
                                                                   AND cu.Type = 0
                                                                   AND cu.IsDeleted = 0
                                                                   AND u.IsDeleted = 0;";
+
         public const string CRM_INSERT = @"INSERT dbo.Crm
                                                     (
                                                         CustomerId,
@@ -1331,6 +1342,271 @@
                                                         0       -- IsDeleted - bit
                                                         );
                                             SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        /// <summary>
+        /// Lấy danh sách CRM của khách hàng đối với những user được quyền xem tất cả CRM
+        /// </summary>
+        public const string CRM_GET_BY_CUSTOMER_ID = @"DROP TABLE IF EXISTS #tmpCrm;
+
+                                                       SELECT c.Id
+                                                       INTO #tmpCrm
+                                                       FROM dbo.Crm c
+                                                           LEFT JOIN dbo.Customer cu
+                                                               ON cu.Id = c.CustomerId
+                                                       WHERE c.CustomerId = @CustomerId
+                                                             AND cu.IsDeleted = 0
+                                                             AND c.IsDeleted = 0;
+                          
+                          
+                                                       SELECT c.Id,
+                                                              c.Code,
+                                                              cs.Name AS CrmStatus,
+                                                              cs.Color AS CrmStatusColor,
+                                                              cu.Name AS CustomerName,
+                                                              cu.Phone AS CustomerPhone,
+                                                              cu.Phone2 AS CustomerPhone2,
+                                                              cu.Phone3 AS CustomerPhone3,
+                                                              cu.Address AS CustomerAddress,
+                                                              p.Name AS Province,
+                                                              d.Name AS District,
+                                                              w.Name AS Ward,
+                                                              cg.Name AS CustomerGroup,
+                                                              cv.Name AS CustomerVip,
+                                                              c.Need,
+                                                              c.Description,
+                                                              pg.Name AS ProductGroup,
+                                                              cp.Name AS CrmPriority,
+                                                              cus.Name AS CustomerSource,
+                                                              ct.Name AS CrmType,
+                                                              c.Visit,
+                                                              u.DisplayName AS UserCreated,
+                                                              u.PhoneNumber AS UserCreatedPhone,
+                                                              c.ContactDate,
+                                                              c.DateCreated
+                                                       FROM #tmpCrm t
+                                                           INNER JOIN dbo.Crm c
+                                                               ON c.Id = t.Id
+                                                           LEFT JOIN dbo.CrmStatus cs
+                                                               ON cs.Id = c.CrmStatusId
+                                                           LEFT JOIN dbo.CrmPriority cp
+                                                               ON cp.Id = c.CrmPriorityId
+                                                           LEFT JOIN dbo.CrmType ct
+                                                               ON ct.Id = c.CrmTypeId
+                                                           LEFT JOIN dbo.Customer cu
+                                                               ON cu.Id = c.CustomerId
+                                                           LEFT JOIN dbo.Province p
+                                                               ON p.Id = cu.ProvinceId
+                                                           LEFT JOIN dbo.District d
+                                                               ON d.Id = cu.DistrictId
+                                                           LEFT JOIN dbo.Ward w
+                                                               ON w.Id = cu.WardId
+                                                           LEFT JOIN dbo.CustomerGroup cg
+                                                               ON cg.Id = cu.CustomerGroupId
+                                                           LEFT JOIN dbo.CustomerSource cus
+                                                               ON cus.Id = c.CustomerSourceId
+                                                           LEFT JOIN dbo.CustomerVip cv
+                                                               ON cv.Id = cu.CustomerVipId
+                                                           LEFT JOIN dbo.ProductGroup pg
+                                                               ON pg.Id = c.ProductGroupId
+                                                           LEFT JOIN dbo.[User] u
+                                                               ON u.Id = c.UserCreated
+                                                       ORDER BY c.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                          
+                                                       SELECT COUNT(*)
+                                                       FROM #tmpCrm;
+                          
+                                                       DROP TABLE #tmpCrm;";
+
+        /// <summary>
+        /// Lấy danh sách CRM của khách hàng đối với những user không có quyền xem hết tất cả CRM
+        /// </summary>
+        public const string CRM_GET_BY_CUSTOMER_ID_2 = @"DROP TABLE IF EXISTS #tmpCrm;
+
+                                                         SELECT c.Id
+                                                         INTO #tmpCrm
+                                                         FROM dbo.Crm c
+                                                             LEFT JOIN dbo.Customer cu
+                                                                 ON cu.Id = c.CustomerId
+                                                             INNER JOIN dbo.CrmUser cru
+                                                                 ON cru.CrmId = c.Id
+                                                         WHERE c.CustomerId = @CustomerId
+                                                               AND cru.UserId = @UserCareId
+                                                               AND cu.IsDeleted = 0
+                                                               AND cru.IsDeleted = 0
+                                                               AND c.IsDeleted = 0;
+                
+                                                         SELECT c.Id,
+                                                                c.Code,
+                                                                cs.Name AS CrmStatus,
+                                                                cs.Color AS CrmStatusColor,
+                                                                cu.Name AS CustomerName,
+                                                                cu.Phone AS CustomerPhone,
+                                                                cu.Phone2 AS CustomerPhone2,
+                                                                cu.Phone3 AS CustomerPhone3,
+                                                                cu.Address AS CustomerAddress,
+                                                                p.Name AS Province,
+                                                                d.Name AS District,
+                                                                w.Name AS Ward,
+                                                                cg.Name AS CustomerGroup,
+                                                                cv.Name AS CustomerVip,
+                                                                c.Need,
+                                                                c.Description,
+                                                                pg.Name AS ProductGroup,
+                                                                cp.Name AS CrmPriority,
+                                                                cus.Name AS CustomerSource,
+                                                                ct.Name AS CrmType,
+                                                                c.Visit,
+                                                                u.DisplayName AS UserCreated,
+                                                                u.PhoneNumber AS UserCreatedPhone,
+                                                                c.ContactDate,
+                                                                c.DateCreated
+                                                         FROM #tmpCrm t
+                                                             INNER JOIN dbo.Crm c
+                                                                 ON c.Id = t.Id
+                                                             LEFT JOIN dbo.CrmStatus cs
+                                                                 ON cs.Id = c.CrmStatusId
+                                                             LEFT JOIN dbo.CrmPriority cp
+                                                                 ON cp.Id = c.CrmPriorityId
+                                                             LEFT JOIN dbo.CrmType ct
+                                                                 ON ct.Id = c.CrmTypeId
+                                                             LEFT JOIN dbo.Customer cu
+                                                                 ON cu.Id = c.CustomerId
+                                                             LEFT JOIN dbo.Province p
+                                                                 ON p.Id = cu.ProvinceId
+                                                             LEFT JOIN dbo.District d
+                                                                 ON d.Id = cu.DistrictId
+                                                             LEFT JOIN dbo.Ward w
+                                                                 ON w.Id = cu.WardId
+                                                             LEFT JOIN dbo.CustomerGroup cg
+                                                                 ON cg.Id = cu.CustomerGroupId
+                                                             LEFT JOIN dbo.CustomerSource cus
+                                                                 ON cus.Id = c.CustomerSourceId
+                                                             LEFT JOIN dbo.CustomerVip cv
+                                                                 ON cv.Id = cu.CustomerVipId
+                                                             LEFT JOIN dbo.ProductGroup pg
+                                                                 ON pg.Id = c.ProductGroupId
+                                                             LEFT JOIN dbo.[User] u
+                                                                 ON u.Id = c.UserCreated
+                                                         ORDER BY c.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                
+                                                         SELECT COUNT(*)
+                                                         FROM #tmpCrm;
+                
+                                                         DROP TABLE #tmpCrm;";
+
+        #endregion
+
+        #region PayMethod
+
+        public const string PAY_METHOD_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.PayMethod 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.PayMethod 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string PAY_METHOD_GET_BY_ID = @"SELECT Id, Name FROM dbo.PayMethod WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string PAY_METHOD_GET_ALL = "SELECT Id, Name FROM dbo.PayMethod WHERE IsDeleted = 0";
+
+        public const string PAY_METHOD_INSERT = @"INSERT dbo.PayMethod
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string PAY_METHOD_UPDATE = @"  UPDATE dbo.PayMethod
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string PAY_METHOD_DELETE = @"  UPDATE dbo.PayMethod
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string PAY_METHOD_FIND_BY_NAME = @"SELECT * FROM dbo.PayMethod WHERE Name = @Name AND IsDeleted = 0";
+
+        public const string PAY_METHOD_FIND_BY_NAME_AND_ID = @"SELECT * FROM dbo.PayMethod WHERE Name = @Name AND Id <> @Id AND IsDeleted = 0";
+
+        #endregion
+
+        #region InvoiceStatus
+
+        public const string INVOICE_STATUS_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.InvoiceStatus 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.InvoiceStatus 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string INVOICE_STATUS_GET_BY_ID = @"SELECT * FROM dbo.InvoiceStatus WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string INVOICE_STATUS_GET_ALL = "SELECT Id, Name FROM dbo.InvoiceStatus WHERE IsDeleted = 0";
+
+        public const string INVOICE_STATUS_INSERT = @"INSERT dbo.InvoiceStatus
+                                                        (Name,
+                                                         Color,
+                                                         IsSendSms,
+                                                         SmsContent,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @IsSendSms,
+                                                         @SmsContent,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string INVOICE_STATUS_UPDATE = @"  UPDATE dbo.InvoiceStatus
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                      IsSendSms = @IsSendSms,
+                                                      SmsContent = @SmsContent,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string INVOICE_STATUS_DELETE = @"  UPDATE dbo.InvoiceStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string INVOICE_STATUS_FIND_BY_NAME = @"SELECT * FROM dbo.InvoiceStatus WHERE Name = @Name AND IsDeleted = 0";
+
+        public const string INVOICE_STATUS_FIND_BY_NAME_AND_ID = @"SELECT * FROM dbo.InvoiceStatus WHERE Name = @Name AND Id <> @Id AND IsDeleted = 0";
+
         #endregion
     }
 }

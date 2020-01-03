@@ -4,55 +4,55 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Pelo.Api.Services.BaseServices;
 using Pelo.Api.Services.UserServices;
-using Pelo.Common.Dtos.CrmType;
+using Pelo.Common.Dtos.ProductGroup;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
-namespace Pelo.Api.Services.CustomerServices
+namespace Pelo.Api.Services.MasterServices
 {
-    public interface ICrmTypeService
+    public interface IProductGroupService
     {
-        Task<TResponse<IEnumerable<CrmTypeSimpleModel>>> GetAll(int userId);
+        Task<TResponse<IEnumerable<ProductGroupSimpleModel>>> GetAll(int userId);
     }
 
-    public class CrmTypeService : BaseService,
-                                  ICrmTypeService
+    public class ProductGroupService : BaseService,
+                                       IProductGroupService
     {
         readonly IRoleService _roleService;
 
-        public CrmTypeService(IDapperReadOnlyRepository readOnlyRepository,
-                              IDapperWriteRepository writeRepository,
-                              IHttpContextAccessor context,
-                              IRoleService roleService) : base(readOnlyRepository,
-                                                               writeRepository,
-                                                               context)
+        public ProductGroupService(IDapperReadOnlyRepository readOnlyRepository,
+                                   IDapperWriteRepository writeRepository,
+                                   IHttpContextAccessor context,
+                                   IRoleService roleService) : base(readOnlyRepository,
+                                                                    writeRepository,
+                                                                    context)
         {
             _roleService = roleService;
         }
 
-        #region ICrmTypeService Members
+        #region IProductGroupService Members
 
-        public async Task<TResponse<IEnumerable<CrmTypeSimpleModel>>> GetAll(int userId)
+        public async Task<TResponse<IEnumerable<ProductGroupSimpleModel>>> GetAll(int userId)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if(canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryAsync<CrmTypeSimpleModel>(SqlQuery.CRM_TYPE_GET_ALL);
+                    var result = await ReadOnlyRepository.QueryAsync<ProductGroupSimpleModel>(SqlQuery.PRODUCT_GROUP_GET_ALL);
                     if(result.IsSuccess)
                     {
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<IEnumerable<CrmTypeSimpleModel>>(result.Message);
+                    return await Fail<IEnumerable<ProductGroupSimpleModel>>(result.Message);
                 }
 
-                return await Fail<IEnumerable<CrmTypeSimpleModel>>(canGetAll.Message);
+                return await Fail<IEnumerable<ProductGroupSimpleModel>>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<IEnumerable<CrmTypeSimpleModel>>(exception);
+                return await Fail<IEnumerable<ProductGroupSimpleModel>>(exception);
             }
         }
 
