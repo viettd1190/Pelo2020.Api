@@ -252,6 +252,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.ProductUnitController.GetAll">
+            <summary>
+                Lấy tất cả đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.ProvinceController.GetAll">
             <summary>
                 Lấy tất cả tỉnh thành

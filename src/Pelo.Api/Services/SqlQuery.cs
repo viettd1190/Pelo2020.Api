@@ -1608,5 +1608,142 @@
         public const string INVOICE_STATUS_FIND_BY_NAME_AND_ID = @"SELECT * FROM dbo.InvoiceStatus WHERE Name = @Name AND Id <> @Id AND IsDeleted = 0";
 
         #endregion
+
+        #region Invoice
+
+        public const string INVOICE_GET_BY_CUSTOMER_ID = @"SELECT i.Id,
+                                                                  ins.Name AS InvoiceStatus,
+                                                                  ins.Color AS InvoiceStatusColor,
+                                                                  i.Code,
+                                                                  c.Name AS CustomerName,
+                                                                  c.Phone AS CustomerPhone,
+                                                                  c.Phone2 AS CustomerPhone2,
+                                                                  c.Phone3 AS CustomerPhone3,
+                                                                  p.Type + ' ' + p.Name AS Province,
+                                                                  d.Type + ' ' + d.Name AS District,
+                                                                  w.Type + ' ' + w.Name AS Ward,
+                                                                  c.Address AS CustomerAddress,
+                                                                  c.Code AS CustomerCode,
+                                                                  b.Name AS Branch,
+                                                                  u2.DisplayName AS UserCreated,
+                                                                  u2.PhoneNumber AS UserCreatedPhone,
+                                                                  u.DisplayName AS UserSell,
+                                                                  u.PhoneNumber AS UserSellPhone,
+                                                                  i.DeliveryDate,
+                                                                  i.DateCreated
+                                                           FROM dbo.Invoice i
+                                                               INNER JOIN dbo.Customer c
+                                                                   ON c.Id = i.CustomerId
+                                                               INNER JOIN dbo.Branch b
+                                                                   ON b.Id = i.BranchId
+                                                               INNER JOIN dbo.InvoiceStatus ins
+                                                                   ON ins.Id = i.InvoiceStatusId
+                                                               INNER JOIN dbo.[User] u
+                                                                   ON u.Id = i.UserSellId
+                                                               INNER JOIN dbo.[User] u2
+                                                                   ON u2.Id = i.UserCreated
+                                                               LEFT JOIN dbo.Province p
+                                                                   ON c.ProvinceId = p.Id
+                                                               LEFT JOIN dbo.District d
+                                                                   ON c.DistrictId = d.Id
+                                                               LEFT JOIN dbo.Ward w
+                                                                   ON c.WardId = c.Id
+                                                           WHERE i.CustomerId = @CustomerId
+                                                                 AND i.IsDeleted = 0
+                                                                 AND c.IsDeleted = 0
+                                                           ORDER BY i.Id DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                    
+                                                           SELECT COUNT(*)
+                                                           FROM dbo.Invoice i
+                                                               INNER JOIN dbo.Customer c
+                                                                   ON c.Id = i.CustomerId
+                                                           WHERE i.CustomerId = @CustomerId
+                                                                 AND i.IsDeleted = 0
+                                                                 AND c.IsDeleted = 0;";
+
+        public const string INVOICE_GET_BY_CUSTOMER_ID_2 = @"SELECT i.Id,
+                                                                    ins.Name AS InvoiceStatus,
+                                                                    ins.Color AS InvoiceStatusColor,
+                                                                    i.Code,
+                                                                    c.Name AS CustomerName,
+                                                                    c.Phone AS CustomerPhone,
+                                                                    c.Phone2 AS CustomerPhone2,
+                                                                    c.Phone3 AS CustomerPhone3,
+                                                                    p.Type + ' ' + p.Name AS Province,
+                                                                    d.Type + ' ' + d.Name AS District,
+                                                                    w.Type + ' ' + w.Name AS Ward,
+                                                                    c.Address AS CustomerAddress,
+                                                                    c.Code AS CustomerCode,
+                                                                    b.Name AS Branch,
+                                                                    u2.DisplayName AS UserCreated,
+                                                                    u2.PhoneNumber AS UserCreatedPhone,
+                                                                    u.DisplayName AS UserSell,
+                                                                    u.PhoneNumber AS UserSellPhone,
+                                                                    i.DeliveryDate,
+                                                                    i.DateCreated
+                                                             FROM dbo.Invoice i
+                                                                 INNER JOIN dbo.Customer c
+                                                                     ON c.Id = i.CustomerId
+                                                                 INNER JOIN dbo.Branch b
+                                                                     ON b.Id = i.BranchId
+                                                                 INNER JOIN dbo.InvoiceStatus ins
+                                                                     ON ins.Id = i.InvoiceStatusId
+                                                                 INNER JOIN dbo.[User] u
+                                                                     ON u.Id = i.UserSellId
+                                                                 INNER JOIN dbo.[User] u2
+                                                                     ON u2.Id = i.UserCreated
+                                                                 LEFT JOIN dbo.Province p
+                                                                     ON c.ProvinceId = p.Id
+                                                                 LEFT JOIN dbo.District d
+                                                                     ON c.DistrictId = d.Id
+                                                                 LEFT JOIN dbo.Ward w
+                                                                     ON c.WardId = c.Id
+                                                                 LEFT JOIN dbo.UserInInvoice uii
+                                                                     ON c.Id = uii.InvoiceId
+                                                             WHERE i.CustomerId = @CustomerId
+                                                                   AND
+                                                                   (
+                                                                       i.UserSellId = @UserId
+                                                                       OR i.UserCreated = @UserId
+                                                                       OR uii.UserId = @UserId
+                                                                   )
+                                                                   AND i.IsDeleted = 0
+                                                                   AND c.IsDeleted = 0
+                                                             ORDER BY i.Id DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                        
+                                                             SELECT COUNT(*)
+                                                             FROM dbo.Invoice i
+                                                                 INNER JOIN dbo.Customer c
+                                                                     ON c.Id = i.CustomerId
+                                                                 LEFT JOIN dbo.UserInInvoice uii
+                                                                     ON c.Id = uii.InvoiceId
+                                                             WHERE i.CustomerId = @CustomerId
+                                                                   AND
+                                                                   (
+                                                                       i.UserSellId = @UserId
+                                                                       OR i.UserCreated = @UserId
+                                                                       OR uii.UserId = @UserId
+                                                                   )
+                                                                   AND i.IsDeleted = 0
+                                                                   AND c.IsDeleted = 0;";
+
+        public const string INVOICE_USER_DELIVERY_GET_BY_CRM_ID = @"SELECT u.DisplayName,
+                                                                   u.PhoneNumber
+                                                            FROM dbo.UserInInvoice uii
+                                                                INNER JOIN dbo.[User] u
+                                                                    ON uii.UserId = u.Id
+                                                            WHERE uii.InvoiceId = @InvoiceId
+                                                                  AND uii.Type = 0
+                                                                  AND uii.IsDeleted = 0
+                                                                  AND u.IsDeleted = 0;";
+
+        public const string PRODUCTS_IN_INVOICE_GET_BY_INVOICE_ID = @"SELECT Id,
+                                                                             ProductName AS Name,
+                                                                             Description
+                                                                      FROM dbo.ProductInInvoice
+                                                                      WHERE InvoiceId = @InvoiceId
+                                                                            AND IsDeleted = 0;";
+
+        #endregion
     }
 }
