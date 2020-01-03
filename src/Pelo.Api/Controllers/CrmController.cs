@@ -39,7 +39,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("api/crm")]
-        public async Task<ActionResult<InsertCrmResponse>> InsertCrm([FromQuery] InsertCrmRequest request)
+        public async Task<ActionResult<bool>> InsertCrm([FromQuery] InsertCrmRequest request)
         {
             return Ok(await _crmService.InsertCrm(await GetUserId(),
                                                   request));
