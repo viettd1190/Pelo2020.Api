@@ -265,7 +265,7 @@ namespace Pelo.Api.Services.CrmServices
                                                                                    request.CustomerSourceId,
                                                                                    request.CrmPriorityId,
                                                                                    request.CrmTypeId,
-                                                                                   Code = crmCodeResponse.Data,
+                                                                                   request.Code,
                                                                                    request.Visit,
                                                                                    UserCreated = userId,
                                                                                    DateCreated = DateTime.Now,
