@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Pelo.Api.Services.CustomerServices;
+using Pelo.Api.Services.MasterServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.ProductGroup;
 

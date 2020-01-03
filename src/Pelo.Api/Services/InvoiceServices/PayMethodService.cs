@@ -4,23 +4,23 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Pelo.Api.Services.BaseServices;
 using Pelo.Api.Services.UserServices;
-using Pelo.Common.Dtos.CrmStatus;
+using Pelo.Common.Dtos.PayMethod;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
-namespace Pelo.Api.Services.CustomerServices
+namespace Pelo.Api.Services.InvoiceServices
 {
-    public interface ICrmStatusService
+    public interface IPayMethodService
     {
-        Task<TResponse<IEnumerable<CrmStatusSimpleModel>>> GetAll(int userId);
+        Task<TResponse<IEnumerable<PayMethodSimpleModel>>> GetAll(int userId);
     }
 
-    public class CrmStatusService : BaseService,
-                                    ICrmStatusService
+    public class PayMethodService : BaseService,
+                                    IPayMethodService
     {
-        readonly IRoleService _roleService;
+        private readonly IRoleService _roleService;
 
-        public CrmStatusService(IDapperReadOnlyRepository readOnlyRepository,
+        public PayMethodService(IDapperReadOnlyRepository readOnlyRepository,
                                 IDapperWriteRepository writeRepository,
                                 IHttpContextAccessor context,
                                 IRoleService roleService) : base(readOnlyRepository,
@@ -30,29 +30,29 @@ namespace Pelo.Api.Services.CustomerServices
             _roleService = roleService;
         }
 
-        #region ICrmStatusService Members
+        #region IPayMethodService Members
 
-        public async Task<TResponse<IEnumerable<CrmStatusSimpleModel>>> GetAll(int userId)
+        public async Task<TResponse<IEnumerable<PayMethodSimpleModel>>> GetAll(int userId)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if(canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryAsync<CrmStatusSimpleModel>(SqlQuery.CRM_STATUS_GET_ALL);
+                    var result = await ReadOnlyRepository.QueryAsync<PayMethodSimpleModel>(SqlQuery.PAY_METHOD_GET_ALL);
                     if(result.IsSuccess)
                     {
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<IEnumerable<CrmStatusSimpleModel>>(result.Message);
+                    return await Fail<IEnumerable<PayMethodSimpleModel>>(result.Message);
                 }
 
-                return await Fail<IEnumerable<CrmStatusSimpleModel>>(canGetAll.Message);
+                return await Fail<IEnumerable<PayMethodSimpleModel>>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<IEnumerable<CrmStatusSimpleModel>>(exception);
+                return await Fail<IEnumerable<PayMethodSimpleModel>>(exception);
             }
         }
 

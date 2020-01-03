@@ -234,6 +234,18 @@
             <param name="id">Id tỉnh thành</param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.GetAll">
+            <summary>
+                Lấy tất cả trạng thái đơn hàng
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.PayMethodController.GetAll">
+            <summary>
+                Lấy tất cả hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.ProductGroupController.GetAll">
             <summary>
                 Lấy tất cả nhóm sản phẩm

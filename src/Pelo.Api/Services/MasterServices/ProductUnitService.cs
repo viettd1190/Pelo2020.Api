@@ -4,55 +4,55 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Pelo.Api.Services.BaseServices;
 using Pelo.Api.Services.UserServices;
-using Pelo.Common.Dtos.ProductGroup;
+using Pelo.Common.Dtos.ProductUnit;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
-namespace Pelo.Api.Services.CustomerServices
+namespace Pelo.Api.Services.MasterServices
 {
-    public interface IProductGroupService
+    public interface IProductUnitService
     {
-        Task<TResponse<IEnumerable<ProductGroupSimpleModel>>> GetAll(int userId);
+        Task<TResponse<IEnumerable<ProductUnitSimpleModel>>> GetAll(int userId);
     }
 
-    public class ProductGroupService : BaseService,
-                                       IProductGroupService
+    public class ProductUnitService : BaseService,
+                                      IProductUnitService
     {
         readonly IRoleService _roleService;
 
-        public ProductGroupService(IDapperReadOnlyRepository readOnlyRepository,
-                                   IDapperWriteRepository writeRepository,
-                                   IHttpContextAccessor context,
-                                   IRoleService roleService) : base(readOnlyRepository,
-                                                                    writeRepository,
-                                                                    context)
+        public ProductUnitService(IDapperReadOnlyRepository readOnlyRepository,
+                                  IDapperWriteRepository writeRepository,
+                                  IHttpContextAccessor context,
+                                  IRoleService roleService) : base(readOnlyRepository,
+                                                                   writeRepository,
+                                                                   context)
         {
             _roleService = roleService;
         }
 
-        #region IProductGroupService Members
+        #region IProductUnitService Members
 
-        public async Task<TResponse<IEnumerable<ProductGroupSimpleModel>>> GetAll(int userId)
+        public async Task<TResponse<IEnumerable<ProductUnitSimpleModel>>> GetAll(int userId)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if(canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryAsync<ProductGroupSimpleModel>(SqlQuery.PRODUCT_GROUP_GET_ALL);
+                    var result = await ReadOnlyRepository.QueryAsync<ProductUnitSimpleModel>(SqlQuery.PRODUCT_UNIT_GET_ALL);
                     if(result.IsSuccess)
                     {
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<IEnumerable<ProductGroupSimpleModel>>(result.Message);
+                    return await Fail<IEnumerable<ProductUnitSimpleModel>>(result.Message);
                 }
 
-                return await Fail<IEnumerable<ProductGroupSimpleModel>>(canGetAll.Message);
+                return await Fail<IEnumerable<ProductUnitSimpleModel>>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<IEnumerable<ProductGroupSimpleModel>>(exception);
+                return await Fail<IEnumerable<ProductUnitSimpleModel>>(exception);
             }
         }
 

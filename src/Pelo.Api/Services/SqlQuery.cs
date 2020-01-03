@@ -928,6 +928,16 @@
 
         #endregion
 
+        #region ProductUnit
+
+        public const string PRODUCT_UNIT_GET_ALL = @"SELECT Id,
+                                                            Name
+                                                     FROM dbo.ProductUnit
+                                                     WHERE IsDeleted = 0
+                                                     ORDER BY Id;";
+
+        #endregion
+
         #region CrmPriority
 
         public const string CRM_PRIORITY_GET_ALL = @"SELECT Id,
@@ -1483,6 +1493,119 @@
                                                          FROM #tmpCrm;
                 
                                                          DROP TABLE #tmpCrm;";
+
+        #endregion
+
+        #region PayMethod
+
+        public const string PAY_METHOD_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.PayMethod 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.PayMethod 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string PAY_METHOD_GET_BY_ID = @"SELECT Id, Name FROM dbo.PayMethod WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string PAY_METHOD_GET_ALL = "SELECT Id, Name FROM dbo.PayMethod WHERE IsDeleted = 0";
+
+        public const string PAY_METHOD_INSERT = @"INSERT dbo.PayMethod
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string PAY_METHOD_UPDATE = @"  UPDATE dbo.PayMethod
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string PAY_METHOD_DELETE = @"  UPDATE dbo.PayMethod
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string PAY_METHOD_FIND_BY_NAME = @"SELECT * FROM dbo.PayMethod WHERE Name = @Name AND IsDeleted = 0";
+
+        public const string PAY_METHOD_FIND_BY_NAME_AND_ID = @"SELECT * FROM dbo.PayMethod WHERE Name = @Name AND Id <> @Id AND IsDeleted = 0";
+
+        #endregion
+
+        #region InvoiceStatus
+
+        public const string INVOICE_STATUS_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.InvoiceStatus 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.InvoiceStatus 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string INVOICE_STATUS_GET_BY_ID = @"SELECT * FROM dbo.InvoiceStatus WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string INVOICE_STATUS_GET_ALL = "SELECT Id, Name FROM dbo.InvoiceStatus WHERE IsDeleted = 0";
+
+        public const string INVOICE_STATUS_INSERT = @"INSERT dbo.InvoiceStatus
+                                                        (Name,
+                                                         Color,
+                                                         IsSendSms,
+                                                         SmsContent,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @IsSendSms,
+                                                         @SmsContent,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string INVOICE_STATUS_UPDATE = @"  UPDATE dbo.InvoiceStatus
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                      IsSendSms = @IsSendSms,
+                                                      SmsContent = @SmsContent,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string INVOICE_STATUS_DELETE = @"  UPDATE dbo.InvoiceStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string INVOICE_STATUS_FIND_BY_NAME = @"SELECT * FROM dbo.InvoiceStatus WHERE Name = @Name AND IsDeleted = 0";
+
+        public const string INVOICE_STATUS_FIND_BY_NAME_AND_ID = @"SELECT * FROM dbo.InvoiceStatus WHERE Name = @Name AND Id <> @Id AND IsDeleted = 0";
 
         #endregion
     }
