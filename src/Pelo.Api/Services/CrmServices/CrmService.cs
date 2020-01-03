@@ -256,21 +256,21 @@ namespace Pelo.Api.Services.CrmServices
                     var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CRM_INSERT,
                                                                                new
                                                                                {
-                                                                                   request.CustomerId,
-                                                                                   request.CrmStatusId,
-                                                                                   request.ContactDate,
-                                                                                   request.ProductGroupId,
-                                                                                   request.Need,
-                                                                                   request.Description,
-                                                                                   request.CustomerSourceId,
-                                                                                   request.CrmPriorityId,
-                                                                                   request.CrmTypeId,
-                                                                                   request.Code,
-                                                                                   request.Visit,
-                                                                                   UserCreated = userId,
-                                                                                   DateCreated = DateTime.Now,
-                                                                                   UserUpdated = userId,
-                                                                                   DateUpdated = DateTime.Now
+                                                                                       request.CustomerId,
+                                                                                       request.CrmStatusId,
+                                                                                       request.ContactDate,
+                                                                                       request.ProductGroupId,
+                                                                                       request.Need,
+                                                                                       request.Description,
+                                                                                       request.CustomerSourceId,
+                                                                                       request.CrmPriorityId,
+                                                                                       request.CrmTypeId,
+                                                                                       Code = crmCodeResponse.Data,
+                                                                                       request.Visit,
+                                                                                       UserCreated = userId,
+                                                                                       DateCreated = DateTime.Now,
+                                                                                       UserUpdated = userId,
+                                                                                       DateUpdated = DateTime.Now
                                                                                });
                     if (result.IsSuccess)
                     {
