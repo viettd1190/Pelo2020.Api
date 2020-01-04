@@ -105,5 +105,16 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _userService.IsBelongDefaultCrmRole(await GetUserId()));
         }
+
+        /// <summary>
+        ///     Kiểm tra xem user có thuộc quyền được xem tất cả đơn hàng hay không
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/user/invoice_default")]
+        public async Task<ActionResult<bool>> IsBelongInvoiceDefaultRole()
+        {
+            return Ok(await _userService.IsBelongDefaultInvoiceRole(await GetUserId()));
+        }
     }
 }
