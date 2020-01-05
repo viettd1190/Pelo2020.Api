@@ -317,7 +317,7 @@ namespace Pelo.Api.Services.UserServices
                 var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
                 if(canGetAllCrm.IsSuccess)
                 {
-                    var defaultRoles = canGetAllCrm.Message.Split(" ");
+                    var defaultRoles = canGetAllCrm.Data.Split(" ");
                     var currentRole = await _roleService.GetNameByUserId(userId);
                     if(currentRole.IsSuccess
                        && !string.IsNullOrEmpty(currentRole.Data)
@@ -342,7 +342,7 @@ namespace Pelo.Api.Services.UserServices
                 var canGetAllInvoice = await _appConfigService.GetByName("DefaultInvoiceAcceptRoles");
                 if(canGetAllInvoice.IsSuccess)
                 {
-                    var defaultRoles = canGetAllInvoice.Message.Split(" ");
+                    var defaultRoles = canGetAllInvoice.Data.Split(" ");
                     var currentRole = await _roleService.GetNameByUserId(userId);
                     if(currentRole.IsSuccess
                        && !string.IsNullOrEmpty(currentRole.Data)

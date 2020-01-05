@@ -318,6 +318,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.UserController.IsBelongInvoiceDefaultRole">
+            <summary>
+                Kiểm tra xem user có thuộc quyền được xem tất cả đơn hàng hay không
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.WardController.GetAll(System.Int32)">
             <summary>
                 Lấy tất cả phường xã của quận huyện
