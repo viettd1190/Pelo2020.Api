@@ -31,5 +31,18 @@ namespace Pelo.Api.Controllers
                                                             page,
                                                             pageSize));
         }
+
+        /// <summary>
+        ///     Lấy danh sách đơn hàng có phân trang
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/invoice")]
+        public async Task<ActionResult<GetInvoicePagingResponse>> GetByPaging([FromQuery] GetInvoicePagingRequest request)
+        {
+            return Ok(await _invoiceService.GetPaging(await GetUserId(),
+                                                      request));
+        }
     }
 }

@@ -55,7 +55,67 @@
 
         #endregion
 
+        #region CrmType
+
+        public const string CRM_TYPE_GET_ALL = @"SELECT Id,
+                                                        Name
+                                                 FROM dbo.CrmType
+                                                 WHERE IsDeleted = 0;";
+
+        #endregion
+
+        #region CrmStatus
+
+        public const string CRM_STATUS_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.CrmStatus
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        #endregion
+
+        #region CustomerSource
+
+        public const string CUSTOMER_SOURCE_GET_ALL = @"SELECT Id,
+                                                               Name
+                                                        FROM dbo.CustomerSource
+                                                        WHERE IsDeleted = 0
+                                                        ORDER BY Id;";
+
+        #endregion
+
+        #region ProductGroup
+
+        public const string PRODUCT_GROUP_GET_ALL = @"SELECT Id,
+                                                                Name
+                                                         FROM dbo.ProductGroup
+                                                         WHERE IsDeleted = 0
+                                                         ORDER BY Id;";
+
+        #endregion
+
+        #region ProductUnit
+
+        public const string PRODUCT_UNIT_GET_ALL = @"SELECT Id,
+                                                            Name
+                                                     FROM dbo.ProductUnit
+                                                     WHERE IsDeleted = 0
+                                                     ORDER BY Id;";
+
+        #endregion
+
+        #region CrmPriority
+
+        public const string CRM_PRIORITY_GET_ALL = @"SELECT Id,
+                                                            Name
+                                                     FROM dbo.CrmPriority
+                                                     WHERE IsDeleted = 0
+                                                     ORDER BY Id;";
+
+        #endregion
+
         #region User
+
         public const string USER_FIND_BY_USERNAME = @"SELECT Id FROM dbo.[User] WHERE Username = @Username AND IsDeleted = 0";
 
         public const string USER_GET_BY_PAGING = @"SELECT u.Id,
@@ -890,66 +950,8 @@
 
         #endregion
 
-        #region CrmType
-
-        public const string CRM_TYPE_GET_ALL = @"SELECT Id,
-                                                        Name
-                                                 FROM dbo.CrmType
-                                                 WHERE IsDeleted = 0;";
-
-        #endregion
-
-        #region CrmStatus
-
-        public const string CRM_STATUS_GET_ALL = @"SELECT Id,
-                                                          Name
-                                                   FROM dbo.CrmStatus
-                                                   WHERE IsDeleted = 0
-                                                   ORDER BY Id;";
-
-        #endregion
-
-        #region CustomerSource
-
-        public const string CUSTOMER_SOURCE_GET_ALL = @"SELECT Id,
-                                                               Name
-                                                        FROM dbo.CustomerSource
-                                                        WHERE IsDeleted = 0
-                                                        ORDER BY Id;";
-
-        #endregion
-
-        #region ProductGroup
-
-        public const string PRODUCT_GROUP_GET_ALL = @"SELECT Id,
-                                                                Name
-                                                         FROM dbo.ProductGroup
-                                                         WHERE IsDeleted = 0
-                                                         ORDER BY Id;";
-
-        #endregion
-
-        #region ProductUnit
-
-        public const string PRODUCT_UNIT_GET_ALL = @"SELECT Id,
-                                                            Name
-                                                     FROM dbo.ProductUnit
-                                                     WHERE IsDeleted = 0
-                                                     ORDER BY Id;";
-
-        #endregion
-
-        #region CrmPriority
-
-        public const string CRM_PRIORITY_GET_ALL = @"SELECT Id,
-                                                            Name
-                                                     FROM dbo.CrmPriority
-                                                     WHERE IsDeleted = 0
-                                                     ORDER BY Id;";
-
-        #endregion
-
         #region Crm
+
         public const string CRM_USER_INSERT = @"INSERT dbo.CrmUser
                                                         (
                                                             CrmId,
@@ -975,7 +977,7 @@
         public const string CRM_COUNT_BY_DATE = @"SELECT COUNT(*) FROM dbo.Crm WHERE Code LIKE @Code";
 
         /// <summary>
-        /// Lấy danh sách CRM ko có điều kiện UserCareId
+        ///     Lấy danh sách CRM ko có điều kiện UserCareId
         /// </summary>
         public const string CRM_GET_BY_PAGING = @"DROP TABLE IF EXISTS #tmpCrm;
 
@@ -1134,7 +1136,7 @@
                                                   DROP TABLE #tmpCrm;";
 
         /// <summary>
-        /// Lấy danh sách CRM có điều kiện UserCareId
+        ///     Lấy danh sách CRM có điều kiện UserCareId
         /// </summary>
         public const string CRM_GET_BY_PAGING_2 = @"DROP TABLE IF EXISTS #tmpCrm;
 
@@ -1345,7 +1347,7 @@
                                             SELECT CAST(SCOPE_IDENTITY() as int);";
 
         /// <summary>
-        /// Lấy danh sách CRM của khách hàng đối với những user được quyền xem tất cả CRM
+        ///     Lấy danh sách CRM của khách hàng đối với những user được quyền xem tất cả CRM
         /// </summary>
         public const string CRM_GET_BY_CUSTOMER_ID = @"DROP TABLE IF EXISTS #tmpCrm;
 
@@ -1419,7 +1421,7 @@
                                                        DROP TABLE #tmpCrm;";
 
         /// <summary>
-        /// Lấy danh sách CRM của khách hàng đối với những user không có quyền xem hết tất cả CRM
+        ///     Lấy danh sách CRM của khách hàng đối với những user không có quyền xem hết tất cả CRM
         /// </summary>
         public const string CRM_GET_BY_CUSTOMER_ID_2 = @"DROP TABLE IF EXISTS #tmpCrm;
 
@@ -1728,7 +1730,7 @@
                                                                    AND i.IsDeleted = 0
                                                                    AND c.IsDeleted = 0;";
 
-        public const string INVOICE_USER_DELIVERY_GET_BY_CRM_ID = @"SELECT u.DisplayName,
+        public const string INVOICE_USER_DELIVERY_GET_BY_INVOICE_ID = @"SELECT u.DisplayName,
                                                                    u.PhoneNumber
                                                             FROM dbo.UserInInvoice uii
                                                                 INNER JOIN dbo.[User] u
@@ -1744,6 +1746,202 @@
                                                                       FROM dbo.ProductInInvoice
                                                                       WHERE InvoiceId = @InvoiceId
                                                                             AND IsDeleted = 0;";
+
+        /// <summary>
+        ///     Lấy danh sách đơn hàng không có điều kiện người giao
+        /// </summary>
+        public const string INVOICE_GET_BY_PAGING = @"DROP TABLE IF EXISTS #tmpInvoice;
+
+                                                      SELECT i.Id
+                                                      INTO #tmpInvoice
+                                                      FROM dbo.Invoice i
+                                                          LEFT JOIN Customer c
+                                                              ON c.Id = i.CustomerId
+                                                      WHERE ISNULL(c.Code, '') LIKE @CustomerCode
+                                                            AND ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI
+                                                            AND
+                                                            (
+                                                                ISNULL(c.Phone, '') LIKE @CustomerPhone
+                                                                OR ISNULL(c.Phone2, '') LIKE @CustomerPhone
+                                                                OR ISNULL(c.Phone3, '') LIKE @CustomerPhone
+                                                            )
+                                                            AND i.Code LIKE @Code
+                                                            AND
+                                                            (
+                                                                @BranchId = 0
+                                                                OR ISNULL(i.BranchId, 0) = @BranchId
+                                                            )
+                                                            AND
+                                                            (
+                                                                @InvoiceStatusId = 0
+                                                                OR ISNULL(i.InvoiceStatusId, 0) = @InvoiceStatusId
+                                                            )
+                                                            AND
+                                                            (
+                                                                @UserCreatedId = 0
+                                                                OR i.UserCreated = @UserCreatedId
+                                                            )
+                                                            AND
+                                                            (
+                                                                @UserSellId = 0
+                                                                OR i.UserSellId = @UserSellId
+                                                            )
+                                                            AND
+                                                            (
+                                                                @FromDate IS NULL
+                                                                OR i.DateCreated >= @FromDate
+                                                            )
+                                                            AND
+                                                            (
+                                                                @ToDate IS NULL
+                                                                OR i.DateCreated <= @ToDate
+                                                            )
+                                                            AND i.IsDeleted = 0
+                                                            AND c.IsDeleted = 0;
+
+
+                                                      SELECT i.Id,
+                                                             i.Code,
+                                                             ins.Name AS InvoiceStatus,
+                                                             ins.Color AS InvoiceStatusColor,
+                                                             c.Name AS Customer,
+                                                             c.Phone AS CustomerPhone,
+                                                             c.Phone2 AS CustomerPhone2,
+                                                             c.Phone3 AS CustomerPhone3,
+                                                             c.Address,
+                                                             p.Type + ' ' + p.Name AS Province,
+                                                             d.Type + ' ' + d.Name AS District,
+                                                             w.Type + ' ' + w.Name AS Ward,
+                                                             c.Code AS CustomerCode,
+                                                             b.Name AS Branch,
+                                                             u1.DisplayName AS UserCreated,
+                                                             u1.PhoneNumber AS UserCreatedPhone,
+                                                             u2.DisplayName AS UserSell,
+                                                             u2.PhoneNumber AS UserSellPhone,
+                                                             i.DeliveryDate,
+                                                             i.DateCreated
+                                                      FROM #tmpInvoice tmp
+                                                          INNER JOIN dbo.Invoice i
+                                                              ON tmp.Id = i.Id
+                                                          LEFT JOIN dbo.Customer c
+                                                              ON c.Id = i.CustomerId
+                                                          LEFT JOIN dbo.Province p
+                                                              ON p.Id = c.ProvinceId
+                                                          LEFT JOIN dbo.District d
+                                                              ON d.Id = c.DistrictId
+                                                          LEFT JOIN dbo.Ward w
+                                                              ON w.Id = c.WardId
+                                                          LEFT JOIN dbo.Branch b
+                                                              ON b.Id = i.BranchId
+                                                          LEFT JOIN dbo.InvoiceStatus ins
+                                                              ON ins.Id = i.InvoiceStatusId
+                                                          LEFT JOIN dbo.[User] u1
+                                                              ON u1.Id = i.UserCreated
+                                                          LEFT JOIN dbo.[User] u2
+                                                              ON u2.Id = i.UserSellId
+                                                      ORDER BY i.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                      SELECT COUNT(*)
+                                                      FROM #tmpInvoice;
+                                                      DROP TABLE #tmpInvoice;";
+
+        /// <summary>
+        ///     Danh sách đơn hàng có thêm điều kiện người giao hàng
+        /// </summary>
+        public const string INVOICE_GET_BY_PAGING_2 = @"DROP TABLE IF EXISTS #tmpInvoice;
+
+                                                        SELECT i.Id
+                                                        INTO #tmpInvoice
+                                                        FROM dbo.Invoice i
+                                                            LEFT JOIN Customer c
+                                                                ON c.Id = i.CustomerId
+                                                        WHERE ISNULL(c.Code, '') LIKE @CustomerCode
+                                                              AND ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI
+                                                              AND
+                                                              (
+                                                                  ISNULL(c.Phone, '') LIKE @CustomerPhone
+                                                                  OR ISNULL(c.Phone2, '') LIKE @CustomerPhone
+                                                                  OR ISNULL(c.Phone3, '') LIKE @CustomerPhone
+                                                              )
+                                                              AND i.Code LIKE @Code
+                                                              AND
+                                                              (
+                                                                  @BranchId = 0
+                                                                  OR ISNULL(i.BranchId, 0) = @BranchId
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @InvoiceStatusId = 0
+                                                                  OR ISNULL(i.InvoiceStatusId, 0) = @InvoiceStatusId
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @UserCreatedId = 0
+                                                                  OR i.UserCreated = @UserCreatedId
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @UserSellId = 0
+                                                                  OR i.UserSellId = @UserSellId
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @FromDate IS NULL
+                                                                  OR i.DateCreated >= @FromDate
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @ToDate IS NULL
+                                                                  OR i.DateCreated <= @ToDate
+                                                              )
+                                                              AND i.IsDeleted = 0
+                                                              AND c.IsDeleted = 0;
+                         
+                         
+                                                        SELECT i.Id,
+                                                               i.Code,
+                                                               ins.Name AS InvoiceStatus,
+                                                               ins.Color AS InvoiceStatusColor,
+                                                               c.Name AS Customer,
+                                                               c.Phone AS CustomerPhone,
+                                                               c.Phone2 AS CustomerPhone2,
+                                                               c.Phone3 AS CustomerPhone3,
+                                                               c.Address,
+                                                               p.Type + ' ' + p.Name AS Province,
+                                                               d.Type + ' ' + d.Name AS District,
+                                                               w.Type + ' ' + w.Name AS Ward,
+                                                               c.Code AS CustomerCode,
+                                                               b.Name AS Branch,
+                                                               u1.DisplayName AS UserCreated,
+                                                               u1.PhoneNumber AS UserCreatedPhone,
+                                                               u2.DisplayName AS UserSell,
+                                                               u2.PhoneNumber AS UserSellPhone,
+                                                               i.DeliveryDate,
+                                                               i.DateCreated
+                                                        FROM #tmpInvoice tmp
+                                                            INNER JOIN dbo.Invoice i
+                                                                ON tmp.Id = i.Id
+                                                            LEFT JOIN dbo.Customer c
+                                                                ON c.Id = i.CustomerId
+                                                            LEFT JOIN dbo.Province p
+                                                                ON p.Id = c.ProvinceId
+                                                            LEFT JOIN dbo.District d
+                                                                ON d.Id = c.DistrictId
+                                                            LEFT JOIN dbo.Ward w
+                                                                ON w.Id = c.WardId
+                                                            LEFT JOIN dbo.Branch b
+                                                                ON b.Id = i.BranchId
+                                                            LEFT JOIN dbo.InvoiceStatus ins
+                                                                ON ins.Id = i.InvoiceStatusId
+                                                            LEFT JOIN dbo.[User] u1
+                                                                ON u1.Id = i.UserCreated
+                                                            LEFT JOIN dbo.[User] u2
+                                                                ON u2.Id = i.UserSellId
+                                                        ORDER BY i.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                         
+                                                        SELECT COUNT(*)
+                                                        FROM #tmpInvoice;
+                                                        DROP TABLE #tmpInvoice;";
 
         #endregion
     }

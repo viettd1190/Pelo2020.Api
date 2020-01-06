@@ -234,6 +234,13 @@
             <param name="id">Id tỉnh thành</param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.InvoiceController.GetByPaging(Pelo.Common.Dtos.Invoice.GetInvoicePagingRequest)">
+            <summary>
+                Lấy danh sách đơn hàng có phân trang
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.InvoiceStatusController.GetAll">
             <summary>
                 Lấy tất cả trạng thái đơn hàng
@@ -409,22 +416,32 @@
         </member>
         <member name="F:Pelo.Api.Services.SqlQuery.CRM_GET_BY_PAGING">
             <summary>
-            Lấy danh sách CRM ko có điều kiện UserCareId
+                Lấy danh sách CRM ko có điều kiện UserCareId
             </summary>
         </member>
         <member name="F:Pelo.Api.Services.SqlQuery.CRM_GET_BY_PAGING_2">
             <summary>
-            Lấy danh sách CRM có điều kiện UserCareId
+                Lấy danh sách CRM có điều kiện UserCareId
             </summary>
         </member>
         <member name="F:Pelo.Api.Services.SqlQuery.CRM_GET_BY_CUSTOMER_ID">
             <summary>
-            Lấy danh sách CRM của khách hàng đối với những user được quyền xem tất cả CRM
+                Lấy danh sách CRM của khách hàng đối với những user được quyền xem tất cả CRM
             </summary>
         </member>
         <member name="F:Pelo.Api.Services.SqlQuery.CRM_GET_BY_CUSTOMER_ID_2">
             <summary>
-            Lấy danh sách CRM của khách hàng đối với những user không có quyền xem hết tất cả CRM
+                Lấy danh sách CRM của khách hàng đối với những user không có quyền xem hết tất cả CRM
+            </summary>
+        </member>
+        <member name="F:Pelo.Api.Services.SqlQuery.INVOICE_GET_BY_PAGING">
+            <summary>
+                Lấy danh sách đơn hàng không có điều kiện người giao
+            </summary>
+        </member>
+        <member name="F:Pelo.Api.Services.SqlQuery.INVOICE_GET_BY_PAGING_2">
+            <summary>
+                Danh sách đơn hàng có thêm điều kiện người giao hàng
             </summary>
         </member>
         <member name="M:Pelo.Api.Services.UserServices.UserService.Insert(System.Int32,Pelo.Common.Dtos.User.InsertUserRequest)">
