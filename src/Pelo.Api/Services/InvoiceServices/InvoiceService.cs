@@ -23,6 +23,9 @@ namespace Pelo.Api.Services.InvoiceServices
 
         Task<TResponse<PageResult<GetInvoicePagingResponse>>> GetPaging(int userId,
                                                                         GetInvoicePagingRequest request);
+
+        Task<TResponse<bool>> Insert(int userId,
+                                     InsertInvoiceRequest request);
     }
 
     public class InvoiceService : BaseService,
@@ -34,11 +37,14 @@ namespace Pelo.Api.Services.InvoiceServices
 
         private readonly IUserService _userService;
 
+        private IProductService _productService;
+
         public InvoiceService(IDapperReadOnlyRepository readOnlyRepository,
                               IDapperWriteRepository writeRepository,
                               IHttpContextAccessor context,
                               IRoleService roleService,
                               IUserService userService,
+                              IProductService productService,
                               IAppConfigService appConfigService) : base(readOnlyRepository,
                                                                          writeRepository,
                                                                          context)
@@ -46,6 +52,7 @@ namespace Pelo.Api.Services.InvoiceServices
             _roleService = roleService;
             _appConfigService = appConfigService;
             _userService = userService;
+            _productService = productService;
         }
 
         #region IInvoiceService Members
@@ -221,6 +228,85 @@ namespace Pelo.Api.Services.InvoiceServices
             }
         }
 
+        public async Task<TResponse<bool>> Insert(int userId,
+                                                  InsertInvoiceRequest request)
+        {
+            try
+            {
+                var canInsert = await CanInsert(userId);
+                if(canInsert.IsSuccess)
+                {
+                    var invoiceCode = await BuildInvoiceCode(DateTime.Now);
+                    var invoiceStatusId = await GetDefaultInvoiceStatus();
+                    int totalAmount = 0;
+                    if(request.Products!=null)
+                    {
+                        totalAmount = request.Products.Sum(c => c.Price * c.Quantity);
+                    }
+
+                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.INVOICE_INSERT,
+                                                                               new
+                                                                               {
+                                                                                       Code = invoiceCode,
+                                                                                       InvoiceStatusId = invoiceStatusId,
+                                                                                       request.BranchId,
+                                                                                       request.CustomerId,
+                                                                                       request.PayMethodId,
+                                                                                       Total = totalAmount,
+                                                                                       request.Deposit,
+                                                                                       DeliveryCode = 0,
+                                                                                       request.Discount,
+                                                                                       request.UserSellId,
+                                                                                       request.DeliveryDate,
+                                                                                       request.Description,
+                                                                                       UserCreated = userId,
+                                                                                       UserUpdated = userId
+                                                                               });
+
+                    if(result.IsSuccess)
+                    {
+                        var invoiceId = result.Data;
+
+                        #region 1. Thêm sản phẩm
+
+                        if(request.Products!=null)
+                        {
+                            foreach (var productInInvoiceRequest in request.Products)
+                            {
+                                var product = await _productService.GetSimpleById(productInInvoiceRequest.Id);
+                                if (product != null)
+                                {
+                                    await WriteRepository.ExecuteAsync(SqlQuery.PRODUCT_IN_INVOICE_INSERT,
+                                                                       new
+                                                                       {
+                                                                               ProductId = productInInvoiceRequest.Id,
+                                                                               InvoiceId = invoiceId,
+                                                                               Price = productInInvoiceRequest.Price,
+                                                                               Quantity = productInInvoiceRequest.Quantity,
+                                                                               ImportPrice = product.ImportPrice,
+                                                                               ProductName = product.Name,
+                                                                               Description = productInInvoiceRequest.Description,
+                                                                               UserCreated = userId,
+                                                                               UserUpdated = userId
+                                                                       });
+                                }
+                            }
+                        }
+
+                        #endregion
+                    }
+
+                    return await Fail<bool>(result.Message);
+                }
+
+                return await Fail<bool>(canInsert.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
         #endregion
 
         private async Task<TResponse<bool>> CanGetPaging(int userId)
@@ -229,6 +315,24 @@ namespace Pelo.Api.Services.InvoiceServices
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
                 if(checkPermission.IsSuccess)
+                {
+                    return await Ok(true);
+                }
+
+                return await Fail<bool>(checkPermission.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        private async Task<TResponse<bool>> CanInsert(int userId)
+        {
+            try
+            {
+                var checkPermission = await _roleService.CheckPermission(userId);
+                if (checkPermission.IsSuccess)
                 {
                     return await Ok(true);
                 }
@@ -353,11 +457,11 @@ namespace Pelo.Api.Services.InvoiceServices
                                        i.Code,
                                        ins.Name AS InvoiceStatus,
                                        ins.Color AS InvoiceStatusColor,
-                                       c.Name AS Customer,
+                                       c.Name AS CustomerName,
                                        c.Phone AS CustomerPhone,
                                        c.Phone2 AS CustomerPhone2,
                                        c.Phone3 AS CustomerPhone3,
-                                       c.Address,
+                                       c.Address AS CustomerAddress,
                                        p.Type + ' ' + p.Name AS Province,
                                        d.Type + ' ' + d.Name AS District,
                                        w.Type + ' ' + w.Name AS Ward,
@@ -395,6 +499,60 @@ namespace Pelo.Api.Services.InvoiceServices
                                 DROP TABLE #tmpInvoice;");
 
             return sqlBuilder.ToString();
+        }
+
+        private async Task<string> BuildInvoiceCode(DateTime date)
+        {
+            try
+            {
+                var invoicePrefixResponse = await _appConfigService.GetByName("InvoicePrefix");
+                string invoicePrefix = "HD";
+                if (invoicePrefixResponse.IsSuccess)
+                {
+                    invoicePrefix = invoicePrefixResponse.Data;
+                }
+
+                var code = $"{invoicePrefix}{(date.Year % 100):00}{date.Month:00}{date.Day:00}";
+                var countResponses = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.INVOICE_COUNT_BY_DATE,
+                                                                                            new
+                                                                                            {
+                                                                                                    Code = $"{code}%"
+                                                                                            });
+                if (countResponses.IsSuccess)
+                {
+                    return $"{code}{(countResponses.Data + 1):000}";
+                }
+
+                return string.Empty;
+            }
+            catch (Exception exception)
+            {
+                //
+            }
+
+            return string.Empty;
+        }
+
+        private async Task<int> GetDefaultInvoiceStatus()
+        {
+            try
+            {
+                var defaultInvoiceStatus = await _appConfigService.GetByName("DefaultInvoiceStatus");
+                int invoiceStatusId = 0;
+                if(defaultInvoiceStatus.IsSuccess)
+                {
+                    if(int.TryParse(defaultInvoiceStatus.Data,out invoiceStatusId))
+                    {
+                        return invoiceStatusId;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                //
+            }
+
+            return 0;
         }
     }
 }

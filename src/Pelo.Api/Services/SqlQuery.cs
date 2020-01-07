@@ -1947,6 +1947,100 @@
                                                         FROM #tmpInvoice;
                                                         DROP TABLE #tmpInvoice;";
 
+        public const string INVOICE_INSERT = @"INSERT dbo.Invoice
+                                               (
+                                                   Code,
+                                                   InvoiceStatusId,
+                                                   BranchId,
+                                                   CustomerId,
+                                                   PayMethodId,
+                                                   Total,
+                                                   Deposit,
+                                                   DeliveryCost,
+                                                   Discount,
+                                                   UserSellId,
+                                                   DeliveryDate,
+                                                   Description,
+                                                   UserCreated,
+                                                   DateCreated,
+                                                   UserUpdated,
+                                                   DateUpdated,
+                                                   IsDeleted
+                                               )
+                                               VALUES
+                                               (   @Code,       -- Code - nvarchar(50)
+                                                   @InvoiceStatusId,         -- InvoiceStatusId - int
+                                                   @BranchId,         -- BranchId - int
+                                                   @CustomerId,         -- CustomerId - int
+                                                   @PayMethodId,         -- PayMethodId - int
+                                                   @Total,         -- Total - bigint
+                                                   @Deposit,         -- Deposit - bigint
+                                                   @DeliveryCost,         -- DeliveryCost - int
+                                                   @Discount,         -- Discount - int
+                                                   @UserSellId,         -- UserSellId - int
+                                                   @DeliveryDate, -- DeliveryDate - datetime
+                                                   @Description,       -- Description - nvarchar(max)
+                                                   @UserCreated,         -- UserCreated - int
+                                                   GETDATE(), -- DateCreated - datetime
+                                                   @UserUpdated,         -- UserUpdated - int
+                                                   GETDATE(), -- DateUpdated - datetime
+                                                   0       -- IsDeleted - bit
+                                                   );
+
+                                               SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string INVOICE_COUNT_BY_DATE = @"SELECT COUNT(*) FROM dbo.Invoice WHERE Code LIKE @Code";
+
+        public const string PRODUCT_IN_INVOICE_INSERT = @"INSERT dbo.ProductInInvoice
+                                                          (
+                                                              ProductId,
+                                                              InvoiceId,
+                                                              Price,
+                                                              Quantity,
+                                                              ImportPrice,
+                                                              ProductName,
+                                                              Description,
+                                                              UserCreated,
+                                                              DateCreated,
+                                                              UserUpdated,
+                                                              DateUpdated,
+                                                              IsDeleted
+                                                          )
+                                                          VALUES
+                                                          (   @ProductId,         -- ProductId - int
+                                                              @InvoiceId,         -- InvoiceId - int
+                                                              @Price,         -- Price - int
+                                                              @Quantity,         -- Quantity - int
+                                                              @ImportPrice,         -- ImportPrice - int
+                                                              @ProductName,       -- ProductName - nvarchar(500)
+                                                              @Description,       -- Description - nvarchar(2000)
+                                                              @UserCreated,         -- UserCreated - int
+                                                              GETDATE(), -- DateCreated - datetime
+                                                              @UserUpdated,         -- UserUpdated - int
+                                                              GETDATE(), -- DateUpdated - datetime
+                                                              0       -- IsDeleted - bit
+                                                              )";
+
+
+        #endregion
+
+        #region Product
+
+        public const string PRODUCT_GET_ALL = @"SELECT Id,
+                                                       Name,
+                                                       ImportPrice,
+                                                       SellPrice
+                                                FROM dbo.Product
+                                                WHERE IsDeleted = 0;";
+
+        public const string PRODUCT_GET_SIMPLE_BY_ID = @"SELECT Id,
+                                                                Name,
+                                                                ImportPrice,
+                                                                SellPrice
+                                                         FROM dbo.Product
+                                                         WHERE Id = @Id
+                                                               AND IsDeleted = 0;";
+
         #endregion
     }
 }
