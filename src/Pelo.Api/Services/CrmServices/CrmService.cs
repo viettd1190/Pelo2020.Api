@@ -232,25 +232,25 @@ namespace Pelo.Api.Services.CrmServices
                 var canGetPaging = await CanGetPaging(userId);
                 if (canGetPaging.IsSuccess)
                 {
-                    bool canGetAll = false;
+                    //bool canGetAll = false;
 
-                    var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
-                    if (canGetAllCrm.IsSuccess)
-                    {
-                        var defaultRoles = canGetAllCrm.Data.Split(" ");
-                        var currentRole = await _roleService.GetNameByUserId(userId);
-                        if (currentRole.IsSuccess
-                           && !string.IsNullOrEmpty(currentRole.Data)
-                           && defaultRoles.Contains(currentRole.Data))
-                        {
-                            canGetAll = true;
-                        }
-                    }
+                    //var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
+                    //if (canGetAllCrm.IsSuccess)
+                    //{
+                    //    var defaultRoles = canGetAllCrm.Data.Split(" ");
+                    //    var currentRole = await _roleService.GetNameByUserId(userId);
+                    //    if (currentRole.IsSuccess
+                    //       && !string.IsNullOrEmpty(currentRole.Data)
+                    //       && defaultRoles.Contains(currentRole.Data))
+                    //    {
+                    //        canGetAll = true;
+                    //    }
+                    //}
 
-                    if (!canGetAll)
-                    {
-                        request.UserCreatedId = userId;
-                    }
+                    //if (!canGetAll)
+                    //{
+                    //    request.UserCreatedId = userId;
+                    //}
 
                     var crmCodeResponse = await BuildCrmCode(DateTime.Now);
                     var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CRM_INSERT,
