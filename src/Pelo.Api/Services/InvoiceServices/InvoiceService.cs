@@ -37,11 +37,14 @@ namespace Pelo.Api.Services.InvoiceServices
 
         private readonly IUserService _userService;
 
+        private IProductService _productService;
+
         public InvoiceService(IDapperReadOnlyRepository readOnlyRepository,
                               IDapperWriteRepository writeRepository,
                               IHttpContextAccessor context,
                               IRoleService roleService,
                               IUserService userService,
+                              IProductService productService,
                               IAppConfigService appConfigService) : base(readOnlyRepository,
                                                                          writeRepository,
                                                                          context)
@@ -49,6 +52,7 @@ namespace Pelo.Api.Services.InvoiceServices
             _roleService = roleService;
             _appConfigService = appConfigService;
             _userService = userService;
+            _productService = productService;
         }
 
         #region IInvoiceService Members
@@ -237,7 +241,7 @@ namespace Pelo.Api.Services.InvoiceServices
                     int totalAmount = 0;
                     if(request.Products!=null)
                     {
-                        totalAmount = request.Products.Sum(c => c.Price * c.Quality);
+                        totalAmount = request.Products.Sum(c => c.Price * c.Quantity);
                     }
 
                     var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.INVOICE_INSERT,
@@ -264,6 +268,30 @@ namespace Pelo.Api.Services.InvoiceServices
                         var invoiceId = result.Data;
 
                         #region 1. Thêm sản phẩm
+
+                        if(request.Products!=null)
+                        {
+                            foreach (var productInInvoiceRequest in request.Products)
+                            {
+                                var product = await _productService.GetSimpleById(productInInvoiceRequest.Id);
+                                if (product != null)
+                                {
+                                    await WriteRepository.ExecuteAsync(SqlQuery.PRODUCT_IN_INVOICE_INSERT,
+                                                                       new
+                                                                       {
+                                                                               ProductId = productInInvoiceRequest.Id,
+                                                                               InvoiceId = invoiceId,
+                                                                               Price = productInInvoiceRequest.Price,
+                                                                               Quantity = productInInvoiceRequest.Quantity,
+                                                                               ImportPrice = product.ImportPrice,
+                                                                               ProductName = product.Name,
+                                                                               Description = productInInvoiceRequest.Description,
+                                                                               UserCreated = userId,
+                                                                               UserUpdated = userId
+                                                                       });
+                                }
+                            }
+                        }
 
                         #endregion
                     }
