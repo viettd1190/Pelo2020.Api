@@ -1078,10 +1078,10 @@
     
                                                   SELECT c.Id,
                                                          c.Code,
+                                                         c.CustomerId,
                                                          cs.Name AS CrmStatus,
                                                          cs.Color AS CrmStatusColor,
-                                                         cu.Name AS CustomerName,
-                                                         cu.Id AS CustomerId,
+                                                         cu.Name AS CustomerName,                                                         
                                                          cu.Phone AS CustomerPhone,
                                                          cu.Phone2 AS CustomerPhone2,
                                                          cu.Phone3 AS CustomerPhone3,
@@ -1241,10 +1241,10 @@
       
                                                     SELECT c.Id,
                                                            c.Code,
+                                                           c.CustomerId,
                                                            cs.Name AS CrmStatus,
                                                            cs.Color AS CrmStatusColor,
                                                            cu.Name AS CustomerName,
-                                                           c.CustomerId,
                                                            cu.Phone AS CustomerPhone,
                                                            cu.Phone2 AS CustomerPhone2,
                                                            cu.Phone3 AS CustomerPhone3,
@@ -1365,7 +1365,7 @@
                           
                                                        SELECT c.Id,
                                                               c.Code,
-                                                              c.CustomerId
+                                                              c.CustomerId,
                                                               cs.Name AS CrmStatus,
                                                               cs.Color AS CrmStatusColor,
                                                               cu.Name AS CustomerName,
@@ -1443,6 +1443,7 @@
                 
                                                          SELECT c.Id,
                                                                 c.Code,
+                                                                c.CustomerId,
                                                                 cs.Name AS CrmStatus,
                                                                 cs.Color AS CrmStatusColor,
                                                                 cu.Name AS CustomerName,
