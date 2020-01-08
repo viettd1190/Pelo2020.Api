@@ -57,11 +57,11 @@ namespace Pelo.Api.Controllers
                                                         page,
                                                         pageSize));
         }
-        [HttpPut]
-        [Route("api/crm")]
-        public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> Update([FromBody] UpdateCrmRequest request)
+        [HttpGet]
+        [Route("api/crm/{id}")]
+        public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> GetCrmById(int id)
         {
-            return Ok(await _crmService.UpdateCrm(await GetUserId(), request));
+            return Ok(await _crmService.GetById(await GetUserId(), id));
         }
     }
 }

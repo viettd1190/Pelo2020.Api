@@ -50,6 +50,8 @@ namespace Pelo.Api.Services.CrmServices
                                                                              int page,
                                                                              int pageSize);
         Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest request);
+
+        Task<TResponse<GetCrmPagingResponse>> GetById(int userId, int id);
     }
 
     public class CrmService : BaseService,
@@ -862,6 +864,40 @@ namespace Pelo.Api.Services.CrmServices
             catch (Exception exception)
             {
                 return await Fail<bool>(exception);
+            }
+        }
+        public async Task<TResponse<GetCrmPagingResponse>> GetById(int userId, int id)
+        {
+            try
+            {
+                var canGetPaging = await CanGetPaging(userId);
+                if (canGetPaging.IsSuccess)
+                {
+                    bool canGetAll = false;
+                    var result = new TResponse<GetCrmPagingResponse>();
+                    var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
+                    if (canGetAllCrm.IsSuccess)
+                    {
+                        var defaultRoles = canGetAllCrm.Data.Split(" ");
+                        var currentRole = await _roleService.GetNameByUserId(userId);
+                        if (currentRole.IsSuccess
+                           && !string.IsNullOrEmpty(currentRole.Data)
+                           && defaultRoles.Contains(currentRole.Data))
+                        {
+                            canGetAll = true;
+                        }
+                        if (canGetAll)
+                        {
+
+                        }
+                    }
+                    return await Fail<GetCrmPagingResponse>(ErrorEnum.USER_DO_HAVE_NOT_PERMISSON_VIEW_THIS_CRM.GetStringValue());
+                }
+                return await Fail<GetCrmPagingResponse>(canGetPaging.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<GetCrmPagingResponse>(exception);
             }
         }
     }
