@@ -974,6 +974,12 @@
                                                             0 );
                                                         SELECT CAST(SCOPE_IDENTITY() as int);";
 
+        public const string CRM_USER_UPDATE= @"UPDATE dbo.CrmUser SET UserId = @UserId, UserUpdated=@UserUpdated, DateUpdated=@DateUpdated WHERE Id = @Id AND IsDeleted=0";
+
+        public const string CRM_USER_DELETE = @"UPDATE dbo.CrmUser SET IsDeleted = 1 WHERE CrmId = @CrmId AND UserId=@UserId";
+
+        public const string GET_CRM_USER_BY_CRMID= @"SELECT * from dbo.CrmUser where CrmId = @CrmId AND IsDeleted=0";
+
         public const string CRM_COUNT_BY_DATE = @"SELECT COUNT(*) FROM dbo.Crm WHERE Code LIKE @Code";
 
         /// <summary>
@@ -1307,7 +1313,7 @@
                                                             WHERE cu.CrmId = @CrmId
                                                                   AND cu.Type = 0
                                                                   AND cu.IsDeleted = 0
-                                                                  AND u.IsDeleted = 0;";
+                                                                  AND u.IsDeleted = 0";
 
         public const string CRM_INSERT = @"INSERT dbo.Crm
                                                     (
@@ -1348,6 +1354,24 @@
                                                         );
                                             SELECT CAST(SCOPE_IDENTITY() as int);";
 
+        public const string CRM_UPDATE = @"UPDATE dbo.Crm
+                                            SET CrmStatusId = @CrmStatusId,
+                                                CrmStatusId = @CrmStatusId,
+                                                ContactDate = @ContactDate,
+                                                ProductGroupId = @ProductGroupId,
+                                                CrmPriorityId = @CrmPriorityId,
+                                                CrmTypeId = @CrmTypeId,
+                                                Need = @Need,
+                                                Description = @Description,
+                                                CustomerSourceId = @CustomerSourceId,
+                                                Visit = @Visit,
+                                                UserUpdated = @UserUpdated,
+                                                DateUpdated = @DateUpdated
+                                               WHERE Id = @Id";
+        public const string GET_CRM_BY_ID = @"SELECT Id
+                                                          FROM dbo.Crm
+                                                          WHERE Id = @Id
+                                                                AND IsDeleted = 0";
         /// <summary>
         ///     Lấy danh sách CRM của khách hàng đối với những user được quyền xem tất cả CRM
         /// </summary>
