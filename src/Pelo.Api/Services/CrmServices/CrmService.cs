@@ -25,7 +25,7 @@ namespace Pelo.Api.Services.CrmServices
         /// <param name="request"></param>
         /// <returns></returns>
         Task<TResponse<PageResult<GetCrmPagingResponse>>> GetPaging(int userId,
-                                                                    GetCrmPagingRequest request);
+                                                                    GetWarrantyPagingRequest request);
 
         /// <summary>
         ///     Kiểm tra xem user đó có quyền add CRM hay không.
@@ -51,7 +51,7 @@ namespace Pelo.Api.Services.CrmServices
                                                                              int pageSize);
         Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest request);
 
-        Task<TResponse<GetCrmPagingResponse>> GetById(int userId, int id);
+        Task<TResponse<GetCrmModelReponse>> GetById(int userId, int id);
     }
 
     public class CrmService : BaseService,
@@ -87,7 +87,7 @@ namespace Pelo.Api.Services.CrmServices
         /// <param name="request"></param>
         /// <returns></returns>
         public async Task<TResponse<PageResult<GetCrmPagingResponse>>> GetPaging(int userId,
-                                                                                 GetCrmPagingRequest request)
+                                                                                 GetWarrantyPagingRequest request)
         {
             try
             {
@@ -866,38 +866,50 @@ namespace Pelo.Api.Services.CrmServices
                 return await Fail<bool>(exception);
             }
         }
-        public async Task<TResponse<GetCrmPagingResponse>> GetById(int userId, int id)
+        public async Task<TResponse<GetCrmModelReponse>> GetById(int userId, int id)
         {
             try
             {
                 var canGetPaging = await CanGetPaging(userId);
                 if (canGetPaging.IsSuccess)
                 {
-                    bool canGetAll = false;
-                    var result = new TResponse<GetCrmPagingResponse>();
+                    var result = new TResponse<GetCrmModelReponse>();
                     var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
                     if (canGetAllCrm.IsSuccess)
                     {
-                        var defaultRoles = canGetAllCrm.Data.Split(" ");
-                        var currentRole = await _roleService.GetNameByUserId(userId);
-                        if (currentRole.IsSuccess
-                           && !string.IsNullOrEmpty(currentRole.Data)
-                           && defaultRoles.Contains(currentRole.Data))
+                        result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCrmModelReponse>(SqlQuery.GET_CRM_BY_ID,
+                                                                                                              new
+                                                                                                              {
+                                                                                                                  Id = id
+                                                                                                              });
+                        if(result.IsSuccess)
                         {
-                            canGetAll = true;
-                        }
-                        if (canGetAll)
-                        {
+                            if (result.Data != null)
+                            {
+                                result.Data.UserCares = new List<UserDisplaySimpleModel>();
+                                var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
+                                                                                                         new
+                                                                                                         {
+                                                                                                             CrmId = id
+                                                                                                         });
+                                if (crmUserCare.IsSuccess
+                                   && crmUserCare.Data != null)
+                                {
+                                    result.Data.UserCares.AddRange(crmUserCare.Data);
+                                }
+                                return await Ok(result.Data);
+                            }
 
+                            return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
                         }
                     }
-                    return await Fail<GetCrmPagingResponse>(ErrorEnum.USER_DO_HAVE_NOT_PERMISSON_VIEW_THIS_CRM.GetStringValue());
+                    return await Fail<GetCrmModelReponse>(ErrorEnum.USER_DO_HAVE_NOT_PERMISSON_VIEW_THIS_CRM.GetStringValue());
                 }
-                return await Fail<GetCrmPagingResponse>(canGetPaging.Message);
+                return await Fail<GetCrmModelReponse>(canGetPaging.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<GetCrmPagingResponse>(exception);
+                return await Fail<GetCrmModelReponse>(exception);
             }
         }
     }
