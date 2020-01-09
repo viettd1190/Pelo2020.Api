@@ -598,25 +598,6 @@ namespace Pelo.Api.Services.CrmServices
                 var canGetPaging = await CanGetPaging(userId);
                 if (canGetPaging.IsSuccess)
                 {
-                    //bool canGetAll = false;
-
-                    //var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
-                    //if (canGetAllCrm.IsSuccess)
-                    //{
-                    //    var defaultRoles = canGetAllCrm.Data.Split(" ");
-                    //    var currentRole = await _roleService.GetNameByUserId(userId);
-                    //    if (currentRole.IsSuccess
-                    //       && !string.IsNullOrEmpty(currentRole.Data)
-                    //       && defaultRoles.Contains(currentRole.Data))
-                    //    {
-                    //        canGetAll = true;
-                    //    }
-                    //}
-
-                    //if (!canGetAll)
-                    //{
-                    //    request.UserCreatedId = userId;
-                    //}
                     var canUpdate = await CanUpdate(userId,
                                                 request);
                     if (canUpdate.IsSuccess)
@@ -633,7 +614,7 @@ namespace Pelo.Api.Services.CrmServices
                                                                                    request.CustomerSourceId,
                                                                                    request.CrmPriorityId,
                                                                                    request.CrmTypeId,
-                                                                                   request.Visit,
+                                                                                   request.Visit,                                                                                   
                                                                                    UserUpdated = userId,
                                                                                    DateUpdated = DateTime.Now
                                                                                });

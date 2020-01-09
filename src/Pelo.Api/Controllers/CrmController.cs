@@ -63,5 +63,17 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _crmService.GetById(await GetUserId(), id));
         }
+        /// <summary>
+        ///     Them CRM
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("api/crm")]
+        public async Task<ActionResult<bool>> UpdateCrm([FromBody] UpdateCrmRequest request)
+        {
+            return Ok(await _crmService.UpdateCrm(await GetUserId(),
+                                                  request));
+        }
     }
 }
