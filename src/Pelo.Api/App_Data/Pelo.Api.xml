@@ -66,6 +66,13 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CrmController.UpdateCrm(Pelo.Common.Dtos.Crm.UpdateCrmRequest)">
+            <summary>
+                Them CRM
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CrmPriorityController.GetAll">
             <summary>
                 Lấy tất cả mức độ khẩn cấp CRM

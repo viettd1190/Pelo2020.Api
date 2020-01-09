@@ -1306,7 +1306,8 @@
                                                     DROP TABLE #tmpCrm;";
 
         public const string CRM_USER_CARE_GET_BY_CRM_ID = @"SELECT u.DisplayName,
-                                                                   u.PhoneNumber
+                                                                   u.PhoneNumber,
+                                                                   u.Id
                                                             FROM dbo.CrmUser cu
                                                                 INNER JOIN dbo.[User] u
                                                                     ON cu.UserId = u.Id
@@ -1356,7 +1357,6 @@
 
         public const string CRM_UPDATE = @"UPDATE dbo.Crm
                                             SET CrmStatusId = @CrmStatusId,
-                                                CrmStatusId = @CrmStatusId,
                                                 ContactDate = @ContactDate,
                                                 ProductGroupId = @ProductGroupId,
                                                 CrmPriorityId = @CrmPriorityId,
@@ -1369,159 +1369,54 @@
                                                 DateUpdated = @DateUpdated
                                                WHERE Id = @Id";
 
-        public const string GET_CRM_BY_ID = @"DROP TABLE IF EXISTS #tmpCrm;
-
-                                                    SELECT c.Id
-                                                    INTO #tmpCrm
-                                                    FROM dbo.Crm c
-                                                        LEFT JOIN dbo.Customer cu
-                                                            ON cu.Id = c.CustomerId
-                                                        INNER JOIN dbo.CrmUser cru
-                                                            ON cru.CrmId = c.Id
-                                                    WHERE c.Code LIKE @Code
-                                                          AND ISNULL(cu.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI
-                                                          AND ISNULL(cu.Address, '') COLLATE Latin1_General_CI_AI LIKE @CustomerAddress COLLATE Latin1_General_CI_AI
-                                                          AND ISNULL(c.Need, '') COLLATE Latin1_General_CI_AI LIKE @Need COLLATE Latin1_General_CI_AI
-                                                          AND
-                                                          (
-                                                              cu.Phone LIKE @CustomerPhone
-                                                              OR cu.Phone2 LIKE @CustomerPhone
-                                                              OR cu.Phone3 LIKE @CustomerPhone
-                                                          )
-                                                          AND cu.Code LIKE @CustomerCode
-                                                          AND
-                                                          (
-                                                              @ProvinceId = 0
-                                                              OR ISNULL(cu.ProvinceId, 0) = @ProvinceId
-                                                          )
-                                                          AND
-                                                          (
-                                                              @DistrictId = 0
-                                                              OR ISNULL(cu.DistrictId, 0) = @DistrictId
-                                                          )
-                                                          AND
-                                                          (
-                                                              @WardId = 0
-                                                              OR ISNULL(cu.WardId, 0) = @WardId
-                                                          )
-                                                          AND
-                                                          (
-                                                              @CrmPriorityId = 0
-                                                              OR ISNULL(c.CrmPriorityId, 0) = @CrmPriorityId
-                                                          )
-                                                          AND
-                                                          (
-                                                              @CrmStatusId = 0
-                                                              OR ISNULL(c.CrmStatusId, 0) = @CrmStatusId
-                                                          )
-                                                          AND
-                                                          (
-                                                              @CustomerSourceId = 0
-                                                              OR ISNULL(c.CustomerSourceId, 0) = @CustomerSourceId
-                                                          )
-                                                          AND
-                                                          (
-                                                              @CustomerGroupId = 0
-                                                              OR ISNULL(cu.CustomerGroupId, 0) = @CustomerGroupId
-                                                          )
-                                                          AND
-                                                          (
-                                                              @ProductGroupId = 0
-                                                              OR ISNULL(c.ProductGroupId, 0) = @ProductGroupId
-                                                          )
-                                                          AND
-                                                          (
-                                                              @CrmTypeId = 0
-                                                              OR ISNULL(c.CrmTypeId, 0) = @CrmTypeId
-                                                          )
-                                                          AND
-                                                          (
-                                                              @CustomerVipId = 0
-                                                              OR ISNULL(cu.CustomerVipId, 0) = @CustomerVipId
-                                                          )
-                                                          AND
-                                                          (
-                                                              @Visit = -1
-                                                              OR ISNULL(c.Visit, 0) = @Visit
-                                                          )
-                                                          AND
-                                                          (
-                                                              @FromDate IS NULL
-                                                              OR c.ContactDate >= @FromDate
-                                                          )
-                                                          AND
-                                                          (
-                                                              @ToDate IS NULL
-                                                              OR c.ContactDate <= @ToDate
-                                                          )
-                                                          AND
-                                                          (
-                                                              @DateCreated IS NULL
-                                                              OR @DateCreated = '2000-01-01 00:00:00'
-                                                              OR CONVERT(DATE, c.DateCreated) = @DateCreated
-                                                          --)
-                                                          AND
-                                                          (
-                                                              @UserCreatedId = 0
-                                                              OR ISNULL(c.UserCreated, 0) = @UserCreatedId
-                                                          )
-                                                          AND cru.UserId = @UserCareId
-                                                          AND cru.IsDeleted = 0
-                                                          AND c.IsDeleted = 0;
-      
-                                                    SELECT c.Id,
-                                                           c.Code,
-                                                           c.CustomerId,
-                                                           c.CrmStatusId,
-                                                           cs.Color AS CrmStatusColor,
-                                                           cu.Name AS CustomerName,
-                                                           cu.Phone AS CustomerPhone,
-                                                           cu.Address AS CustomerAddress,                                                           
-                                                           cg.Name AS CustomerGroup,
-                                                           cv.Name AS CustomerVip,
-                                                           c.Need,
-                                                           c.Description,
-                                                           pg.Id AS ProductGroupId,
-                                                           cp.Id AS CrmPriorityId,
-                                                           cus.Id AS CustomerSourceId,
-                                                           ct.Id AS CrmTypeId,
-                                                           c.Visit,
-                                                           u.DisplayName AS UserCreated,
-                                                           u.PhoneNumber AS UserCreatedPhone,
-                                                           c.ContactDate,
-                                                           c.DateCreated,
-                                                           c.DateUpdated
-                                                    FROM #tmpCrm t
-                                                        INNER JOIN dbo.Crm c
-                                                            ON c.Id = t.Id
-                                                        LEFT JOIN dbo.CrmStatus cs
-                                                            ON cs.Id = c.CrmStatusId
-                                                        LEFT JOIN dbo.CrmPriority cp
-                                                            ON cp.Id = c.CrmPriorityId
-                                                        LEFT JOIN dbo.CrmType ct
-                                                            ON ct.Id = c.CrmTypeId
-                                                        LEFT JOIN dbo.Customer cu
-                                                            ON cu.Id = c.CustomerId
-                                                        LEFT JOIN dbo.Province p
-                                                            ON p.Id = cu.ProvinceId
-                                                        LEFT JOIN dbo.District d
-                                                            ON d.Id = cu.DistrictId
-                                                        LEFT JOIN dbo.Ward w
-                                                            ON w.Id = cu.WardId
-                                                        LEFT JOIN dbo.CustomerGroup cg
-                                                            ON cg.Id = cu.CustomerGroupId
-                                                        LEFT JOIN dbo.CustomerSource cus
-                                                            ON cus.Id = c.CustomerSourceId
-                                                        LEFT JOIN dbo.CustomerVip cv
-                                                            ON cv.Id = cu.CustomerVipId
-                                                        LEFT JOIN dbo.ProductGroup pg
-                                                            ON pg.Id = c.ProductGroupId
-                                                        LEFT JOIN dbo.[User] u
-                                                            ON u.Id = c.UserCreated
-                                                    FROM #tmpCrm;                                                    
-                                                    WHERE Id = @Id
-                                                                AND IsDeleted = 0
-                                                    DROP TABLE #tmpCrm;";
+        public const string GET_CRM_BY_ID = @"SELECT c.Id,
+		                                        c.Code,
+		                                        c.CustomerId,
+		                                        c.CrmStatusId,
+		                                        cs.Color AS CrmStatusColor,
+		                                        cu.Name AS CustomerName,
+		                                        cu.Phone AS CustomerPhone,
+		                                        cu.Address AS CustomerAddress,                                                           
+		                                        cg.Name AS CustomerGroup,
+		                                        cv.Name AS CustomerVip,
+		                                        c.Need,
+		                                        c.Description,
+		                                        pg.Id AS ProductGroupId,
+		                                        cp.Id AS CrmPriorityId,
+		                                        cus.Id AS CustomerSourceId,
+		                                        ct.Id AS CrmTypeId,
+		                                        c.Visit,
+		                                        u.DisplayName AS UserCreated,
+		                                        u.PhoneNumber AS UserCreatedPhone,
+		                                        c.ContactDate,
+		                                        c.DateCreated,
+		                                        c.DateUpdated
+		                                        from dbo.Crm c
+		                                        LEFT JOIN dbo.CrmStatus cs
+                                                    ON cs.Id = c.CrmStatusId
+                                                LEFT JOIN dbo.CrmPriority cp
+                                                    ON cp.Id = c.CrmPriorityId
+                                                LEFT JOIN dbo.CrmType ct
+                                                    ON ct.Id = c.CrmTypeId
+                                                LEFT JOIN dbo.Customer cu
+                                                    ON cu.Id = c.CustomerId
+                                                LEFT JOIN dbo.Province p
+                                                    ON p.Id = cu.ProvinceId
+                                                LEFT JOIN dbo.District d
+                                                    ON d.Id = cu.DistrictId
+                                                LEFT JOIN dbo.Ward w
+                                                    ON w.Id = cu.WardId
+                                                LEFT JOIN dbo.CustomerGroup cg
+                                                    ON cg.Id = cu.CustomerGroupId
+                                                LEFT JOIN dbo.CustomerSource cus
+                                                    ON cus.Id = c.CustomerSourceId
+                                                LEFT JOIN dbo.CustomerVip cv
+                                                    ON cv.Id = cu.CustomerVipId
+                                                LEFT JOIN dbo.ProductGroup pg
+                                                    ON pg.Id = c.ProductGroupId
+                                                LEFT JOIN dbo.[User] u
+                                                    ON u.Id = c.UserCreated                                     
+                                                    WHERE c.Id = @Id AND c.IsDeleted = 0";
         /// <summary>
         ///     Lấy danh sách CRM của khách hàng đối với những user được quyền xem tất cả CRM
         /// </summary>

@@ -602,18 +602,18 @@ namespace Pelo.Api.Services.CrmServices
                                                 request);
                     if (canUpdate.IsSuccess)
                     {
-                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CRM_UPDATE,
+                        var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_UPDATE,
                                                                                new
                                                                                {
                                                                                    request.Id,
                                                                                    request.CrmStatusId,
                                                                                    request.ContactDate,
                                                                                    request.ProductGroupId,
+                                                                                   request.CrmTypeId,
                                                                                    request.Need,
                                                                                    request.Description,
                                                                                    request.CustomerSourceId,
-                                                                                   request.CrmPriorityId,
-                                                                                   request.CrmTypeId,
+                                                                                   request.CrmPriorityId,                                                                                   
                                                                                    request.Visit,                                                                                   
                                                                                    UserUpdated = userId,
                                                                                    DateUpdated = DateTime.Now
@@ -880,9 +880,8 @@ namespace Pelo.Api.Services.CrmServices
                                 }
                                 return await Ok(result.Data);
                             }
-
-                            return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
                         }
+                        return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
                     }
                     return await Fail<GetCrmModelReponse>(ErrorEnum.USER_DO_HAVE_NOT_PERMISSON_VIEW_THIS_CRM.GetStringValue());
                 }
