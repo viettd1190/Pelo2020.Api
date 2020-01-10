@@ -591,104 +591,66 @@ namespace Pelo.Api.Services.CrmServices
             }
         }
 
-        public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest request)
+public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest request)
         {
             try
             {
-                var canGetPaging = await CanGetPaging(userId);
-                if (canGetPaging.IsSuccess)
-                {
-                    var canUpdate = await CanUpdate(userId,
+                var canUpdate = await CanUpdate(userId,
                                                 request);
-                    if (canUpdate.IsSuccess)
+                if (canUpdate.IsSuccess)
+                {
+                    var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_UPDATE,
+                                                                           new
+                                                                           {
+                                                                               request.Id,
+                                                                               request.CrmStatusId,
+                                                                               request.ContactDate,
+                                                                               request.ProductGroupId,
+                                                                               request.CrmTypeId,
+                                                                               request.Need,
+                                                                               request.Description,
+                                                                               request.CustomerSourceId,
+                                                                               request.CrmPriorityId,
+                                                                               request.Visit,
+                                                                               UserUpdated = userId,
+                                                                               DateUpdated = DateTime.Now
+                                                                           });
+                    if (result.IsSuccess)
                     {
-                        var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_UPDATE,
-                                                                               new
-                                                                               {
-                                                                                   request.Id,
-                                                                                   request.CrmStatusId,
-                                                                                   request.ContactDate,
-                                                                                   request.ProductGroupId,
-                                                                                   request.CrmTypeId,
-                                                                                   request.Need,
-                                                                                   request.Description,
-                                                                                   request.CustomerSourceId,
-                                                                                   request.CrmPriorityId,                                                                                   
-                                                                                   request.Visit,                                                                                   
-                                                                                   UserUpdated = userId,
-                                                                                   DateUpdated = DateTime.Now
-                                                                               });
-                        if (result.IsSuccess)
+                        if (result.Data > 0)
                         {
-                            if (result.Data > 0)
+                            var crmId = result.Data;
+                            var crmUser = await ReadOnlyRepository.QueryAsync<CrmUserResponse>(SqlQuery.GET_CRM_USER_BY_CRMID,
+                                                                           new
+                                                                           {
+                                                                               CrmId = crmId
+                                                                           });
+                            if (request.UserIds == null)
                             {
-                                var crmId = result.Data;
-                                var crmUser = await ReadOnlyRepository.QueryAsync<CrmUserResponse>(SqlQuery.GET_CRM_USER_BY_CRMID,
-                                                                               new
-                                                                               {
-                                                                                   CrmId = crmId
-                                                                               });
-                                if (request.UserIds == null)
-                                {
-                                    request.UserIds = new List<int>();
-                                }
+                                request.UserIds = new List<int>();
+                            }
 
-                                if (crmUser != null)
-                                {
-                                    if (request.UserIds.Any())
-                                    {
-                                        foreach (var user in request.UserIds)
-                                        {
-                                            CrmUserResponse crmUserResponse = crmUser.Data.FirstOrDefault(c => c.CrmId == request.Id && c.UserId == user);
-                                            if (crmUserResponse != null)
-                                            {
-                                                var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_UPDATE,
-                                                                    new
-                                                                    {
-                                                                        crmUserResponse.Id,
-                                                                        crmUserResponse.UserId,
-                                                                        UserUpdated = userId,
-                                                                        DateUpdated = DateTime.Now
-                                                                    });
-                                            }
-                                            else
-                                            {
-                                                var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
-                                                                       new
-                                                                       {
-                                                                           CrmId = request.Id,
-                                                                           UserId = user,
-                                                                           Type = 0,
-                                                                           UserUpdated = userId,
-                                                                           UserCreated = userId,
-                                                                           DateUpdated = DateTime.Now,
-                                                                           DateCreated = DateTime.Now,
-                                                                       });
-
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (crmUser.IsSuccess)
-                                        {
-                                            foreach (var item in crmUser.Data)
-                                            {
-                                                var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_DELETE,
-                                                                       new
-                                                                       {
-                                                                           CrmId = request.Id,
-                                                                           UserId = item.Id
-                                                                       });
-                                            }
-                                        }
-                                    }
-                                }
-                                else
+                            if (crmUser != null)
+                            {
+                                if (request.UserIds.Any())
                                 {
                                     foreach (var user in request.UserIds)
                                     {
-                                        var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
+                                        CrmUserResponse crmUserResponse = crmUser.Data.FirstOrDefault(c => c.CrmId == request.Id && c.UserId == user);
+                                        if (crmUserResponse != null)
+                                        {
+                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_UPDATE,
+                                                                new
+                                                                {
+                                                                    crmUserResponse.Id,
+                                                                    crmUserResponse.UserId,
+                                                                    UserUpdated = userId,
+                                                                    DateUpdated = DateTime.Now
+                                                                });
+                                        }
+                                        else
+                                        {
+                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
                                                                    new
                                                                    {
                                                                        CrmId = request.Id,
@@ -699,97 +661,61 @@ namespace Pelo.Api.Services.CrmServices
                                                                        DateUpdated = DateTime.Now,
                                                                        DateCreated = DateTime.Now,
                                                                    });
+
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (crmUser.IsSuccess)
+                                    {
+                                        foreach (var item in crmUser.Data)
+                                        {
+                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_DELETE,
+                                                                   new
+                                                                   {
+                                                                       CrmId = request.Id,
+                                                                       UserId = item.Id
+                                                                   });
+                                        }
                                     }
                                 }
                             }
+                            else
+                            {
+                                foreach (var user in request.UserIds)
+                                {
+                                    var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
+                                                               new
+                                                               {
+                                                                   CrmId = request.Id,
+                                                                   UserId = user,
+                                                                   Type = 0,
+                                                                   UserUpdated = userId,
+                                                                   UserCreated = userId,
+                                                                   DateUpdated = DateTime.Now,
+                                                                   DateCreated = DateTime.Now,
+                                                               });
+                                }
+                            }
+
                             return await Ok(true);
                         }
+
+                        return await Fail<bool>("Can not execute CRM_UPDATE");
                     }
 
-                    //if (result.IsSuccess)
-                    //{
-                    //    if (result.Data > 0)
-                    //    {
-                    //        var crmId = result.Data;
-
-                    //        #region 3. Thêm người liên quan
-
-                    //        #region 3.1. Kiểm tra xem người tạo có trong danh sách người liên quan không, nếu không có thì thêm vào
-
-                    //        if (request.UserIds == null)
-                    //        {
-                    //            request.UserIds = new List<int>();
-                    //        }
-
-                    //        if (!request.UserIds.Any())
-                    //        {
-                    //            request.UserIds.Add(userId);
-                    //        }
-
-                    //        if (!request.UserIds.Contains(userId))
-                    //        {
-                    //            request.UserIds.Add(userId);
-                    //        }
-
-                    //        #endregion
-
-                    //        #endregion
-
-                    //        var notificationUserCrmsResponse = await _appConfigService.GetByName("NotificationCRMUsers");
-                    //        if (notificationUserCrmsResponse != null)
-                    //        {
-                    //            if (!string.IsNullOrEmpty(notificationUserCrmsResponse.Data))
-                    //            {
-                    //                var notificationUSerCrms = notificationUserCrmsResponse.Data.Split(' ');
-                    //                if (notificationUSerCrms.Any())
-                    //                {
-                    //                    foreach (var notificationUSerCrm in notificationUSerCrms)
-                    //                    {
-                    //                        var notificationUser = await _userService.GetByUsername(notificationUSerCrm);
-                    //                        if (notificationUser.IsSuccess)
-                    //                        {
-                    //                            if (!request.UserIds.Contains(notificationUser.Data.Id))
-                    //                            {
-                    //                                request.UserIds.Add(notificationUser.Data.Id);
-                    //                            }
-                    //                        }
-                    //                    }
-                    //                }
-                    //            }
-                    //        }
-
-                    //        //#region 5. Thêm lịch sử chỉnh sửa Crm
-
-                    //        //KafkaHelper.PublishMessage(Constants.KAFKA_URL_SERVER,
-                    //        //                           Constants.TOPIC_AUDIT_TABLE,
-                    //        //                           new AuditTableKafkaMessage<AuditCrm>
-                    //        //                           {
-                    //        //                               Table = AuditTableTypeEnum.CRM,
-                    //        //                               LogType = LogTypeEnum.INSERT,
-                    //        //                               Id = crmId,
-                    //        //                               OldValue = null,
-                    //        //                               Value = null,
-                    //        //                               Comment = string.Empty,
-                    //        //                               UserId = userId,
-                    //        //                               Attachments = new Dictionary<string, string>()
-                    //        //                           });
-
-                    //        //#endregion
-
-                    //        return await Ok(true);
-                    //    }
-
-                    //    return await Fail<bool>("Error");
-                    //}
+                    return await Fail<bool>(result.Message);
                 }
+
+                return await Fail<bool>(canUpdate.Message);
             }
             catch (Exception exception)
             {
                 return await Fail<bool>(exception);
             }
-
-            return await Fail<bool>("Error");
         }
+        
         private async Task<TResponse<bool>> CanUpdate(int userId, UpdateCrmRequest request)
         {
             try
