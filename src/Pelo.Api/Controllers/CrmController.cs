@@ -27,7 +27,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/crm")]
-        public async Task<ActionResult<GetCrmPagingResponse>> GetByPaging([FromQuery] GetCrmPagingRequest request)
+        public async Task<ActionResult<GetCrmPagingResponse>> GetByPaging([FromQuery] GetWarrantyPagingRequest request)
         {
             return Ok(await _crmService.GetPaging(await GetUserId(),
                                                   request));
@@ -56,6 +56,24 @@ namespace Pelo.Api.Controllers
                                                         customerId,
                                                         page,
                                                         pageSize));
+        }
+        [HttpGet]
+        [Route("api/crm/{id}")]
+        public async Task<ActionResult<GetCrmModelReponse>> GetCrmById(int id)
+        {
+            return Ok(await _crmService.GetById(await GetUserId(), id));
+        }
+        /// <summary>
+        ///     Them CRM
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("api/crm")]
+        public async Task<ActionResult<bool>> UpdateCrm([FromBody] UpdateCrmRequest request)
+        {
+            return Ok(await _crmService.UpdateCrm(await GetUserId(),
+                                                  request));
         }
     }
 }
