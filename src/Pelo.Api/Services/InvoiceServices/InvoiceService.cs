@@ -294,6 +294,80 @@ namespace Pelo.Api.Services.InvoiceServices
                         }
 
                         #endregion
+
+                        #region 2. Thêm thông báo
+
+                        List<int> receiveNotificationUserIds=new List<int>();
+
+                        #region 2.1. Kiểm tra xem user admin có trong danh sách người nhận thông báo không, nếu  không có thì thêm vào
+
+                        var adminUserId = await _userService.GetByUsername("admin");
+                        if (adminUserId.IsSuccess)
+                        {
+                            receiveNotificationUserIds.Add(adminUserId.Data.Id);
+                        }
+
+                        #endregion
+
+                        #region 4.2. Thêm danh sách tài khoản mặc định nhận thông báo Crm
+
+                        var notificationUserInvoicesResponse = await _appConfigService.GetByName("NotificationInvoiceUsers");
+                        if (notificationUserInvoicesResponse != null)
+                        {
+                            if (!string.IsNullOrEmpty(notificationUserInvoicesResponse.Data))
+                            {
+                                var notificationUSerCrms = notificationUserInvoicesResponse.Data.Split(' ');
+                                if (notificationUSerCrms.Any())
+                                {
+                                    foreach (var notificationUSerCrm in notificationUSerCrms)
+                                    {
+                                        var notificationUser = await _userService.GetByUsername(notificationUSerCrm);
+                                        if (notificationUser.IsSuccess)
+                                        {
+                                            if (!receiveNotificationUserIds.Contains(notificationUser.Data.Id))
+                                            {
+                                                receiveNotificationUserIds.Add(notificationUser.Data.Id);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        #endregion
+
+                        var resultNotification = await Notify(userId,
+                                                              receiveNotificationUserIds,
+                                                              "đã thêm đơn hàng mới",
+                                                              string.Empty,
+                                                              invoiceCode,
+                                                              invoiceId);
+                        //if (!resultNotification.IsSuccess)
+                        //{
+                        //    Log(resultNotification.Message);
+                        //}
+
+                        #endregion
+
+                        //#region 5. Thêm lịch sử chỉnh sửa Crm
+
+                        //KafkaHelper.PublishMessage(Constants.KAFKA_URL_SERVER,
+                        //                           Constants.TOPIC_AUDIT_TABLE,
+                        //                           new AuditTableKafkaMessage<AuditCrm>
+                        //                           {
+                        //                               Table = AuditTableTypeEnum.CRM,
+                        //                               LogType = LogTypeEnum.INSERT,
+                        //                               Id = crmId,
+                        //                               OldValue = null,
+                        //                               Value = null,
+                        //                               Comment = string.Empty,
+                        //                               UserId = userId,
+                        //                               Attachments = new Dictionary<string, string>()
+                        //                           });
+
+                        //#endregion
+
+                        return await Ok(true);
                     }
 
                     return await Fail<bool>(result.Message);
@@ -553,6 +627,55 @@ namespace Pelo.Api.Services.InvoiceServices
             }
 
             return 0;
+        }
+
+        private async Task<TResponse<bool>> Notify(int userId,
+                                                   List<int> userReceiveIds,
+                                                   string title,
+                                                   string message,
+                                                   string code,
+                                                   int invoiceId)
+        {
+            return await Ok(true);
+            //try
+            //{
+            //    var disableNotifications = await _notificationService.DisableNotification();
+            //    if (disableNotifications.IsSuccess)
+            //    {
+            //        foreach (var userReceiveId in userReceiveIds)
+            //        {
+            //            InsertNotificationModel notification = new InsertNotificationModel
+            //            {
+            //                UserId = userId,
+            //                UserReceiveId = userReceiveId,
+            //                Title = $"{title} <b>{code}</b>",
+            //                Message = message,
+            //                Action = $"/Crm/Detail/{crmId}",
+            //                Type = (int)NotificationTypeEnum.CRM,
+            //                Status = userReceiveId == userId
+            //                                                                            ? 1
+            //                                                                            : 0
+            //            };
+            //            var result = await _notificationService.Add(notification);
+            //            if (result.IsSuccess)
+            //            {
+            //                KafkaHelper.PublishMessage(Constants.KAFKA_URL_SERVER,
+            //                                           Constants.TOPIC_UPDATE_NOTIFICATION,
+            //                                           new UpdateNotificationKafkaMessage
+            //                                           {
+            //                                               UserId = userReceiveId,
+            //                                               Status = UpdateUserNotificationEnum.INSERT
+            //                                           });
+            //            }
+            //        }
+            //    }
+
+            //    return await Fail<bool>(disableNotifications.Message);
+            //}
+            //catch (Exception exception)
+            //{
+            //    return await Fail<bool>(exception);
+            //}
         }
     }
 }
