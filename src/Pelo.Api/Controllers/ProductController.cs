@@ -21,7 +21,7 @@ namespace Pelo.Api.Controllers
         }
 
         /// <summary>
-        ///     Lấy tất cả sản phẩm
+        ///     Lấy tất cả sản phẩm 
         /// </summary>
         /// <returns></returns>
         [HttpGet]
