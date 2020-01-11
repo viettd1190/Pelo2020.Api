@@ -82,7 +82,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("api/crm/comment")]
-        public async Task<ActionResult<bool>> Comment([FromBody] CommentCrmRequest request)
+        public async Task<ActionResult<bool>> Comment([FromForm] CommentCrmRequest request)
         {
             return Ok(await _crmService.UpdateComment(await GetUserId(),
                                                   request));
