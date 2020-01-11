@@ -68,7 +68,14 @@
         </member>
         <member name="M:Pelo.Api.Controllers.CrmController.UpdateCrm(Pelo.Common.Dtos.Crm.UpdateCrmRequest)">
             <summary>
-                Them CRM
+                Update CRM
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmController.Comment(Pelo.Common.Dtos.Crm.CommentCrmRequest)">
+            <summary>
+                Them CRM Comment
             </summary>
             <param name="request"></param>
             <returns></returns>
@@ -368,6 +375,14 @@
             </summary>
             <typeparam name="T"></typeparam>
             <param name="message"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Services.BaseServices.BaseService.SaveComment(System.String,System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="sql"></param>
+            <param name="obj"></param>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Services.CrmServices.ICrmService.GetPaging(System.Int32,Pelo.Common.Dtos.Crm.GetWarrantyPagingRequest)">

@@ -64,7 +64,7 @@ namespace Pelo.Api.Controllers
             return Ok(await _crmService.GetById(await GetUserId(), id));
         }
         /// <summary>
-        ///     Them CRM
+        ///     Update CRM
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -73,6 +73,18 @@ namespace Pelo.Api.Controllers
         public async Task<ActionResult<bool>> UpdateCrm([FromBody] UpdateCrmRequest request)
         {
             return Ok(await _crmService.UpdateCrm(await GetUserId(),
+                                                  request));
+        }
+        /// <summary>
+        ///     Them CRM Comment
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("api/crm/comment")]
+        public async Task<ActionResult<bool>> Comment([FromBody] CommentCrmRequest request)
+        {
+            return Ok(await _crmService.UpdateComment(await GetUserId(),
                                                   request));
         }
     }

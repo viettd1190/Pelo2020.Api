@@ -87,5 +87,16 @@ namespace Pelo.Api.Services.BaseServices
         {
             _logger.Info(exception);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        protected bool SaveComment(string sql, dynamic obj)
+        {
+            return true;
+        }
     }
 }

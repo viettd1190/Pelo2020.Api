@@ -52,6 +52,8 @@ namespace Pelo.Api.Services.CrmServices
         Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest request);
 
         Task<TResponse<GetCrmModelReponse>> GetById(int userId, int id);
+
+        Task<TResponse<bool>> UpdateComment(int userId, CommentCrmRequest comment);
     }
 
     public class CrmService : BaseService,
@@ -591,19 +593,18 @@ namespace Pelo.Api.Services.CrmServices
             }
         }
 
-public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest request)
+        public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest request)
         {
             try
             {
-                var canUpdate = await CanUpdate(userId,
+                var oldInformation = await CanUpdate(userId,
                                                 request);
-                if (canUpdate.IsSuccess)
+                if (oldInformation.IsSuccess)
                 {
                     var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_UPDATE,
                                                                            new
                                                                            {
                                                                                request.Id,
-                                                                               request.CrmStatusId,
                                                                                request.ContactDate,
                                                                                request.ProductGroupId,
                                                                                request.CrmTypeId,
@@ -619,6 +620,38 @@ public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest reques
                     {
                         if (result.Data > 0)
                         {
+                            if (oldInformation.Data.CrmPriorityId != request.CrmPriorityId)
+                            {
+
+                            }
+                            if (oldInformation.Data.CrmTypeId != request.CrmTypeId)
+                            {
+
+                            }
+                            if (oldInformation.Data.Visit != request.Visit)
+                            {
+
+                            }
+                            if (oldInformation.Data.Need != request.Need)
+                            {
+
+                            }
+                            if (oldInformation.Data.ProductGroupId != request.ProductGroupId)
+                            {
+
+                            }
+                            if (oldInformation.Data.CustomerSourceId != request.CustomerSourceId)
+                            {
+
+                            }
+                            if (oldInformation.Data.ContactDate != request.ContactDate)
+                            {
+
+                            }
+                            if (oldInformation.Data.Description != request.Description)
+                            {
+
+                            }
                             var crmId = result.Data;
                             var crmUser = await ReadOnlyRepository.QueryAsync<CrmUserResponse>(SqlQuery.GET_CRM_USER_BY_CRMID,
                                                                            new
@@ -629,28 +662,34 @@ public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest reques
                             {
                                 request.UserIds = new List<int>();
                             }
+                            if (crmUser.Data.Any() || request.UserIds.Any())
+                            {
+                                if (crmUser.Data.Any() && (request.UserIds == null || !request.UserIds.Any()))
+                                {
 
+                                }
+                                else if (request.UserIds.Any() && (crmUser.Data == null || !crmUser.Data.Any()))
+                                {
+
+                                }
+                            }
                             if (crmUser != null)
                             {
                                 if (request.UserIds.Any())
                                 {
+                                    CrmUserResponse[] crmUserResponse = crmUser.Data.Where(c => c.CrmId == request.Id && !request.UserIds.Contains(c.UserId)).ToArray();
+                                    foreach (var item in crmUserResponse)
+                                    {
+                                        await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_DELETE,
+                                                                   new
+                                                                   {
+                                                                       CrmId = request.Id,
+                                                                       UserId = item.Id
+                                                                   });
+                                    }
                                     foreach (var user in request.UserIds)
                                     {
-                                        CrmUserResponse crmUserResponse = crmUser.Data.FirstOrDefault(c => c.CrmId == request.Id && c.UserId == user);
-                                        if (crmUserResponse != null)
-                                        {
-                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_UPDATE,
-                                                                new
-                                                                {
-                                                                    crmUserResponse.Id,
-                                                                    crmUserResponse.UserId,
-                                                                    UserUpdated = userId,
-                                                                    DateUpdated = DateTime.Now
-                                                                });
-                                        }
-                                        else
-                                        {
-                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
+                                        var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
                                                                    new
                                                                    {
                                                                        CrmId = request.Id,
@@ -661,8 +700,6 @@ public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest reques
                                                                        DateUpdated = DateTime.Now,
                                                                        DateCreated = DateTime.Now,
                                                                    });
-
-                                        }
                                     }
                                 }
                                 else
@@ -708,15 +745,15 @@ public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest reques
                     return await Fail<bool>(result.Message);
                 }
 
-                return await Fail<bool>(canUpdate.Message);
+                return await Fail<bool>(oldInformation.Message);
             }
             catch (Exception exception)
             {
                 return await Fail<bool>(exception);
             }
         }
-        
-        private async Task<TResponse<bool>> CanUpdate(int userId, UpdateCrmRequest request)
+
+        private async Task<TResponse<CrmDetailResponse>> CanUpdate(int userId, UpdateCrmRequest request)
         {
             try
             {
@@ -725,52 +762,48 @@ public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest reques
                 {
                     if (request.Id == 0)
                     {
-                        return await Fail<bool>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<CrmDetailResponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
                     }
 
                     if (request.ProductGroupId == 0)
                     {
-                        return await Fail<bool>(ErrorEnum.PRODUCT_GROUP_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<CrmDetailResponse>(ErrorEnum.PRODUCT_GROUP_HAS_NOT_EXIST.GetStringValue());
                     }
                     if (request.CrmPriorityId == 0)
                     {
-                        return await Fail<bool>(ErrorEnum.CRM_PRIORITY_HAS_NOT_EXIST.GetStringValue());
-                    }
-                    if (request.CrmStatusId == 0)
-                    {
-                        return await Fail<bool>(ErrorEnum.CRM_STATUS_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<CrmDetailResponse>(ErrorEnum.CRM_PRIORITY_HAS_NOT_EXIST.GetStringValue());
                     }
                     if (request.CrmTypeId == 0)
                     {
-                        return await Fail<bool>(ErrorEnum.CRM_TYPE_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<CrmDetailResponse>(ErrorEnum.CRM_TYPE_HAS_NOT_EXIST.GetStringValue());
                     }
                     if (request.CustomerSourceId == 0)
                     {
-                        return await Fail<bool>(ErrorEnum.CUSTOMER_SOURCE_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<CrmDetailResponse>(ErrorEnum.CUSTOMER_SOURCE_HAS_NOT_EXIST.GetStringValue());
                     }
-                    var checkIdInvalid = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.GET_CRM_BY_ID,
+                    var checkIdInvalid = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmDetailResponse>(SqlQuery.GET_CRM_BY_ID,
                                                                                                 new
                                                                                                 {
                                                                                                     request.Id
                                                                                                 });
                     if (checkIdInvalid.IsSuccess)
                     {
-                        if (checkIdInvalid.Data > 0)
+                        if (checkIdInvalid.Data != null)
                         {
-                            return await Ok(true);
+                            return await Ok(checkIdInvalid.Data);
                         }
 
-                        return await Fail<bool>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<CrmDetailResponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
                     }
 
-                    return await Fail<bool>(checkIdInvalid.Message);
+                    return await Fail<CrmDetailResponse>(checkIdInvalid.Message);
                 }
 
-                return await Fail<bool>(checkPermission.Message);
+                return await Fail<CrmDetailResponse>(checkPermission.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<bool>(exception);
+                return await Fail<CrmDetailResponse>(exception);
             }
         }
         public async Task<TResponse<GetCrmModelReponse>> GetById(int userId, int id)
@@ -789,7 +822,7 @@ public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest reques
                                                                                                               {
                                                                                                                   Id = id
                                                                                                               });
-                        if(result.IsSuccess)
+                        if (result.IsSuccess)
                         {
                             if (result.Data != null)
                             {
@@ -818,5 +851,59 @@ public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest reques
                 return await Fail<GetCrmModelReponse>(exception);
             }
         }
+
+        public async Task<TResponse<bool>> UpdateComment(int userId, CommentCrmRequest request)
+        {
+            try
+            {
+                var crm = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmDetailResponse>(SqlQuery.GET_CRM_BY_ID,
+                                                                                                new
+                                                                                                {
+                                                                                                    request.Id
+                                                                                                });
+                if (crm.IsSuccess)
+                {
+                    var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_UPDATE,
+                                                                           new
+                                                                           {
+                                                                               request.Id,
+                                                                               request.CrmStatusId,
+                                                                               UserUpdated = userId,
+                                                                               DateUpdated = DateTime.Now
+                                                                           });
+                    if (result.IsSuccess)
+                    {
+                        if (crm.Data != null)
+                        {
+                            bool isUpdate = false;
+                            if (crm.Data.CrmStatusId != request.CrmStatusId)
+                            {
+                                isUpdate = true;
+                            }
+                            //SaveComment(SqlQuery.CRM_COMMENT_INSERT, new
+                            //{
+                            //    CrmId = request.Id,
+                            //    request.Comment,
+                            //    FileId = 0,
+                            //    Type = isUpdate,
+                            //    OldStatusId = crm.Data.CrmStatusId,
+                            //    NewStatusId = crm.Data.CrmStatusId,
+                            //    UserIds = "",
+                            //    UserCreated = userId,
+                            //    DateCreated = DateTime.Now,
+                            //});
+                        }
+                        return await Ok(true);
+                    }
+                }
+                return await Fail<bool>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+            }
+            catch (Exception)
+            {
+                return await Fail<bool>(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue());
+            }
+        }
+
+
     }
 }

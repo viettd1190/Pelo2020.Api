@@ -1356,8 +1356,7 @@
                                             SELECT CAST(SCOPE_IDENTITY() as int);";
 
         public const string CRM_UPDATE = @"UPDATE dbo.Crm
-                                            SET CrmStatusId = @CrmStatusId,
-                                                ContactDate = @ContactDate,
+                                            SET ContactDate = @ContactDate,
                                                 ProductGroupId = @ProductGroupId,
                                                 CrmPriorityId = @CrmPriorityId,
                                                 CrmTypeId = @CrmTypeId,
@@ -1368,7 +1367,43 @@
                                                 UserUpdated = @UserUpdated,
                                                 DateUpdated = @DateUpdated
                                                WHERE Id = @Id";
-
+        public const string STATUS_CRM_UPDATE = @"UPDATE dbo.Crm
+                                            SET ContactDate = @ContactDate,
+                                                ProductGroupId = @ProductGroupId,
+                                                CrmPriorityId = @CrmPriorityId,
+                                                CrmTypeId = @CrmTypeId,
+                                                Need = @Need,
+                                                Description = @Description,
+                                                CustomerSourceId = @CustomerSourceId,
+                                                Visit = @Visit,
+                                                UserUpdated = @UserUpdated,
+                                                DateUpdated = @DateUpdated
+                                               WHERE Id = @Id";
+        public const string CRM_COMMENT_INSERT= @"INSERT dbo.CrmComment
+                                                        (
+                                                            CrmId,
+                                                            Comment,
+                                                            FileId
+                                                            Type,
+                                                            UserIds,
+                                                            OldStatusId,
+                                                            NewStatusId,
+                                                            UserCreated,
+                                                            DateCreated,
+                                                            UserUpdated
+                                                        )
+                                                        VALUES
+                                                        (   @CrmId,
+                                                            @Comment,
+                                                            @FileId,
+                                                            @Type,
+                                                            @OldStatusId,
+                                                            @NewStatusId,
+                                                            @UserIds,
+                                                            @UserCreated,
+                                                            @DateCreated,
+                                                            @UserUpdated;
+                                                        SELECT CAST(SCOPE_IDENTITY() as int);";
         public const string GET_CRM_BY_ID = @"SELECT c.Id,
 		                                        c.Code,
 		                                        c.CustomerId,
