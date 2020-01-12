@@ -261,6 +261,36 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.GetPaging(Pelo.Common.Dtos.Invoice.GetInvoiceStatusPagingRequest)">
+            <summary>
+                Lấy tất cả trạng thái đơn hàng/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.GetById(System.Int32)">
+            <summary>
+                Lấy trạng thái đơn hàng
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.Insert(Pelo.Common.Dtos.Invoice.InsertInvoiceStatus)">
+            <summary>
+                insert trạng thái đơn hàng
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.Update(Pelo.Common.Dtos.Invoice.UpdateInvoiceStatus)">
+            <summary>
+                insert trạng thái đơn hàng
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.Delete(System.Int32)">
+            <summary>
+                delete trạng thái đơn hàng
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.PayMethodController.GetAll">
             <summary>
                 Lấy tất cả hình thức thanh toán
@@ -269,7 +299,7 @@
         </member>
         <member name="M:Pelo.Api.Controllers.ProductController.GetAll">
             <summary>
-                Lấy tất cả sản phẩm
+                Lấy tất cả sản phẩm 
             </summary>
             <returns></returns>
         </member>

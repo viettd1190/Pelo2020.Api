@@ -31,5 +31,57 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _crmPriorityService.GetAll(await GetUserId()));
         }
+
+        /// <summary>
+        ///     Lấy tất cả mức độ khẩn cấp CRM/page
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/crm_priority")]
+        public async Task<ActionResult<GetCrmPriorityPagingResponse>> GetPaging([FromQuery] GetCrmPriorityPagingRequest request)
+        {
+            return Ok(await _crmPriorityService.GetPaging(await GetUserId(), request));
+        }
+        /// <summary>
+        ///     Lấy mức độ khẩn cấp CRM
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/crm_priority/{id}")]
+        public async Task<ActionResult<GetCrmPriorityResponse>> GetById(int id)
+        {
+            return Ok(await _crmPriorityService.GetById(await GetUserId(), id));
+        }
+        /// <summary>
+        ///     insert mức độ khẩn cấp CRM
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/crm_priority/insert")]
+        public async Task<ActionResult<bool>> Insert([FromBody] InsertCrmPriority request)
+        {
+            return Ok(await _crmPriorityService.Insert(await GetUserId(), request));
+        }
+
+        /// <summary>
+        ///     insert mức độ khẩn cấp CRM
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("api/crm_priority/update")]
+        public async Task<ActionResult<bool>> Update([FromBody] UpdateCrmPriority request)
+        {
+            return Ok(await _crmPriorityService.Update(await GetUserId(), request));
+        }
+        /// <summary>
+        ///     delete mức độ khẩn cấp CRM
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("api/crm_priority/delete/{id}")]
+        public async Task<ActionResult<bool>> Delete(int id)
+        {
+            return Ok(await _crmPriorityService.Delete(await GetUserId(), id));
+        }
     }
 }
