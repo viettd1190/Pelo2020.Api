@@ -753,7 +753,7 @@ namespace Pelo.Api.Services.CrmServices
             }
         }
 
-        private async Task<TResponse<CrmDetailResponse>> CanUpdate(int userId, UpdateCrmRequest request)
+        private async Task<TResponse<GetCrmModelReponse>> CanUpdate(int userId, UpdateCrmRequest request)
         {
             try
             {
@@ -762,26 +762,26 @@ namespace Pelo.Api.Services.CrmServices
                 {
                     if (request.Id == 0)
                     {
-                        return await Fail<CrmDetailResponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
                     }
 
                     if (request.ProductGroupId == 0)
                     {
-                        return await Fail<CrmDetailResponse>(ErrorEnum.PRODUCT_GROUP_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<GetCrmModelReponse>(ErrorEnum.PRODUCT_GROUP_HAS_NOT_EXIST.GetStringValue());
                     }
                     if (request.CrmPriorityId == 0)
                     {
-                        return await Fail<CrmDetailResponse>(ErrorEnum.CRM_PRIORITY_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_PRIORITY_HAS_NOT_EXIST.GetStringValue());
                     }
                     if (request.CrmTypeId == 0)
                     {
-                        return await Fail<CrmDetailResponse>(ErrorEnum.CRM_TYPE_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_TYPE_HAS_NOT_EXIST.GetStringValue());
                     }
                     if (request.CustomerSourceId == 0)
                     {
-                        return await Fail<CrmDetailResponse>(ErrorEnum.CUSTOMER_SOURCE_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<GetCrmModelReponse>(ErrorEnum.CUSTOMER_SOURCE_HAS_NOT_EXIST.GetStringValue());
                     }
-                    var checkIdInvalid = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmDetailResponse>(SqlQuery.GET_CRM_BY_ID,
+                    var checkIdInvalid = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCrmModelReponse>(SqlQuery.GET_CRM_BY_ID,
                                                                                                 new
                                                                                                 {
                                                                                                     request.Id
@@ -793,17 +793,17 @@ namespace Pelo.Api.Services.CrmServices
                             return await Ok(checkIdInvalid.Data);
                         }
 
-                        return await Fail<CrmDetailResponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
                     }
 
-                    return await Fail<CrmDetailResponse>(checkIdInvalid.Message);
+                    return await Fail<GetCrmModelReponse>(checkIdInvalid.Message);
                 }
 
-                return await Fail<CrmDetailResponse>(checkPermission.Message);
+                return await Fail<GetCrmModelReponse>(checkPermission.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<CrmDetailResponse>(exception);
+                return await Fail<GetCrmModelReponse>(exception);
             }
         }
         public async Task<TResponse<GetCrmModelReponse>> GetById(int userId, int id)
