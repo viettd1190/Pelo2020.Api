@@ -38,7 +38,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/crm_priority")]
-        public async Task<ActionResult<GetCrmPriorityPagingResponse>> GetPaging([FromQuery] GetCrmPriorityPagingRequest request)
+        public async Task<ActionResult<GetCrmStatusPagingResponse>> GetPaging([FromQuery] GetCrmPriorityPagingRequest request)
         {
             return Ok(await _crmPriorityService.GetPaging(await GetUserId(), request));
         }
@@ -48,7 +48,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/crm_priority/{id}")]
-        public async Task<ActionResult<GetCrmPriorityResponse>> GetById(int id)
+        public async Task<ActionResult<GetCrmStatusResponse>> GetById(int id)
         {
             return Ok(await _crmPriorityService.GetById(await GetUserId(), id));
         }
@@ -64,7 +64,7 @@ namespace Pelo.Api.Controllers
         }
 
         /// <summary>
-        ///     insert mức độ khẩn cấp CRM
+        ///     update mức độ khẩn cấp CRM
         /// </summary>
         /// <returns></returns>
         [HttpPut]
