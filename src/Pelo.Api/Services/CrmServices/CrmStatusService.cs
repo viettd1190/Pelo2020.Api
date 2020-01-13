@@ -40,9 +40,37 @@ namespace Pelo.Api.Services.CrmServices
             _roleService = roleService;
         }
 
-        public Task<TResponse<bool>> Delete(int userId, int id)
+        public async Task<TResponse<bool>> Delete(int userId, int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var canGetAll = await CanGetAll(userId);
+                if (canGetAll.IsSuccess)
+                {
+                    var data = await GetById(userId, id);
+                    if (data.IsSuccess)
+                    {
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CRM_STATUS_DELETE,
+                                                                                                              new
+                                                                                                              {
+                                                                                                                  Id = id,
+                                                                                                                  UserUpdated = userId,
+                                                                                                                  DateUpdated = DateTime.Now
+                                                                                                              });
+                        if (result.IsSuccess)
+                        {
+                            return await Ok(true);
+                        }
+                        return await Fail<bool>(result.Message);
+                    }
+                    return await Fail<bool>(data.Message);
+                }
+                return await Fail<bool>(canGetAll.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
         }
 
         #region ICrmStatusService Members
