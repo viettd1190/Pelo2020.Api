@@ -177,6 +177,49 @@
                                                         WHERE IsDeleted = 0
                                                         ORDER BY Id;";
 
+        public const string CUSTOMER_SOURCE_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.CustomerSource 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.CustomerSource 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string CUSTOMER_SOURCE_GET_BY_ID = @"SELECT * FROM dbo.CustomerSource WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string CUSTOMER_SOURCE_INSERT = @"INSERT dbo.CustomerSource
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string CUSTOMER_SOURCE_UPDATE = @"  UPDATE dbo.CustomerSource
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string CUSTOMER_SOURCE_DELETE = @"  UPDATE dbo.CustomerSource
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
         #endregion
 
         #region ProductGroup

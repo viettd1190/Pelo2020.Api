@@ -14,7 +14,7 @@ namespace Pelo.Api.Services.CrmServices
     {
         Task<TResponse<IEnumerable<CrmTypeSimpleModel>>> GetAll(int userId);
 
-        Task<TResponse<IEnumerable<GetCrmTypePagingResponse>>> GetPaging(int v, GetCrmTypePagingRequest request);
+        Task<TResponse<PageResult<GetCrmTypePagingResponse>>> GetPaging(int v, GetCrmTypePagingRequest request);
 
         Task<TResponse<GetCrmTypeResponse>> GetById(int userId, int id);
 
@@ -80,10 +80,10 @@ namespace Pelo.Api.Services.CrmServices
             try
             {
                 var canGetAll = await CanGetAll(userId);
-                if(canGetAll.IsSuccess)
+                if (canGetAll.IsSuccess)
                 {
                     var result = await ReadOnlyRepository.QueryAsync<CrmTypeSimpleModel>(SqlQuery.CRM_TYPE_GET_ALL);
-                    if(result.IsSuccess)
+                    if (result.IsSuccess)
                     {
                         return await Ok(result.Data);
                     }
@@ -106,7 +106,7 @@ namespace Pelo.Api.Services.CrmServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCrmTypeResponse>(SqlQuery.CRM_TYPe_GET_BY_ID,
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCrmTypeResponse>(SqlQuery.CRM_TYPE_GET_BY_ID,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -127,14 +127,14 @@ namespace Pelo.Api.Services.CrmServices
             }
         }
 
-        public async Task<TResponse<IEnumerable<GetCrmTypePagingResponse>>> GetPaging(int userId, GetCrmTypePagingRequest request)
+        public async Task<TResponse<PageResult<GetCrmTypePagingResponse>>> GetPaging(int userId, GetCrmTypePagingRequest request)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryAsync<GetCrmTypePagingResponse>(SqlQuery.CRM_TYPE_GET_BY_PAGING,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmTypePagingResponse, int>(SqlQuery.CRM_TYPE_GET_BY_PAGING,
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Name,
@@ -143,17 +143,17 @@ namespace Pelo.Api.Services.CrmServices
                                                                                                               });
                     if (result.IsSuccess)
                     {
-                        return await Ok(result.Data);
+                        return await Ok(new PageResult<GetCrmTypePagingResponse>(request.Page, request.PageSize, result.Data.Item2, result.Data.Item1));
                     }
 
-                    return await Fail<IEnumerable<GetCrmTypePagingResponse>>(result.Message);
+                    return await Fail<PageResult<GetCrmTypePagingResponse>>(result.Message);
                 }
 
-                return await Fail<IEnumerable<GetCrmTypePagingResponse>>(canGetAll.Message);
+                return await Fail<PageResult<GetCrmTypePagingResponse>>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<IEnumerable<GetCrmTypePagingResponse>>(exception);
+                return await Fail<PageResult<GetCrmTypePagingResponse>>(exception);
             }
         }
 
@@ -226,7 +226,7 @@ namespace Pelo.Api.Services.CrmServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if(checkPermission.IsSuccess)
+                if (checkPermission.IsSuccess)
                 {
                     return await Ok(true);
                 }

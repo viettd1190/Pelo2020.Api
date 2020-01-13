@@ -6,6 +6,7 @@ using Pelo.Api.Services.CustomerServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.CrmPriority;
 using Pelo.Common.Dtos.CrmStatus;
+using Pelo.Common.Models;
 
 namespace Pelo.Api.Controllers
 {
@@ -39,7 +40,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/crm_status")]
-        public async Task<ActionResult<GetCrmStatusPagingResponse>> GetPaging([FromQuery] GetCrmStatusPagingRequest request)
+        public async Task<ActionResult<PageResult<GetCrmStatusPagingResponse>>> GetPaging([FromQuery] GetCrmStatusPagingRequest request)
         {
             return Ok(await _crmStatusService.GetPaging(await GetUserId(), request));
         }

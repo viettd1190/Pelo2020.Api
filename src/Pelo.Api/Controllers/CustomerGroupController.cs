@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pelo.Api.Services.CustomerServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.CustomerGroup;
+using Pelo.Common.Models;
 
 namespace Pelo.Api.Controllers
 {
@@ -38,7 +39,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/customer_group")]
-        public async Task<ActionResult<GetCustomerGroupPagingResponse>> GetByPaging([FromQuery] GetCustomerGroupPagingRequest request)
+        public async Task<ActionResult<PageResult<GetCustomerGroupPagingResponse>>> GetByPaging([FromQuery] GetCustomerGroupPagingRequest request)
         {
             return Ok(await _customerGroupService.GetPaging(await GetUserId(),
                                                             request));
