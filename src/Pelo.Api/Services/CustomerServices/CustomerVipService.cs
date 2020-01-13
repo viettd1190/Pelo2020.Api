@@ -57,17 +57,17 @@ namespace Pelo.Api.Services.CustomerServices
             try
             {
                 var canGetPaging = await CanGetPaging(userId);
-                if(canGetPaging.IsSuccess)
+                if (canGetPaging.IsSuccess)
                 {
                     var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCustomerVipPagingResponse, int>(string.Format(SqlQuery.CUSTOMER_VIP_GET_BY_PAGING,
                                                                                                                                 request.ColumnOrder,
                                                                                                                                 request.SortDir.ToUpper()),
                                                                                                                   new
                                                                                                                   {
-                                                                                                                          Skip = (request.Page - 1) * request.PageSize,
-                                                                                                                          Take = request.PageSize
+                                                                                                                      Skip = (request.Page - 1) * request.PageSize,
+                                                                                                                      Take = request.PageSize
                                                                                                                   });
-                    if(result.IsSuccess)
+                    if (result.IsSuccess)
                         return await Ok(new PageResult<GetCustomerVipPagingResponse>(request.Page,
                                                                                      request.PageSize,
                                                                                      result.Data.Item2,
@@ -91,20 +91,22 @@ namespace Pelo.Api.Services.CustomerServices
             {
                 var canInsert = await CanInsert(userId,
                                                 request);
-                if(canInsert.IsSuccess)
+                if (canInsert.IsSuccess)
                 {
                     var result = await WriteRepository.ExecuteAsync(SqlQuery.CUSTOMER_VIP_INSERT,
                                                                     new
                                                                     {
-                                                                            request.Name,
-                                                                            request.Color,
-                                                                            request.Profit,
-                                                                            UserCreated = userId,
-                                                                            UserUpdated = userId
+                                                                        request.Name,
+                                                                        request.Color,
+                                                                        request.Profit,
+                                                                        UserCreated = userId,
+                                                                        DateCreated = DateTime.Now,
+                                                                        UserUpdated = userId,
+                                                                        DateUpdated = DateTime.Now
                                                                     });
-                    if(result.IsSuccess)
+                    if (result.IsSuccess)
                     {
-                        if(result.Data > 0)
+                        if (result.Data > 0)
                         {
                             return await Ok(true);
                         }
@@ -131,20 +133,20 @@ namespace Pelo.Api.Services.CustomerServices
             {
                 var canUpdate = await CanUpdate(userId,
                                                 request);
-                if(canUpdate.IsSuccess)
+                if (canUpdate.IsSuccess)
                 {
                     var result = await WriteRepository.ExecuteAsync(SqlQuery.CUSTOMER_VIP_UPDATE,
                                                                     new
                                                                     {
-                                                                            request.Id,
-                                                                            request.Name,
-                                                                            request.Color,
-                                                                            request.Profit,
-                                                                            UserUpdated = userId
+                                                                        request.Id,
+                                                                        request.Name,
+                                                                        request.Color,
+                                                                        request.Profit,
+                                                                        UserUpdated = userId
                                                                     });
-                    if(result.IsSuccess)
+                    if (result.IsSuccess)
                     {
-                        if(result.Data > 0)
+                        if (result.Data > 0)
                         {
                             return await Ok(true);
                         }
@@ -171,16 +173,16 @@ namespace Pelo.Api.Services.CustomerServices
             {
                 var canGetById = await CanGetById(userId,
                                                   id);
-                if(canGetById.IsSuccess)
+                if (canGetById.IsSuccess)
                 {
                     var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCustomerVipByIdResponse>(SqlQuery.CUSTOMER_VIP_GET_BY_ID,
                                                                                                                new
                                                                                                                {
-                                                                                                                       Id = id
+                                                                                                                   Id = id
                                                                                                                });
-                    if(result.IsSuccess)
+                    if (result.IsSuccess)
                     {
-                        if(result.Data != null)
+                        if (result.Data != null)
                         {
                             return await Ok(result.Data);
                         }
@@ -206,17 +208,17 @@ namespace Pelo.Api.Services.CustomerServices
             {
                 var canDelete = await CanDelete(userId,
                                                 id);
-                if(canDelete.IsSuccess)
+                if (canDelete.IsSuccess)
                 {
                     var result = await WriteRepository.ExecuteAsync(SqlQuery.CUSTOMER_VIP_DELETE,
                                                                     new
                                                                     {
-                                                                            Id = id,
-                                                                            UserUpdated = userId
+                                                                        Id = id,
+                                                                        UserUpdated = userId
                                                                     });
-                    if(result.IsSuccess)
+                    if (result.IsSuccess)
                     {
-                        if(result.Data > 0)
+                        if (result.Data > 0)
                         {
                             return await Ok(true);
                         }
@@ -242,7 +244,7 @@ namespace Pelo.Api.Services.CustomerServices
             {
                 var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_VIP_GET_DEFAULT,
                                                                                     null);
-                if(result.IsSuccess)
+                if (result.IsSuccess)
                 {
                     return await Ok(result.Data);
                 }
@@ -260,10 +262,10 @@ namespace Pelo.Api.Services.CustomerServices
             try
             {
                 var canGetAll = await CanGetAll(userId);
-                if(canGetAll.IsSuccess)
+                if (canGetAll.IsSuccess)
                 {
                     var result = await ReadOnlyRepository.QueryAsync<CustomerVipSimpleModel>(SqlQuery.CUSTOMER_VIP_GET_ALL);
-                    if(result.IsSuccess)
+                    if (result.IsSuccess)
                     {
                         return await Ok(result.Data);
                     }
@@ -286,7 +288,7 @@ namespace Pelo.Api.Services.CustomerServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if(checkPermission.IsSuccess)
+                if (checkPermission.IsSuccess)
                 {
                     return await Ok(true);
                 }
@@ -305,16 +307,16 @@ namespace Pelo.Api.Services.CustomerServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if(checkPermission.IsSuccess)
+                if (checkPermission.IsSuccess)
                 {
                     var checkInvalidName = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_VIP_CHJECK_NAME_INVALID,
                                                                                                   new
                                                                                                   {
-                                                                                                          request.Name
+                                                                                                      request.Name
                                                                                                   });
-                    if(checkInvalidName.IsSuccess)
+                    if (checkInvalidName.IsSuccess)
                     {
-                        if(checkInvalidName.Data > 0)
+                        if (checkInvalidName.Data > 0)
                         {
                             return await Fail<bool>(ErrorEnum.CUSTOMER_VIP_HAS_EXIST.GetStringValue());
                         }
@@ -322,12 +324,12 @@ namespace Pelo.Api.Services.CustomerServices
                         var checkInvalidProfit = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_VIP_CHECK_PROFIT_INVALID,
                                                                                                         new
                                                                                                         {
-                                                                                                                request.Profit
+                                                                                                            request.Profit
                                                                                                         });
 
-                        if(checkInvalidProfit.IsSuccess)
+                        if (checkInvalidProfit.IsSuccess)
                         {
-                            if(checkInvalidProfit.Data > 0)
+                            if (checkInvalidProfit.Data > 0)
                             {
                                 return await Fail<bool>(ErrorEnum.CUSTOMER_VIP_PROFIT_HAS_EXIST.GetStringValue());
                             }
@@ -355,23 +357,23 @@ namespace Pelo.Api.Services.CustomerServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if(checkPermission.IsSuccess)
+                if (checkPermission.IsSuccess)
                 {
                     var checkInvalidId = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_VIP_CHECK_ID_INVALID,
                                                                                                 new
                                                                                                 {
-                                                                                                        request.Id
+                                                                                                    request.Id
                                                                                                 });
-                    if(checkInvalidId.IsSuccess)
+                    if (checkInvalidId.IsSuccess)
                     {
                         var checkInvalidName = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_VIP_CHJECK_NAME_INVALID,
                                                                                                       new
                                                                                                       {
-                                                                                                              request.Name
+                                                                                                          request.Name
                                                                                                       });
-                        if(checkInvalidName.IsSuccess)
+                        if (checkInvalidName.IsSuccess)
                         {
-                            if(checkInvalidName.Data > 0)
+                            if (checkInvalidName.Data > 0)
                             {
                                 return await Fail<bool>(ErrorEnum.CUSTOMER_VIP_HAS_EXIST.GetStringValue());
                             }
@@ -379,12 +381,12 @@ namespace Pelo.Api.Services.CustomerServices
                             var checkInvalidProfit = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_VIP_CHECK_PROFIT_INVALID,
                                                                                                             new
                                                                                                             {
-                                                                                                                    request.Profit
+                                                                                                                request.Profit
                                                                                                             });
 
-                            if(checkInvalidProfit.IsSuccess)
+                            if (checkInvalidProfit.IsSuccess)
                             {
-                                if(checkInvalidProfit.Data > 0)
+                                if (checkInvalidProfit.Data > 0)
                                 {
                                     return await Fail<bool>(ErrorEnum.CUSTOMER_VIP_PROFIT_HAS_EXIST.GetStringValue());
                                 }
@@ -415,7 +417,7 @@ namespace Pelo.Api.Services.CustomerServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if(checkPermission.IsSuccess)
+                if (checkPermission.IsSuccess)
                 {
                     return await Ok(true);
                 }
@@ -434,16 +436,16 @@ namespace Pelo.Api.Services.CustomerServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if(checkPermission.IsSuccess)
+                if (checkPermission.IsSuccess)
                 {
                     var checkIdInvalid = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_VIP_CHECK_ID_INVALID,
                                                                                                 new
                                                                                                 {
-                                                                                                        Id = id
+                                                                                                    Id = id
                                                                                                 });
-                    if(checkIdInvalid.IsSuccess)
+                    if (checkIdInvalid.IsSuccess)
                     {
-                        if(checkIdInvalid.Data > 0)
+                        if (checkIdInvalid.Data > 0)
                         {
                             return await Ok(true);
                         }
@@ -467,7 +469,7 @@ namespace Pelo.Api.Services.CustomerServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if(checkPermission.IsSuccess)
+                if (checkPermission.IsSuccess)
                 {
                     return await Ok(true);
                 }

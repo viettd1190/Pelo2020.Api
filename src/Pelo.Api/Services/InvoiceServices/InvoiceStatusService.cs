@@ -14,7 +14,7 @@ namespace Pelo.Api.Services.InvoiceServices
     {
         Task<TResponse<IEnumerable<InvoiceStatusSimpleModel>>> GetAll(int userId);
 
-        Task<TResponse<IEnumerable<GetInvoiceStatusPagingResponse>>> GetPaging(int userId, GetInvoiceStatusPagingRequest request);
+        Task<TResponse<PageResult<GetInvoiceStatusPagingResponse>>> GetPaging(int userId, GetInvoiceStatusPagingRequest request);
 
         Task<TResponse<GetInvoiceStatusPagingResponse>> GetById(int userId, int id);
 
@@ -131,14 +131,14 @@ namespace Pelo.Api.Services.InvoiceServices
             }
         }
 
-        public async Task<TResponse<IEnumerable<GetInvoiceStatusPagingResponse>>> GetPaging(int userId, GetInvoiceStatusPagingRequest request)
+        public async Task<TResponse<PageResult<GetInvoiceStatusPagingResponse>>> GetPaging(int userId, GetInvoiceStatusPagingRequest request)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryAsync<GetInvoiceStatusPagingResponse>(SqlQuery.INVOICE_STATUS_GET_BY_PAGING,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetInvoiceStatusPagingResponse, int>(SqlQuery.INVOICE_STATUS_GET_BY_PAGING,
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Name,
@@ -147,17 +147,17 @@ namespace Pelo.Api.Services.InvoiceServices
                                                                                                               });
                     if (result.IsSuccess)
                     {
-                        return await Ok(result.Data);
+                        return await Ok(new PageResult<GetInvoiceStatusPagingResponse>(request.Page, request.PageSize, result.Data.Item2, result.Data.Item1));
                     }
 
-                    return await Fail<IEnumerable<GetInvoiceStatusPagingResponse>>(result.Message);
+                    return await Fail<PageResult<GetInvoiceStatusPagingResponse>>(result.Message);
                 }
 
-                return await Fail<IEnumerable<GetInvoiceStatusPagingResponse>>(canGetAll.Message);
+                return await Fail<PageResult<GetInvoiceStatusPagingResponse>>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<IEnumerable<GetInvoiceStatusPagingResponse>>(exception);
+                return await Fail<PageResult<GetInvoiceStatusPagingResponse>>(exception);
             }
         }
 
@@ -176,7 +176,9 @@ namespace Pelo.Api.Services.InvoiceServices
                                                                                                                   request.IsSendSms,
                                                                                                                   request.SmsContent,
                                                                                                                   UserCreated = userId,
-                                                                                                                  DateCreated = DateTime.Now
+                                                                                                                  DateCreated = DateTime.Now,
+                                                                                                                  UserUpdated = userId,
+                                                                                                                  DateUpdated = DateTime.Now
                                                                                                               });
                     if (result.IsSuccess)
                     {
@@ -211,7 +213,7 @@ namespace Pelo.Api.Services.InvoiceServices
                                                                                                                   request.IsSendSms,
                                                                                                                   request.SmsContent,
                                                                                                                   UserUpdated = userId,
-                                                                                                                  DateUpdated = DateTime.Now
+                                                                                                                  DateUpdated = DateTime.Now,
                                                                                                               });
                         if (result.IsSuccess)
                         {

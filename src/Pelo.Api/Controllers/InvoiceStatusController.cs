@@ -55,7 +55,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("api/invoice_status/insert")]
+        [Route("api/invoice_status")]
         public async Task<ActionResult<bool>> Insert([FromBody] InsertInvoiceStatus request)
         {
             return Ok(await _invoiceStatusService.Insert(await GetUserId(), request));
@@ -66,7 +66,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        [Route("api/invoice_status/update")]
+        [Route("api/invoice_status")]
         public async Task<ActionResult<bool>> Update([FromBody] UpdateInvoiceStatus request)
         {
             return Ok(await _invoiceStatusService.Update(await GetUserId(), request));
@@ -76,7 +76,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
-        [Route("api/invoice_status/delete/{id}")]
+        [Route("api/invoice_status/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {
             return Ok(await _invoiceStatusService.Delete(await GetUserId(), id));

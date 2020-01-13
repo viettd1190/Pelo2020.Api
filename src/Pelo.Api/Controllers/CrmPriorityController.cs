@@ -58,7 +58,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("api/crm_priority/insert")]
+        [Route("api/crm_priority")]
         public async Task<ActionResult<bool>> Insert([FromBody] InsertCrmPriority request)
         {
             return Ok(await _crmPriorityService.Insert(await GetUserId(), request));
@@ -69,7 +69,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        [Route("api/crm_priority/update")]
+        [Route("api/crm_priority")]
         public async Task<ActionResult<bool>> Update([FromBody] UpdateCrmPriority request)
         {
             return Ok(await _crmPriorityService.Update(await GetUserId(), request));
@@ -79,7 +79,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
-        [Route("api/crm_priority/delete/{id}")]
+        [Route("api/crm_priority/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {
             return Ok(await _crmPriorityService.Delete(await GetUserId(), id));

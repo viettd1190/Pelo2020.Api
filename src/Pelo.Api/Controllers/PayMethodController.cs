@@ -30,5 +30,7 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _payMethodService.GetAll(await GetUserId()));
         }
+
+
     }
 }

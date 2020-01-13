@@ -86,15 +86,105 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CrmPriorityController.GetPaging(Pelo.Common.Dtos.CrmPriority.GetCrmPriorityPagingRequest)">
+            <summary>
+                Lấy tất cả mức độ khẩn cấp CRM/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmPriorityController.GetById(System.Int32)">
+            <summary>
+                Lấy mức độ khẩn cấp CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmPriorityController.Insert(Pelo.Common.Dtos.CrmPriority.InsertCrmPriority)">
+            <summary>
+                insert mức độ khẩn cấp CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmPriorityController.Update(Pelo.Common.Dtos.CrmPriority.UpdateCrmPriority)">
+            <summary>
+                update mức độ khẩn cấp CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmPriorityController.Delete(System.Int32)">
+            <summary>
+                delete mức độ khẩn cấp CRM
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CrmStatusController.GetAll">
             <summary>
                 Lấy tất cả trạng thái CRM
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CrmStatusController.GetPaging(Pelo.Common.Dtos.CrmStatus.GetCrmStatusPagingRequest)">
+            <summary>
+                Lấy tất cả trạng thái CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmStatusController.GetById(System.Int32)">
+            <summary>
+                Lấy trạng thái CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmStatusController.Insert(Pelo.Common.Dtos.CrmStatus.InsertCrmStatus)">
+            <summary>
+                insert trạng thái CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmStatusController.Update(Pelo.Common.Dtos.CrmStatus.UpdateCrmStatus)">
+            <summary>
+                update trạng thái CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmStatusController.Delete(System.Int32)">
+            <summary>
+                delete trạng thái CRM
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CrmTypeController.GetAll">
             <summary>
                 Lấy tất cả kiểu chốt CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmTypeController.GetPaging(Pelo.Common.Dtos.CrmType.GetCrmTypePagingRequest)">
+            <summary>
+                Lấy tất cả kiểu chốt CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmTypeController.GetById(System.Int32)">
+            <summary>
+                Lấy kiểu chốt CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmTypeController.Insert(Pelo.Common.Dtos.CrmType.InsertCrmType)">
+            <summary>
+                insert kiểu chốt CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmTypeController.Update(Pelo.Common.Dtos.CrmType.UpdateCrmType)">
+            <summary>
+                update kiểu chốt CRM
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CrmTypeController.Delete(System.Int32)">
+            <summary>
+                delete kiểu chốt CRM
             </summary>
             <returns></returns>
         </member>
@@ -190,8 +280,43 @@
         </member>
         <member name="M:Pelo.Api.Controllers.CustomerSourceController.GetAll">
             <summary>
-                Lấy tất cả nhóm sản phẩm
+                Lấy tất cả nguồn khách hàng
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CustomerSourceController.GetByPaging(Pelo.Common.Dtos.CustomerSource.GetCustomerSourcePagingRequest)">
+            <summary>
+                Lấy danh sách nguồn khách hàng
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CustomerSourceController.Insert(Pelo.Common.Dtos.CustomerSource.InsertCustomerSource)">
+            <summary>
+                Thêm mới nguồn khách hàng
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CustomerSourceController.GetById(System.Int32)">
+            <summary>
+                Lấy thông tin nguồn khách hàng
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CustomerSourceController.Update(Pelo.Common.Dtos.CustomerSource.UpdateCustomerSource)">
+            <summary>
+                Cập nhật thông tin nguồn khách hàng
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CustomerSourceController.Delete(System.Int32)">
+            <summary>
+                Xóa nguồn khách hàng
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.CustomerVipController.GetAll">
@@ -261,7 +386,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.GetPaging(Pelo.Common.Dtos.Invoice.GetInvoiceStatusPagingRequest)">
+        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.GetPaging(Pelo.Common.Dtos.InvoiceStatus.GetInvoiceStatusPagingRequest)">
             <summary>
                 Lấy tất cả trạng thái đơn hàng/page
             </summary>
@@ -273,13 +398,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.Insert(Pelo.Common.Dtos.Invoice.InsertInvoiceStatus)">
+        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.Insert(Pelo.Common.Dtos.InvoiceStatus.InsertInvoiceStatus)">
             <summary>
                 insert trạng thái đơn hàng
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.Update(Pelo.Common.Dtos.Invoice.UpdateInvoiceStatus)">
+        <member name="M:Pelo.Api.Controllers.InvoiceStatusController.Update(Pelo.Common.Dtos.InvoiceStatus.UpdateInvoiceStatus)">
             <summary>
                 insert trạng thái đơn hàng
             </summary>
@@ -386,6 +511,42 @@
                 Lấy tất cả phường xã của quận huyện
             </summary>
             <param name="id">Id tỉnh thành</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyStatusController.GetAll">
+            <summary>
+                Lấy tất cả trạng thái bảo hành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyStatusController.GetPaging(Pelo.Common.Dtos.WarrantyStatus.GetWarrantyStatusPagingRequest)">
+            <summary>
+                Lấy tất cả trạng thái bảo hành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyStatusController.GetById(System.Int32)">
+            <summary>
+                Lấy trạng thái bảo hành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyStatusController.Insert(Pelo.Common.Dtos.WarrantyStatus.InsertWarrantyStatus)">
+            <summary>
+                insert trạng thái bảo hành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyStatusController.Update(Pelo.Common.Dtos.WarrantyStatus.UpdateWarrantyStatus)">
+            <summary>
+                update trạng thái bảo hành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyStatusController.Delete(System.Int32)">
+            <summary>
+                delete trạng thái bảo hành
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Services.BaseServices.BaseService.Ok``1(``0,System.String)">

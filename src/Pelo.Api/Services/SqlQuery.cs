@@ -2329,5 +2329,64 @@
                                                                AND IsDeleted = 0;";
 
         #endregion
+
+        #region WarrantStatus
+        public const string WARRANTY_STATUS_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.WarrantyStatus 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.WarrantyStatus 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string WARRANTY_STATUS_GET_BY_ID = @"SELECT * FROM dbo.WarrantyStatus WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string WARRANTY_STATUS_GET_ALL = "SELECT Id, Name FROM dbo.WarrantyStatus WHERE IsDeleted = 0";
+
+        public const string WARRANTY_STATUS_INSERT = @"INSERT dbo.WarrantyStatus
+                                                        (Name,
+                                                         Color,
+                                                         SortOrder,
+                                                         IsSendSms,
+                                                         SmsContent,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @SortOrder,
+                                                         @IsSendSms,
+                                                         @SmsContent,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string WARRANTY_STATUS_UPDATE = @"  UPDATE dbo.WarrantyStatus
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                      IsSendSms = @IsSendSms,
+                                                      SortOrder = @SortOrder,
+                                                      SmsContent = @SmsContent,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string WARRANTY_STATUS_DELETE = @"  UPDATE dbo.WarrantyStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
     }
 }

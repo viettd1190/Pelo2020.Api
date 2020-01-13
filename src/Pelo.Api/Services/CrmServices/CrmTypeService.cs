@@ -169,7 +169,9 @@ namespace Pelo.Api.Services.CrmServices
                                                                                                               {
                                                                                                                   request.Name,
                                                                                                                   UserCreated = userId,
-                                                                                                                  DateCreated = DateTime.Now
+                                                                                                                  DateCreated = DateTime.Now,
+                                                                                                                  UserUpdated = userId,
+                                                                                                                  DateUpdated = DateTime.Now
                                                                                                               });
                     if (result.IsSuccess)
                     {

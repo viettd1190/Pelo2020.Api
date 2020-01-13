@@ -1,43 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Pelo.Api.Services.BaseServices;
+using Pelo.Api.Services.MasterServices;
 using Pelo.Api.Services.UserServices;
-using Pelo.Common.Dtos.CrmPriority;
+using Pelo.Common.Dtos.Warranty;
+using Pelo.Common.Dtos.WarrantyStatus;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
-namespace Pelo.Api.Services.CrmServices
+namespace Pelo.Api.Services.WarrantyServices
 {
-    public interface ICrmPriorityService
+    public interface IWarrantyStatusService
     {
-        Task<TResponse<IEnumerable<CrmPrioritySimpleModel>>> GetAll(int userId);
+        Task<TResponse<IEnumerable<WarrantyStatusSimpleModel>>> GetAll(int userId);
 
-        Task<TResponse<PageResult<GetCrmPriorityPagingResponse>>> GetPaging(int userId, GetCrmPriorityPagingRequest request);
+        Task<TResponse<PageResult<GetWarrantyStatusPagingResponse>>> GetPaging(int userId, GetWarrantyStatusPagingRequest request);
 
-        Task<TResponse<GetCrmPriorityResponse>> GetById(int userId, int id);
+        Task<TResponse<GetWarrantyStatusPagingResponse>> GetById(int userId, int id);
 
-        Task<TResponse<bool>> Insert(int userId, InsertCrmPriority request);
+        Task<TResponse<bool>> Insert(int userId, InsertWarrantyStatus request);
 
-        Task<TResponse<bool>> Update(int userId, UpdateCrmPriority request);
+        Task<TResponse<bool>> Update(int userId, UpdateWarrantyStatus request);
 
         Task<TResponse<bool>> Delete(int userId, int id);
     }
-
-    public class CrmPriorityService : BaseService,
-                                      ICrmPriorityService
+    public class WarrantyStatusService : BaseService, IWarrantyStatusService
     {
-        readonly IRoleService _roleService;
+        private readonly IAppConfigService _appConfigService;
 
-        public CrmPriorityService(IDapperReadOnlyRepository readOnlyRepository,
-                                  IDapperWriteRepository writeRepository,
-                                  IHttpContextAccessor context,
-                                  IRoleService roleService) : base(readOnlyRepository,
-                                                                   writeRepository,
-                                                                   context)
+        private readonly IRoleService _roleService;
+
+        private readonly IUserService _userService;
+
+        private IProductService _productService;
+        public WarrantyStatusService(IDapperReadOnlyRepository readOnlyRepository, IDapperWriteRepository writeRepository, IHttpContextAccessor context, IRoleService roleService,
+                              IUserService userService,
+                              IProductService productService,
+                              IAppConfigService appConfigService) : base(readOnlyRepository, writeRepository, context)
         {
             _roleService = roleService;
+            _appConfigService = appConfigService;
+            _userService = userService;
+            _productService = productService;
         }
 
         public async Task<TResponse<bool>> Delete(int userId, int id)
@@ -50,7 +57,7 @@ namespace Pelo.Api.Services.CrmServices
                     var data = await GetById(userId, id);
                     if (data.IsSuccess)
                     {
-                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CRM_PRIORITY_DELETE,
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.WARRANTY_STATUS_DELETE,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -73,40 +80,38 @@ namespace Pelo.Api.Services.CrmServices
             }
         }
 
-        #region ICrmPriorityService Members
-
-        public async Task<TResponse<IEnumerable<CrmPrioritySimpleModel>>> GetAll(int userId)
+        public async Task<TResponse<IEnumerable<WarrantyStatusSimpleModel>>> GetAll(int userId)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryAsync<CrmPrioritySimpleModel>(SqlQuery.CRM_PRIORITY_GET_ALL);
+                    var result = await ReadOnlyRepository.QueryAsync<WarrantyStatusSimpleModel>(SqlQuery.WARRANTY_STATUS_GET_ALL);
                     if (result.IsSuccess)
                     {
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<IEnumerable<CrmPrioritySimpleModel>>(result.Message);
+                    return await Fail<IEnumerable<WarrantyStatusSimpleModel>>(result.Message);
                 }
 
-                return await Fail<IEnumerable<CrmPrioritySimpleModel>>(canGetAll.Message);
+                return await Fail<IEnumerable<WarrantyStatusSimpleModel>>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<IEnumerable<CrmPrioritySimpleModel>>(exception);
+                return await Fail<IEnumerable<WarrantyStatusSimpleModel>>(exception);
             }
         }
 
-        public async Task<TResponse<GetCrmPriorityResponse>> GetById(int userId, int id)
+        public async Task<TResponse<GetWarrantyStatusPagingResponse>> GetById(int userId, int id)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCrmPriorityResponse>(SqlQuery.CRM_PRIORITY_GET_BY_ID,
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyStatusPagingResponse>(SqlQuery.INVOICE_STATUS_GET_BY_ID,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -116,25 +121,25 @@ namespace Pelo.Api.Services.CrmServices
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<GetCrmPriorityResponse>(result.Message);
+                    return await Fail<GetWarrantyStatusPagingResponse>(result.Message);
                 }
 
-                return await Fail<GetCrmPriorityResponse>(canGetAll.Message);
+                return await Fail<GetWarrantyStatusPagingResponse>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<GetCrmPriorityResponse>(exception);
+                return await Fail<GetWarrantyStatusPagingResponse>(exception);
             }
         }
 
-        public async Task<TResponse<PageResult<GetCrmPriorityPagingResponse>>> GetPaging(int userId, GetCrmPriorityPagingRequest request)
+        public async Task<TResponse<PageResult<GetWarrantyStatusPagingResponse>>> GetPaging(int userId, GetWarrantyStatusPagingRequest request)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPriorityPagingResponse, int>(SqlQuery.CRM_PRIORITY_GET_BY_PAGING,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyStatusPagingResponse, int>(SqlQuery.WARRANTY_STATUS_GET_BY_PAGING,
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Name,
@@ -143,35 +148,35 @@ namespace Pelo.Api.Services.CrmServices
                                                                                                               });
                     if (result.IsSuccess)
                     {
-                        return await Ok(new PageResult<GetCrmPriorityPagingResponse>(request.Page,
-                                                                                  request.PageSize,
-                                                                                  result.Data.Item2,
-                                                                                  result.Data.Item1));
+                        return await Ok(new PageResult<GetWarrantyStatusPagingResponse>(request.Page, request.PageSize, result.Data.Item2, result.Data.Item1));
                     }
 
-                    return await Fail<PageResult<GetCrmPriorityPagingResponse>>(result.Message);
+                    return await Fail<PageResult<GetWarrantyStatusPagingResponse>>(result.Message);
                 }
 
-                return await Fail<PageResult<GetCrmPriorityPagingResponse>>(canGetAll.Message);
+                return await Fail<PageResult<GetWarrantyStatusPagingResponse>>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<PageResult<GetCrmPriorityPagingResponse>>(exception);
+                return await Fail<PageResult<GetWarrantyStatusPagingResponse>>(exception);
             }
         }
 
-        public async Task<TResponse<bool>> Insert(int userId, InsertCrmPriority request)
+        public async Task<TResponse<bool>> Insert(int userId, InsertWarrantyStatus request)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CRM_PRIORITY_INSERT,
+                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.WARRANTY_STATUS_INSERT,
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Name,
                                                                                                                   request.Color,
+                                                                                                                  request.SortOrder,
+                                                                                                                  request.IsSendSms,
+                                                                                                                  request.SmsContent,
                                                                                                                   UserCreated = userId,
                                                                                                                   DateCreated = DateTime.Now,
                                                                                                                   UserUpdated = userId,
@@ -191,7 +196,7 @@ namespace Pelo.Api.Services.CrmServices
             }
         }
 
-        public async Task<TResponse<bool>> Update(int userId, UpdateCrmPriority request)
+        public async Task<TResponse<bool>> Update(int userId, UpdateWarrantyStatus request)
         {
             try
             {
@@ -201,12 +206,14 @@ namespace Pelo.Api.Services.CrmServices
                     var data = await GetById(userId, request.Id);
                     if (data.IsSuccess)
                     {
-                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CRM_PRIORITY_UPDATE,
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.WARRANTY_STATUS_UPDATE,
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Id,
                                                                                                                   request.Name,
                                                                                                                   request.Color,
+                                                                                                                  request.IsSendSms,
+                                                                                                                  request.SmsContent,
                                                                                                                   UserUpdated = userId,
                                                                                                                   DateUpdated = DateTime.Now
                                                                                                               });
@@ -225,9 +232,6 @@ namespace Pelo.Api.Services.CrmServices
                 return await Fail<bool>(exception);
             }
         }
-
-        #endregion
-
         private async Task<TResponse<bool>> CanGetAll(int userId)
         {
             try
