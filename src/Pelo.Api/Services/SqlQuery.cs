@@ -9,6 +9,88 @@
                                                FROM dbo.Branch
                                                WHERE IsDeleted = 0;";
 
+        public const string BRANCH_GET_BY_ID = @"SELECT * FROM dbo.Branch WHERE Id = @Id AND IsDeleted = 0";
+
+
+
+        public const string BRANCH_INSERT = @"INSERT dbo.Branch
+                                                        (Name,
+                                                         Hotline,
+                                                         ProvinceId,
+                                                         DistrictId,                                                         
+                                                         WardId,
+                                                         Address,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Hotline,
+                                                         @ProvinceId,
+                                                         @DistrictId,
+                                                         @WardId,
+                                                         @Address,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string BRANCH_UPDATE = @"  UPDATE dbo.Branch
+                                                  SET Name = @Name,
+                                                      ProvinceId = @ProvinceId,
+                                                      DistrictId = @DistrictId,
+                                                      Hotline = @Hotline,
+                                                      WardId = @WardId,
+                                                      Address = @Address,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string BRANCH_DELETE = @"  UPDATE dbo.Branch
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string BRANCH_PAGING= @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.Hotline,
+                                                              p.Name AS Province,
+                                                              d.Name AS District,
+                                                              w.Name AS Ward,
+                                                              c.Address,
+                                                              c.Description,
+                                                              c.DateUpdated
+                                                       FROM dbo.Customer c
+                                                           LEFT JOIN dbo.Province p
+                                                               ON p.Id = c.ProvinceId
+                                                           LEFT JOIN dbo.District d
+                                                               ON d.Id = c.DistrictId
+                                                           LEFT JOIN dbo.Ward w
+                                                               ON w.Id = c.WardId
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(c.Hotline, '') LIKE @Hotline
+                                                             AND
+                                                             (
+                                                                 @ProvinceId = 0
+                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @DistrictId = 0
+                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @WardId = 0
+                                                                 OR ISNULL(c.WardId, 0) = @WardId
+                                                             )
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+
         #endregion
 
         #region Department
