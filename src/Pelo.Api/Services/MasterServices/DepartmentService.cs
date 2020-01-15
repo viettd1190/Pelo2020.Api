@@ -13,6 +13,16 @@ namespace Pelo.Api.Services.MasterServices
     public interface IDepartmentService
     {
         Task<TResponse<IEnumerable<DepartmentSimpleModel>>> GetAll(int userId);
+
+        Task<TResponse<PageResult<GetDepartmentPagingResponse>>> GetPaging(int userId, GetDepartmentPagingRequest request);
+
+        Task<TResponse<GetDepartmentReponse>> GetById(int userId, int id);
+
+        Task<TResponse<bool>> Insert(int userId, InsertDepartment request);
+
+        Task<TResponse<bool>> Update(int userId, UpdateDepartment request);
+
+        Task<TResponse<bool>> Delete(int userId, int id);
     }
 
     public class DepartmentService : BaseService,
@@ -28,6 +38,39 @@ namespace Pelo.Api.Services.MasterServices
                                                                   context)
         {
             _roleService = roleService;
+        }
+
+        public async Task<TResponse<bool>> Delete(int userId, int id)
+        {
+            try
+            {
+                var canGetAll = await _roleService.CheckPermission(userId);
+                if (canGetAll.IsSuccess)
+                {
+                    var data = await GetById(userId, id);
+                    if (data.IsSuccess)
+                    {
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.DEPARTMENT_DELETE,
+                                                                                                              new
+                                                                                                              {
+                                                                                                                  Id = id,
+                                                                                                                  UserUpdated = userId,
+                                                                                                                  DateUpdated = DateTime.Now
+                                                                                                              });
+                        if (result.IsSuccess)
+                        {
+                            return await Ok(true);
+                        }
+                        return await Fail<bool>(result.Message);
+                    }
+                    return await Fail<bool>(data.Message);
+                }
+                return await Fail<bool>(canGetAll.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
         }
 
         #region IDepartmentService Members
@@ -50,6 +93,105 @@ namespace Pelo.Api.Services.MasterServices
             catch (Exception exception)
             {
                 return await Fail<IEnumerable<DepartmentSimpleModel>>(exception);
+            }
+        }
+
+        public Task<TResponse<GetDepartmentReponse>> GetById(int userId, int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<TResponse<PageResult<GetDepartmentPagingResponse>>> GetPaging(int userId, GetDepartmentPagingRequest request)
+        {
+            try
+            {
+                var canGetAll = await _roleService.CheckPermission(userId);
+                if (canGetAll.IsSuccess)
+                {
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetDepartmentPagingResponse, int>(SqlQuery.DEPARTMENT_PAGING,
+                                                                                                              new
+                                                                                                              {
+                                                                                                                  request.Name,
+                                                                                                                  Skip = (request.Page - 1) * request.PageSize,
+                                                                                                                  Take = request.PageSize
+                                                                                                              });
+                    if (result.IsSuccess)
+                    {
+                        return await Ok(new PageResult<GetDepartmentPagingResponse>(request.Page, request.PageSize, result.Data.Item2, result.Data.Item1));
+                    }
+
+                    return await Fail<PageResult<GetDepartmentPagingResponse>>(result.Message);
+                }
+
+                return await Fail<PageResult<GetDepartmentPagingResponse>>(canGetAll.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<PageResult<GetDepartmentPagingResponse>>(exception);
+            }
+        }
+
+        public async Task<TResponse<bool>> Insert(int userId, InsertDepartment request)
+        {
+            try
+            {
+                var canGetAll = await _roleService.CheckPermission(userId);
+                if (canGetAll.IsSuccess)
+                {
+                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.DEPARTMENT_INSERT,
+                                                                                                              new
+                                                                                                              {
+                                                                                                                  request.Name,
+                                                                                                                  UserCreated = userId,
+                                                                                                                  DateCreated = DateTime.Now,
+                                                                                                                  UserUpdated = userId,
+                                                                                                                  DateUpdated = DateTime.Now
+                                                                                                              });
+                    if (result.IsSuccess)
+                    {
+                        return await Ok(true);
+                    }
+                    return await Fail<bool>(result.Message);
+                }
+                return await Fail<bool>(canGetAll.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            };
+        }
+
+        public async Task<TResponse<bool>> Update(int userId, UpdateDepartment request)
+        {
+            try
+            {
+                var canGetAll = await _roleService.CheckPermission(userId);
+                if (canGetAll.IsSuccess)
+                {
+                    var data = await GetById(userId, request.Id);
+                    if (data.IsSuccess)
+                    {
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.DEPARTMENT_UPDATE,
+                                                                                                              new
+                                                                                                              {
+                                                                                                                  request.Id,
+                                                                                                                  request.Name,
+                                                                                                                  UserUpdated = userId,
+                                                                                                                  DateUpdated = DateTime.Now,
+                                                                                                              });
+                        if (result.IsSuccess)
+                        {
+                            return await Ok(true);
+                        }
+                        return await Fail<bool>(result.Message);
+                    }
+                    return await Fail<bool>(data.Message);
+                }
+                return await Fail<bool>(canGetAll.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
             }
         }
 

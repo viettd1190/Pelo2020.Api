@@ -52,6 +52,36 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.BranchController.GetPaging(Pelo.Common.Dtos.Branch.GetBranchPagingRequest)">
+            <summary>
+                Lấy tất cả chi nhánh
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.BranchController.GetById(System.Int32)">
+            <summary>
+                Lấy chi nhánh
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.BranchController.Insert(Pelo.Common.Dtos.Branch.InsertBranch)">
+            <summary>
+                insert chi nhánh
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.BranchController.Update(Pelo.Common.Dtos.Branch.UpdateBranch)">
+            <summary>
+                update chi nhánh
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.BranchController.Delete(System.Int32)">
+            <summary>
+                delete chi nhánh
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CrmController.GetByPaging(Pelo.Common.Dtos.Crm.GetWarrantyPagingRequest)">
             <summary>
                 Lấy danh sách CRM có phân trang
@@ -366,11 +396,71 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.DepartmentController.GetPaging(Pelo.Common.Dtos.Department.GetDepartmentPagingRequest)">
+            <summary>
+                Lấy tất cả phòng ban
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.DepartmentController.GetById(System.Int32)">
+            <summary>
+                Lấy phòng ban
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.DepartmentController.Insert(Pelo.Common.Dtos.Department.InsertDepartment)">
+            <summary>
+                insert phòng ban
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.DepartmentController.Update(Pelo.Common.Dtos.Department.UpdateDepartment)">
+            <summary>
+                update phòng ban
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.DepartmentController.Delete(System.Int32)">
+            <summary>
+                delete phòng ban
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.DistrictController.GetAll(System.Int32)">
             <summary>
                 Lấy tất cả quận huyện của tỉnh thành
             </summary>
             <param name="id">Id tỉnh thành</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.DistrictController.GetPaging(Pelo.Common.Dtos.District.GetDistrictPagingRequest)">
+            <summary>
+                Lấy tất cả quận huyện của tỉnh thành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.DistrictController.GetById(System.Int32)">
+            <summary>
+                Lấy quận huyện của tỉnh thành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.DistrictController.Insert(Pelo.Common.Dtos.District.InsertDistrict)">
+            <summary>
+                insert quận huyện của tỉnh thành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.DistrictController.Update(Pelo.Common.Dtos.District.UpdateDistrict)">
+            <summary>
+                update quận huyện của tỉnh thành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.DistrictController.Delete(System.Int32)">
+            <summary>
+                delete quận huyện của tỉnh thành
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.InvoiceController.GetByPaging(Pelo.Common.Dtos.Invoice.GetInvoicePagingRequest)">
@@ -434,9 +524,69 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.ProductGroupController.GetPaging(Pelo.Common.Dtos.ProductGroup.GetProductGroupPagingRequest)">
+            <summary>
+                Lấy tất cả nhóm sản phẩm
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductGroupController.GetById(System.Int32)">
+            <summary>
+                Lấy nhóm sản phẩm
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductGroupController.Insert(Pelo.Common.Dtos.ProductGroup.InsertProductGroup)">
+            <summary>
+                insert nhóm sản phẩm
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductGroupController.Update(Pelo.Common.Dtos.ProductGroup.UpdateProductGroup)">
+            <summary>
+                update nhóm sản phẩm
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductGroupController.Delete(System.Int32)">
+            <summary>
+                delete nhóm sản phẩm
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.ProductUnitController.GetAll">
             <summary>
                 Lấy tất cả đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductUnitController.GetPaging(Pelo.Common.Dtos.ProductUnit.GetProductUnitPagingRequest)">
+            <summary>
+                Lấy tất cả đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductUnitController.GetById(System.Int32)">
+            <summary>
+                Lấy đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductUnitController.Insert(Pelo.Common.Dtos.ProductUnit.InsertProductUnit)">
+            <summary>
+                insert đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductUnitController.Update(Pelo.Common.Dtos.ProductUnit.UpdateProductUnit)">
+            <summary>
+                update đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductUnitController.Delete(System.Int32)">
+            <summary>
+                delete đơn vị tính
             </summary>
             <returns></returns>
         </member>
@@ -446,11 +596,71 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.ProvinceController.GetPaging(Pelo.Common.Dtos.Province.GetProvincePagingRequest)">
+            <summary>
+                Lấy tất cả province
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProvinceController.GetById(System.Int32)">
+            <summary>
+                Lấy province
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProvinceController.Insert(Pelo.Common.Dtos.Province.InsertProvince)">
+            <summary>
+                insert province
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProvinceController.Update(Pelo.Common.Dtos.Province.UpdateProvince)">
+            <summary>
+                update province
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProvinceController.Delete(System.Int32)">
+            <summary>
+                delete province
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.RoleController.GetAll">
             <summary>
-                Lấy tất cả nhóm người dùng
+                Lấy tất cả role
             </summary>
             <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RoleController.GetPaging(Pelo.Common.Dtos.Role.GetRolePagingRequest)">
+            <summary>
+                Lấy tất cả phường xã
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RoleController.GetById(System.Int32)">
+            <summary>
+                Lấy phường xã
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RoleController.Insert(Pelo.Common.Dtos.Role.InsertRole)">
+            <summary>
+                insert phường xã
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RoleController.Update(Pelo.Common.Dtos.Role.UpdateRole)">
+            <summary>
+                update phường xã
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RoleController.Delete(System.Int32)">
+            <summary>
+                delete phường xã
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.UserController.GetByPaging(Pelo.Common.Dtos.User.GetUserPagingRequest)">
@@ -511,6 +721,36 @@
                 Lấy tất cả phường xã của quận huyện
             </summary>
             <param name="id">Id tỉnh thành</param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WardController.GetPaging(Pelo.Common.Dtos.Ward.GetWardPagingRequest)">
+            <summary>
+                Lấy tất cả phường xã
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WardController.GetById(System.Int32)">
+            <summary>
+                Lấy phường xã
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WardController.Insert(Pelo.Common.Dtos.Ward.InsertWard)">
+            <summary>
+                insert phường xã
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WardController.Update(Pelo.Common.Dtos.Ward.UpdateWard)">
+            <summary>
+                update phường xã
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WardController.Delete(System.Int32)">
+            <summary>
+                delete phường xã
+            </summary>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.WarrantyStatusController.GetAll">

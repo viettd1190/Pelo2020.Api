@@ -11,8 +11,6 @@
 
         public const string BRANCH_GET_BY_ID = @"SELECT * FROM dbo.Branch WHERE Id = @Id AND IsDeleted = 0";
 
-
-
         public const string BRANCH_INSERT = @"INSERT dbo.Branch
                                                         (Name,
                                                          Hotline,
@@ -100,6 +98,43 @@
                                                    FROM dbo.Department
                                                    WHERE IsDeleted = 0;";
 
+        public const string DEPARTMENT_GET_BY_ID = @"SELECT * FROM dbo.Department WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string DEPARTMENT_INSERT = @"INSERT dbo.Department
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string DEPARTMENT_UPDATE = @"  UPDATE dbo.Department
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string DEPARTMENT_DELETE = @"  UPDATE dbo.Department
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string DEPARTMENT_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.DateUpdated
+                                                       FROM dbo.Department c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+
         #endregion
 
         #region Province
@@ -110,6 +145,51 @@
                                                  FROM dbo.Province
                                                  WHERE IsDeleted = 0
                                                  ORDER BY SortOrder;";
+
+        public const string PROVINCE_GET_BY_ID = @"SELECT * FROM dbo.Province WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string PROVINCE_INSERT = @"INSERT dbo.Province
+                                                        (Type,
+                                                         Name,
+                                                         SortOrder,                                                         
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Type,
+                                                         @Name,
+                                                         @SortOrder,                                                         
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string PROVINCE_UPDATE = @"  UPDATE dbo.Province
+                                                  SET Name = @Name,
+                                                      Type = @Type,
+                                                      SortOrder = @SortOrder,                                                         
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string PROVINCE_DELETE = @"  UPDATE dbo.Province
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string PROVINCE_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.Type,
+                                                              c.SortOrder,
+                                                              c.DateUpdated
+                                                       FROM dbo.Province c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
 
         #endregion
 
@@ -123,6 +203,62 @@
                                                        AND ProvinceId = @ProvinceId
                                                  ORDER BY SortOrder;";
 
+        public const string DISTRICT_GET_BY_ID = @"SELECT * FROM dbo.District WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string DISTRICT_INSERT = @"INSERT dbo.District
+                                                        (Type,
+                                                         Name,
+                                                         ProvinceId,                                                         
+                                                         SortOrder,                                                         
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Type,
+                                                         @Name,
+                                                         @ProvinceId,
+                                                         @SortOrder,                                                         
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string DISTRICT_UPDATE = @"  UPDATE dbo.District
+                                                  SET Name = @Name,
+                                                      Type = @Type,
+                                                      ProvinceId = @ProvinceId,
+                                                      SortOrder = @SortOrder,                                                         
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string DISTRICT_DELETE = @"  UPDATE dbo.District
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string DISTRICT_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.Type,
+                                                              c.SortOrder,
+                                                              p.Name AS Province,
+                                                              c.DateUpdated
+                                                       FROM dbo.District c
+                                                           LEFT JOIN dbo.ProvinceId p
+                                                               ON p.Id = c.ProvinceId
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @ProvinceId = 0
+                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                             )
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+
         #endregion
 
         #region Ward
@@ -134,6 +270,62 @@
                                              WHERE IsDeleted = 0
                                                    AND DistrictId = @DistrictId
                                              ORDER BY SortOrder;";
+
+        public const string WARD_GET_BY_ID = @"SELECT * FROM dbo.Ward WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string WARD_INSERT = @"INSERT dbo.Ward
+                                                        (Type,
+                                                         Name,
+                                                         DistrictId,                                                         
+                                                         SortOrder,                                                         
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Type,
+                                                         @Name,
+                                                         @DistrictId,
+                                                         @SortOrder,                                                         
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string WARD_UPDATE = @"  UPDATE dbo.Ward
+                                                  SET Name = @Name,
+                                                      Type = @Type,
+                                                      DistrictId = @DistrictId,
+                                                      SortOrder = @SortOrder,                                                         
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string WARD_DELETE = @"  UPDATE dbo.Ward
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string WARD_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.Type,
+                                                              c.SortOrder,
+                                                              d.Name AS District,
+                                                              c.DateUpdated
+                                                       FROM dbo.Ward c
+                                                           LEFT JOIN dbo.District d
+                                                               ON d.Id = c.DistrictId
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @DistrictId = 0
+                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
+                                                             )
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
 
         #endregion
 
@@ -312,6 +504,43 @@
                                                          WHERE IsDeleted = 0
                                                          ORDER BY Id;";
 
+        public const string PRODUCT_GROUP_GET_BY_ID = @"SELECT * FROM dbo.ProductGroup WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string PRODUCT_GROUP_INSERT = @"INSERT dbo.ProductGroup
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string PRODUCT_GROUP_UPDATE = @"  UPDATE dbo.ProductGroup
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string PRODUCT_GROUP_DELETE = @"  UPDATE dbo.ProductGroup
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string PRODUCT_GROUP_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.DateUpdated
+                                                       FROM dbo.ProductGroup c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+
         #endregion
 
         #region ProductUnit
@@ -321,6 +550,43 @@
                                                      FROM dbo.ProductUnit
                                                      WHERE IsDeleted = 0
                                                      ORDER BY Id;";
+
+        public const string PRODUCT_UNIT_GET_BY_ID = @"SELECT * FROM dbo.ProductUnit WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string PRODUCT_UNIT_INSERT = @"INSERT dbo.ProductUnit
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string PRODUCT_UNIT_UPDATE = @"  UPDATE dbo.ProductUnit
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string PRODUCT_UNIT_DELETE = @"  UPDATE dbo.ProductUnit
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string PRODUCT_UNIT_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.DateUpdated
+                                                       FROM dbo.ProductUnit c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
 
         #endregion
 
@@ -637,6 +903,43 @@
         public const string ROLE_GET_ALL = @"SELECT Id, Name
                                              FROM dbo.Role
                                              WHERE IsDeleted = 0;";
+
+        public const string ROLE_GET_BY_ID = @"SELECT * FROM dbo.Role WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string ROLE_INSERT = @"INSERT dbo.Role
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string ROLE_UPDATE = @"  UPDATE dbo.Role
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string ROLE_DELETE = @"  UPDATE dbo.Role
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string ROLE_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.DateUpdated
+                                                       FROM dbo.Role c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
 
         #endregion
 
