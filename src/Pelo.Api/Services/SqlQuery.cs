@@ -2713,6 +2713,60 @@
                                                          WHERE Id = @Id
                                                                AND IsDeleted = 0;";
 
+        public const string PRODUCT_GET_BY_ID = @"SELECT * FROM dbo.Product WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string PRODUCT_INSERT = @"INSERT dbo.Product
+                                                        (Name,
+                                                         ImportPrice,
+                                                         SellPrice,
+                                                         MinCount,
+                                                         MaxCount,WarrantyMonth,ProductStatusId,ProductGroupId,ProductUnitId,ManufacturerId,CountryId,Description,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @ImportPrice,
+                                                         @SellPrice,
+                                                         @MinCount,
+                                                         @MaxCount,@WarrantyMonth,@ProductStatusId,@ProductGroupId,@ProductUnitId,@ManufacturerId,@CountryId,@Description,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string PRODUCT_UPDATE = @"  UPDATE dbo.Product
+                                                  SET Name = @Name,
+                                                      ImportPrice = @ImportPrice,
+                                                         SellPrice=@SellPrice,
+                                                         MinCount=@MinCount,
+                                                         MaxCount=@MaxCount,WarrantyMonth=@WarrantyMonth,ProductStatusId=@ProductStatusId,ProductGroupId=@ProductGroupId,ProductUnitId=@ProductUnitId,ManufacturerId=@ManufacturerId,CountryId=@CountryId,Description=@Description,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string PRODUCT_DELETE = @"  UPDATE dbo.Product
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string PRODUCT_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.Product 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.Product 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
         #endregion
 
         #region WarrantStatus

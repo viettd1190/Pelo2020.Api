@@ -50,7 +50,7 @@ namespace Pelo.Api.Services.MasterServices
                     var data = await GetById(userId, id);
                     if (data.IsSuccess)
                     {
-                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.DEPARTMENT_DELETE,
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.PAY_METHOD_DELETE,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -96,9 +96,32 @@ namespace Pelo.Api.Services.MasterServices
             }
         }
 
-        public Task<TResponse<GetDepartmentReponse>> GetById(int userId, int id)
+        public async Task<TResponse<GetDepartmentReponse>> GetById(int userId, int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var canGetAll = await _roleService.CheckPermission(userId);
+                if (canGetAll.IsSuccess)
+                {
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetDepartmentReponse>(SqlQuery.DEPARTMENT_GET_BY_ID,
+                                                                                                              new
+                                                                                                              {
+                                                                                                                  Id = id,
+                                                                                                              });
+                    if (result.IsSuccess)
+                    {
+                        return await Ok(result.Data);
+                    }
+
+                    return await Fail<GetDepartmentReponse>(result.Message);
+                }
+
+                return await Fail<GetDepartmentReponse>(canGetAll.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<GetDepartmentReponse>(exception);
+            }
         }
 
         public async Task<TResponse<PageResult<GetDepartmentPagingResponse>>> GetPaging(int userId, GetDepartmentPagingRequest request)

@@ -512,6 +512,36 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.PayMethodController.GetPaging(Pelo.Common.Dtos.PayMethod.GetPayMethodPagingRequest)">
+            <summary>
+                Lấy tất cả hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.PayMethodController.GetById(System.Int32)">
+            <summary>
+                Lấy hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.PayMethodController.Insert(Pelo.Common.Dtos.PayMethod.InsertPayMethod)">
+            <summary>
+                insert hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.PayMethodController.Update(Pelo.Common.Dtos.PayMethod.UpdatePayMethod)">
+            <summary>
+                update hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.PayMethodController.Delete(System.Int32)">
+            <summary>
+                delete hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.ProductController.GetAll">
             <summary>
                 Lấy tất cả sản phẩm 
