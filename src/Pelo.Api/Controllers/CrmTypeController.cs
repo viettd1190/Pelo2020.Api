@@ -40,7 +40,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/crm_status")]
+        [Route("api/crm_type")]
         public async Task<ActionResult<PageResult<GetCrmTypePagingResponse>>> GetPaging([FromQuery] GetCrmTypePagingRequest request)
         {
             return Ok(await _crmTypeService.GetPaging(await GetUserId(), request));
@@ -50,7 +50,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/crm_status/{id}")]
+        [Route("api/crm_type/{id}")]
         public async Task<ActionResult<GetCrmTypeResponse>> GetById(int id)
         {
             return Ok(await _crmTypeService.GetById(await GetUserId(), id));
@@ -60,7 +60,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("api/crm_status")]
+        [Route("api/crm_type")]
         public async Task<ActionResult<bool>> Insert([FromBody] InsertCrmType request)
         {
             return Ok(await _crmTypeService.Insert(await GetUserId(), request));
@@ -71,7 +71,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut]
-        [Route("api/crm_status")]
+        [Route("api/crm_type")]
         public async Task<ActionResult<bool>> Update([FromBody] UpdateCrmType request)
         {
             return Ok(await _crmTypeService.Update(await GetUserId(), request));
@@ -81,7 +81,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
-        [Route("api/crm_status/{id}")]
+        [Route("api/crm_type/{id}")]
         public async Task<ActionResult<bool>> Delete(int id)
         {
             return Ok(await _crmTypeService.Delete(await GetUserId(), id));

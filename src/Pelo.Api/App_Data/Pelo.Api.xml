@@ -548,6 +548,36 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.ProductController.GetPaging(Pelo.Common.Dtos.Product.GetProductPagingRequest)">
+            <summary>
+                Lấy tất cả sản phẩm /page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductController.GetById(System.Int32)">
+            <summary>
+                Lấy sản phẩm 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductController.Insert(Pelo.Common.Dtos.Product.InsertProduct)">
+            <summary>
+                insert sản phẩm 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductController.Update(Pelo.Common.Dtos.Product.UpdateProduct)">
+            <summary>
+                insert sản phẩm 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductController.Delete(System.Int32)">
+            <summary>
+                delete sản phẩm 
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.ProductGroupController.GetAll">
             <summary>
                 Lấy tất cả nhóm sản phẩm
