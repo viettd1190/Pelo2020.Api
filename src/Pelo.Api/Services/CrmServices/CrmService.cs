@@ -880,20 +880,23 @@ namespace Pelo.Api.Services.CrmServices
                             {
                                 isUpdate = true;
                             }
-                            //SaveComment(SqlQuery.CRM_COMMENT_INSERT, new
-                            //{
-                            //    CrmId = request.Id,
-                            //    request.Comment,
-                            //    FileId = 0,
-                            //    Type = isUpdate,
-                            //    OldStatusId = crm.Data.CrmStatusId,
-                            //    NewStatusId = crm.Data.CrmStatusId,
-                            //    UserIds = "",
-                            //    UserCreated = userId,
-                            //    DateCreated = DateTime.Now,
-                            //});
+                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_COMMENT_INSERT,
+                                                                           new
+                                                                           {
+                                                                               CrmId = request.Id,
+                                                                               request.Comment,
+                                                                               Type = isUpdate,
+                                                                               OldStatusId = crm.Data.CrmStatusId,
+                                                                               NewStatusId = crm.Data.CrmStatusId,
+                                                                               UserIds = "",
+                                                                               UserCreated = userId,
+                                                                               DateCreated = DateTime.Now
+                                                                           });
+                            if (rs.IsSuccess)
+                            {
+                                return await Ok(true);
+                            }
                         }
-                        return await Ok(true);
                     }
                 }
                 return await Fail<bool>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());

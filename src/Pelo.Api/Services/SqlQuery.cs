@@ -1951,7 +1951,6 @@
                                                         (
                                                             CrmId,
                                                             Comment,
-                                                            FileId
                                                             Type,
                                                             UserIds,
                                                             OldStatusId,
@@ -1963,7 +1962,6 @@
                                                         VALUES
                                                         (   @CrmId,
                                                             @Comment,
-                                                            @FileId,
                                                             @Type,
                                                             @OldStatusId,
                                                             @NewStatusId,
