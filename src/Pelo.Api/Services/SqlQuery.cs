@@ -253,7 +253,7 @@
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
                                                              AND
                                                              (
-                                                                 ProvinceId = 0
+                                                                 @ProvinceId = 0
                                                                  OR ISNULL(c.ProvinceId, 0) = @ProvinceId
                                                              )
                                                              AND c.IsDeleted = 0
