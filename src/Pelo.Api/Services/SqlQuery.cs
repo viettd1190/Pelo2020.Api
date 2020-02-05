@@ -62,7 +62,7 @@
                                                               c.Address,
                                                               c.Description,
                                                               c.DateUpdated
-                                                       FROM dbo.Customer c
+                                                       FROM dbo.Branch c
                                                            LEFT JOIN dbo.Province p
                                                                ON p.Id = c.ProvinceId
                                                            LEFT JOIN dbo.District d
@@ -73,17 +73,17 @@
                                                              AND ISNULL(c.Hotline, '') LIKE @Hotline
                                                              AND
                                                              (
-                                                                 @ProvinceId = 0
+                                                                 ProvinceId = 0
                                                                  OR ISNULL(c.ProvinceId, 0) = @ProvinceId
                                                              )
                                                              AND
                                                              (
-                                                                 @DistrictId = 0
+                                                                 DistrictId = 0
                                                                  OR ISNULL(c.DistrictId, 0) = @DistrictId
                                                              )
                                                              AND
                                                              (
-                                                                 @WardId = 0
+                                                                 WardId = 0
                                                                  OR ISNULL(c.WardId, 0) = @WardId
                                                              )
                                                              AND c.IsDeleted = 0
@@ -253,7 +253,7 @@
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
                                                              AND
                                                              (
-                                                                 @ProvinceId = 0
+                                                                 ProvinceId = 0
                                                                  OR ISNULL(c.ProvinceId, 0) = @ProvinceId
                                                              )
                                                              AND c.IsDeleted = 0
