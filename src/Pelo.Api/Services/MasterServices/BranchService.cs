@@ -135,6 +135,10 @@ namespace Pelo.Api.Services.MasterServices
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Name,
+                                                                                                                  request.Hotline,
+                                                                                                                  request.ProvinceId,
+                                                                                                                  request.DistrictId,
+                                                                                                                  request.WardId,
                                                                                                                   Skip = (request.Page - 1) * request.PageSize,
                                                                                                                   Take = request.PageSize
                                                                                                               });
