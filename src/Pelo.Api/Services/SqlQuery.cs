@@ -73,17 +73,17 @@
                                                              AND ISNULL(c.Hotline, '') LIKE @Hotline
                                                              AND
                                                              (
-                                                                 ProvinceId = 0
+                                                                 @ProvinceId = 0
                                                                  OR ISNULL(c.ProvinceId, 0) = @ProvinceId
                                                              )
                                                              AND
                                                              (
-                                                                 DistrictId = 0
+                                                                 @DistrictId = 0
                                                                  OR ISNULL(c.DistrictId, 0) = @DistrictId
                                                              )
                                                              AND
                                                              (
-                                                                 WardId = 0
+                                                                 @WardId = 0
                                                                  OR ISNULL(c.WardId, 0) = @WardId
                                                              )
                                                              AND c.IsDeleted = 0
