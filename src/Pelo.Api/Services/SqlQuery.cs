@@ -60,7 +60,6 @@
                                                               d.Name AS District,
                                                               w.Name AS Ward,
                                                               c.Address,
-                                                              c.Description,
                                                               c.DateUpdated
                                                        FROM dbo.Branch c
                                                            LEFT JOIN dbo.Province p
@@ -73,21 +72,22 @@
                                                              AND ISNULL(c.Hotline, '') LIKE @Hotline
                                                              AND
                                                              (
-                                                                 @ProvinceId = 0
+                                                                 ISNULL(@ProvinceId, 0) = 0
                                                                  OR ISNULL(c.ProvinceId, 0) = @ProvinceId
                                                              )
                                                              AND
                                                              (
-                                                                 @DistrictId = 0
+                                                                 ISNULL(@DistrictId, 0) = 0
                                                                  OR ISNULL(c.DistrictId, 0) = @DistrictId
                                                              )
                                                              AND
                                                              (
-                                                                 @WardId = 0
+                                                                 ISNULL(@WardId, 0) = 0
                                                                  OR ISNULL(c.WardId, 0) = @WardId
                                                              )
                                                              AND c.IsDeleted = 0
                                                        ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+                                                   
 
         #endregion
 

@@ -131,7 +131,9 @@ namespace Pelo.Api.Services.MasterServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetBranchPagingResponse, int>(SqlQuery.BRANCH_PAGING,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetBranchPagingResponse, int>(string.Format(SqlQuery.BRANCH_PAGING,
+                                                                                                                         request.ColumnOrder,
+                                                                                                                         request.SortDir.ToUpper()),
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Name,
