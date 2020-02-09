@@ -86,8 +86,34 @@
                                                                  OR ISNULL(c.WardId, 0) = @WardId
                                                              )
                                                              AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
-                                                   
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                SELECT COUNT(*)
+                                                   FROM dbo.Branch c
+                                                           LEFT JOIN dbo.Province p
+                                                               ON p.Id = c.ProvinceId
+                                                           LEFT JOIN dbo.District d
+                                                               ON d.Id = c.DistrictId
+                                                           LEFT JOIN dbo.Ward w
+                                                               ON w.Id = c.WardId
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(c.Hotline, '') LIKE @Hotline
+                                                             AND
+                                                             (
+                                                                 ISNULL(@ProvinceId, 0) = 0
+                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 ISNULL(@DistrictId, 0) = 0
+                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 ISNULL(@WardId, 0) = 0
+                                                                 OR ISNULL(c.WardId, 0) = @WardId
+                                                             )
+                                                             AND c.IsDeleted = 0";
+
 
         #endregion
 
