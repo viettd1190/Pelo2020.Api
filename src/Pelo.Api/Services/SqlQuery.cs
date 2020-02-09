@@ -159,7 +159,11 @@
                                                        FROM dbo.Department c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
                                                              AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                       SELECT COUNT(*)
+                                                       FROM dbo.Department c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0";
 
         #endregion
 
@@ -215,7 +219,11 @@
                                                        FROM dbo.Province c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
                                                              AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                    SELECT COUNT(*) 
+                                                    FROM dbo.Province c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0";
 
         #endregion
 
@@ -283,7 +291,18 @@
                                                                  OR ISNULL(c.ProvinceId, 0) = @ProvinceId
                                                              )
                                                              AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+ SELECT COUNT(*) 
+FROM dbo.District c
+                                                           LEFT JOIN dbo.ProvinceId p
+                                                               ON p.Id = c.ProvinceId
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @ProvinceId = 0
+                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                             )
+                                                             AND c.IsDeleted = 0";
 
         #endregion
 
@@ -351,7 +370,17 @@
                                                                  OR ISNULL(c.DistrictId, 0) = @DistrictId
                                                              )
                                                              AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+SELECT COUNT(*) FROM dbo.Ward c
+                                                           LEFT JOIN dbo.District d
+                                                               ON d.Id = c.DistrictId
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @DistrictId = 0
+                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
+                                                             )
+                                                             AND c.IsDeleted = 0";
 
         #endregion
 
@@ -565,7 +594,11 @@
                                                        FROM dbo.ProductGroup c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
                                                              AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+SELECT COUNT(*) 
+FROM dbo.ProductGroup c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0";
 
         #endregion
 
@@ -612,7 +645,10 @@
                                                        FROM dbo.ProductUnit c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
                                                              AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+SELECT COUNT(*) FROM dbo.ProductUnit c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0";
 
         #endregion
 
@@ -965,7 +1001,10 @@
                                                        FROM dbo.Role c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
                                                              AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;";
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+SELECT COUNT(*) FROM dbo.Role c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0";
 
         #endregion
 
