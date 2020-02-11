@@ -614,6 +614,42 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.ProductStatusController.GetAll">
+            <summary>
+                Lấy tất cả đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductStatusController.GetPaging(Pelo.Common.Dtos.ProductStatus.GetProductStatusPagingRequest)">
+            <summary>
+                Lấy tất cả đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductStatusController.GetById(System.Int32)">
+            <summary>
+                Lấy đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductStatusController.Insert(Pelo.Common.Dtos.ProductStatus.InsertProductStatus)">
+            <summary>
+                insert đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductStatusController.Update(Pelo.Common.Dtos.ProductStatus.UpdateProductStatus)">
+            <summary>
+                update đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ProductStatusController.Delete(System.Int32)">
+            <summary>
+                delete đơn vị tính
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.ProductUnitController.GetAll">
             <summary>
                 Lấy tất cả đơn vị tính
