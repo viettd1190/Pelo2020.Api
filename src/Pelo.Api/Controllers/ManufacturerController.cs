@@ -48,7 +48,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/manufacturer/{id}")]
-        public async Task<ActionResult<ManufacturerModel>> GetById(int id)
+        public async Task<ActionResult<GetManufacturerResponse>> GetById(int id)
         {
             return Ok(await _ManufacturerService.GetById(await GetUserId(), id));
         }
@@ -58,7 +58,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("api/manufacturer")]
-        public async Task<ActionResult<bool>> Insert([FromBody] InsertManufacturer request)
+        public async Task<ActionResult<bool>> Insert([FromBody] InsertManufacturerRequest request)
         {
             return Ok(await _ManufacturerService.Insert(await GetUserId(), request));
         }
@@ -69,7 +69,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("api/manufacturer")]
-        public async Task<ActionResult<bool>> Update([FromBody] UpdateManufacturer request)
+        public async Task<ActionResult<bool>> Update([FromBody] UpdateManufacturerRequest request)
         {
             return Ok(await _ManufacturerService.Update(await GetUserId(), request));
         }
