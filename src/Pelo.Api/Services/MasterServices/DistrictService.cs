@@ -131,9 +131,7 @@ namespace Pelo.Api.Services.MasterServices
                 var canGetAll = await _roleService.CheckPermission(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetDistrictPagingResponse, int>(string.Format(SqlQuery.DISTRICT_PAGING,
-                                                                                                                         request.ColumnOrder,
-                                                                                                                         request.SortDir.ToUpper()),
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetDistrictPagingResponse, int>(SqlQuery.DISTRICT_PAGING,
                                                                                                               new
                                                                                                               {
                                                                                                                   Name = $"%{request.Name}%",

@@ -340,7 +340,7 @@
                                                           OR ISNULL(c.ProvinceId, 0) = @ProvinceId
                                                       )
                                                       AND c.IsDeleted = 0
-                                                ORDER BY c.Id ASC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                ORDER BY p.SortOrder OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
 
                                                 SELECT COUNT(*)
                                                 FROM dbo.District c
