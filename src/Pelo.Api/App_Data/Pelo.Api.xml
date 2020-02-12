@@ -82,6 +82,42 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CandidateStatusController.GetAll">
+            <summary>
+                Lấy tất cả trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CandidateStatusController.GetPaging(Pelo.Common.Dtos.CandidateStatus.GetCandidateStatusPagingRequest)">
+            <summary>
+                Lấy tất cả trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CandidateStatusController.GetById(System.Int32)">
+            <summary>
+                Lấy trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CandidateStatusController.Insert(Pelo.Common.Dtos.CandidateStatus.InsertCandidateStatus)">
+            <summary>
+                insert trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CandidateStatusController.Update(Pelo.Common.Dtos.CandidateStatus.UpdateCandidateStatus)">
+            <summary>
+                update trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CandidateStatusController.Delete(System.Int32)">
+            <summary>
+                delete trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CrmController.GetByPaging(Pelo.Common.Dtos.Crm.GetWarrantyPagingRequest)">
             <summary>
                 Lấy danh sách CRM có phân trang
@@ -506,6 +542,42 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.ManufacturerControlle.GetAll">
+            <summary>
+                Lấy tất cả hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ManufacturerControlle.GetPaging(Pelo.Common.Dtos.Manufacturer.GetManufacturerPagingRequest)">
+            <summary>
+                Lấy tất cả hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ManufacturerControlle.GetById(System.Int32)">
+            <summary>
+                Lấy hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ManufacturerControlle.Insert(Pelo.Common.Dtos.Manufacturer.InsertManufacturerRequest)">
+            <summary>
+                insert hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ManufacturerControlle.Update(Pelo.Common.Dtos.Manufacturer.UpdateManufacturerRequest)">
+            <summary>
+                update hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ManufacturerControlle.Delete(System.Int32)">
+            <summary>
+                delete hình thức thanh toán
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.PayMethodController.GetAll">
             <summary>
                 Lấy tất cả hình thức thanh toán
@@ -722,6 +794,78 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptDescriptionController.GetAll">
+            <summary>
+                Lấy tất cả trạng thái receipt description
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptDescriptionController.GetPaging(Pelo.Common.Dtos.ReceiptDescription.GetReceiptDescriptionPagingRequest)">
+            <summary>
+                Lấy tất cả trạng thái receipt  description/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptDescriptionController.GetById(System.Int32)">
+            <summary>
+                Lấy trạng thái receipt
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptDescriptionController.Insert(Pelo.Common.Dtos.ReceiptDescription.InsertReceiptDescription)">
+            <summary>
+                insert trạng thái receipt description
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptDescriptionController.Update(Pelo.Common.Dtos.ReceiptDescription.UpdateReceiptDescription)">
+            <summary>
+                insert trạng thái receipt description
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptDescriptionController.Delete(System.Int32)">
+            <summary>
+                delete trạng thái receipt description
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptStatusController.GetAll">
+            <summary>
+                Lấy tất cả trạng thái receipt
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptStatusController.GetPaging(Pelo.Common.Dtos.ReceiptStatus.GetReceiptStatusPagingRequest)">
+            <summary>
+                Lấy tất cả trạng thái receipt/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptStatusController.GetById(System.Int32)">
+            <summary>
+                Lấy trạng thái receipt
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptStatusController.Insert(Pelo.Common.Dtos.ReceiptStatus.InsertReceiptStatus)">
+            <summary>
+                insert trạng thái receipt
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptStatusController.Update(Pelo.Common.Dtos.ReceiptStatus.UpdateReceiptStatus)">
+            <summary>
+                insert trạng thái receipt
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptStatusController.Delete(System.Int32)">
+            <summary>
+                delete trạng thái receipt
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.RoleController.GetAll">
             <summary>
                 Lấy tất cả role
@@ -756,6 +900,78 @@
         <member name="M:Pelo.Api.Controllers.RoleController.Delete(System.Int32)">
             <summary>
                 delete phường xã
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskPriorityController.GetAll">
+            <summary>
+                Lấy tất cả trạng thái Task Priority
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskPriorityController.GetPaging(Pelo.Common.Dtos.TaskPriority.GetTaskPriorityPagingRequest)">
+            <summary>
+                Lấy tất cả trạng thái Task  Priority/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskPriorityController.GetById(System.Int32)">
+            <summary>
+                Lấy trạng thái Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskPriorityController.Insert(Pelo.Common.Dtos.TaskPriority.InsertTaskPriority)">
+            <summary>
+                insert trạng thái Task Priority
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskPriorityController.Update(Pelo.Common.Dtos.TaskPriority.UpdateTaskPriority)">
+            <summary>
+                insert trạng thái Task Priority
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskPriorityController.Delete(System.Int32)">
+            <summary>
+                delete trạng thái Task Priority
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskStatusController.GetAll">
+            <summary>
+                Lấy tất cả trạng thái Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskStatusController.GetPaging(Pelo.Common.Dtos.TaskStatus.GetTaskStatusPagingRequest)">
+            <summary>
+                Lấy tất cả trạng thái Task/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskStatusController.GetById(System.Int32)">
+            <summary>
+                Lấy trạng thái Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskStatusController.Insert(Pelo.Common.Dtos.TaskStatus.InsertTaskStatus)">
+            <summary>
+                insert trạng thái Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskStatusController.Update(Pelo.Common.Dtos.TaskStatus.UpdateTaskStatus)">
+            <summary>
+                insert trạng thái Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskStatusController.Delete(System.Int32)">
+            <summary>
+                delete trạng thái Task
             </summary>
             <returns></returns>
         </member>
@@ -846,6 +1062,42 @@
         <member name="M:Pelo.Api.Controllers.WardController.Delete(System.Int32)">
             <summary>
                 delete phường xã
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyDescriptionController.GetAll">
+            <summary>
+                Lấy tất cả trạng thái bảo hành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyDescriptionController.GetPaging(Pelo.Common.Dtos.WarrantyDescription.GetWarrantyDescriptionPagingRequest)">
+            <summary>
+                Lấy tất cả trạng thái bảo hành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyDescriptionController.GetById(System.Int32)">
+            <summary>
+                Lấy trạng thái bảo hành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyDescriptionController.Insert(Pelo.Common.Dtos.WarrantyDescription.InsertWarrantyDescription)">
+            <summary>
+                insert trạng thái bảo hành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyDescriptionController.Update(Pelo.Common.Dtos.WarrantyDescription.UpdateWarrantyDescription)">
+            <summary>
+                update trạng thái bảo hành
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyDescriptionController.Delete(System.Int32)">
+            <summary>
+                delete trạng thái bảo hành
             </summary>
             <returns></returns>
         </member>
