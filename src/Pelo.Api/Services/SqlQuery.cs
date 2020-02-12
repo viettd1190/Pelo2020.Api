@@ -405,32 +405,62 @@
                                                   WHERE Id = @Id";
 
         public const string WARD_PAGING = @"SELECT c.Id,
-                                                              c.Name,
-                                                              c.Type,
-                                                              c.SortOrder,
-                                                              d.Name AS District,
-                                                              c.DateUpdated
-                                                       FROM dbo.Ward c
-                                                           LEFT JOIN dbo.District d
-                                                               ON d.Id = c.DistrictId
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND
-                                                             (
-                                                                 @DistrictId = 0
-                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
-                                                             )
-                                                             AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
-SELECT COUNT(*) FROM dbo.Ward c
-                                                           LEFT JOIN dbo.District d
-                                                               ON d.Id = c.DistrictId
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND
-                                                             (
-                                                                 @DistrictId = 0
-                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
-                                                             )
-                                                             AND c.IsDeleted = 0";
+                                                   c.Name,
+                                                   c.Type,
+                                                   c.SortOrder,
+                                                   d.Type + ' ' + d.Name AS District,
+                                                   p.Type + ' ' + p.Name AS Province,
+                                                   c.DateUpdated
+                                            FROM dbo.Ward c
+                                                LEFT JOIN dbo.District d
+                                                    ON d.Id = c.DistrictId
+                                                LEFT JOIN dbo.Province p
+                                                    ON p.Id = c.ProvinceId
+                                            WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                  AND
+                                                  (
+                                                      @ProvinceId = 0
+                                                      OR
+                                                      (
+                                                          @ProvinceId > 0
+                                                          AND @DistrictId = 0
+                                                          AND c.ProvinceId = @ProvinceId
+                                                      )
+                                                      OR
+                                                      (
+                                                          @ProvinceId > 0
+                                                          AND @DistrictId > 0
+                                                          AND c.DistrictId = @DistrictId
+                                                      )
+                                                  )
+                                                  AND c.IsDeleted = 0
+                                            ORDER BY p.SortOrder,
+                                                     d.SortOrder,
+                                                     c.SortOrder OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                            SELECT COUNT(*)
+                                            FROM dbo.Ward c
+                                                LEFT JOIN dbo.District d
+                                                    ON d.Id = c.DistrictId
+                                                LEFT JOIN dbo.Province p
+                                                    ON p.Id = c.ProvinceId
+                                            WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                  AND
+                                                  (
+                                                      @ProvinceId = 0
+                                                      OR
+                                                      (
+                                                          @ProvinceId > 0
+                                                          AND @DistrictId = 0
+                                                          AND c.ProvinceId = @ProvinceId
+                                                      )
+                                                      OR
+                                                      (
+                                                          @ProvinceId > 0
+                                                          AND @DistrictId > 0
+                                                          AND c.DistrictId = @DistrictId
+                                                      )
+                                                  )
+                                                  AND c.IsDeleted = 0;";
 
         #endregion
 

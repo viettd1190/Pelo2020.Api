@@ -131,12 +131,12 @@ namespace Pelo.Api.Services.MasterServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWardPagingResponse, int>(string.Format(SqlQuery.WARD_PAGING,
-                                                                                                                         request.ColumnOrder,
-                                                                                                                         request.SortDir.ToUpper()),
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWardPagingResponse, int>(SqlQuery.WARD_PAGING,
                                                                                                               new
                                                                                                               {
                                                                                                                   Name = $"%{request.Name}%",
+                                                                                                                  request.ProvinceId,
+                                                                                                                  request.DistrictId,
                                                                                                                   Skip = (request.Page - 1) * request.PageSize,
                                                                                                                   Take = request.PageSize
                                                                                                               });
