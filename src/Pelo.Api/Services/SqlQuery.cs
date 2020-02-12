@@ -328,7 +328,7 @@
                                                        c.Name,
                                                        c.Type,
                                                        c.SortOrder,
-                                                       p.Name AS Province,
+                                                       p.Type+' '+p.Name AS Province,
                                                        c.DateUpdated
                                                 FROM dbo.District c
                                                     LEFT JOIN dbo.Province p
@@ -341,6 +341,7 @@
                                                       )
                                                       AND c.IsDeleted = 0
                                                 ORDER BY c.Id ASC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
                                                 SELECT COUNT(*)
                                                 FROM dbo.District c
                                                     LEFT JOIN dbo.Province p
