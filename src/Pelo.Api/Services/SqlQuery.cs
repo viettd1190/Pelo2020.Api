@@ -3167,5 +3167,54 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              AND c.IsDeleted = 0;";
 
         #endregion
+        #region WarrantyDescription
+
+        public const string WARRANTY_DESCRIPTION_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.WarrantyDescription
+                                                   WHERE IsDeleted = 0;";
+
+        public const string WARRANTY_DESCRIPTION_GET_BY_ID = @"SELECT * FROM dbo.WarrantyDescription WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string WARRANTY_DESCRIPTION_INSERT = @"INSERT dbo.WarrantyDescription
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string WARRANTY_DESCRIPTION_UPDATE = @"  UPDATE dbo.WarrantyDescription
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string WARRANTY_DESCRIPTION_DELETE = @"  UPDATE dbo.WarrantyDescription
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string WARRANTY_DESCRIPTION_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.DateUpdated
+                                                       FROM dbo.WarrantyDescription c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                       SELECT COUNT(*)
+                                                       FROM dbo.WarrantyDescription c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0;";
+
+        #endregion
     }
 }
