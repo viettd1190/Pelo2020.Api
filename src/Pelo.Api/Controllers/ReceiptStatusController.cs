@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Pelo.Api.Services.ReceiptServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.ReceiptStatus;
 
