@@ -903,6 +903,42 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.TaskLoopController.GetAll">
+            <summary>
+                Lấy tất cả Loop Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskLoopController.GetPaging(Pelo.Common.Dtos.TaskLoop.GetTaskLoopPagingRequest)">
+            <summary>
+                Lấy tất cả Loop Task/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskLoopController.GetById(System.Int32)">
+            <summary>
+                Lấy Loop Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskLoopController.Insert(Pelo.Common.Dtos.TaskLoop.InsertTaskLoop)">
+            <summary>
+                insert Loop Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskLoopController.Update(Pelo.Common.Dtos.TaskLoop.UpdateTaskLoop)">
+            <summary>
+                insert Loop Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskLoopController.Delete(System.Int32)">
+            <summary>
+                delete Loop Task
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.TaskPriorityController.GetAll">
             <summary>
                 Lấy tất cả trạng thái Task Priority
@@ -972,6 +1008,42 @@
         <member name="M:Pelo.Api.Controllers.TaskStatusController.Delete(System.Int32)">
             <summary>
                 delete trạng thái Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskTypeController.GetAll">
+            <summary>
+                Lấy tất cả type Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskTypeController.GetPaging(Pelo.Common.Dtos.TaskType.GetTaskTypePagingRequest)">
+            <summary>
+                Lấy tất cả type Task/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskTypeController.GetById(System.Int32)">
+            <summary>
+                Lấy type Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskTypeController.Insert(Pelo.Common.Dtos.TaskType.InsertTaskType)">
+            <summary>
+                insert type Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskTypeController.Update(Pelo.Common.Dtos.TaskType.UpdateTaskType)">
+            <summary>
+                insert type Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskTypeController.Delete(System.Int32)">
+            <summary>
+                delete type Task
             </summary>
             <returns></returns>
         </member>

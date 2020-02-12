@@ -3308,7 +3308,6 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          SortOrder,
                                                          IsSendSms,
                                                          SmsContent,
-                                                         SortOrder,
                                                          UserCreated,
                                                          DateCreated,
                                                          UserUpdated,
@@ -3319,7 +3318,6 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          @SortOrder,
                                                          @IsSendSms,
                                                          @SmsContent,
-                                                         @SortOrder,                                                                                                                  
                                                          @UserCreated,
                                                          @DateCreated,
                                                          @UserUpdated,
@@ -3334,12 +3332,126 @@ SELECT COUNT(*) FROM dbo.Role c
                                                       SortOrder = @SortOrder,
                                                       IsSendSms = @IsSendSms,
                                                       SmsContent = @SmsContent,
-                                                      SortOrder=@SortOrder, 
                                                       UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated
                                                   WHERE Id = @Id";
 
         public const string TASK_STATUS_DELETE = @"  UPDATE dbo.TaskStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
+
+        #region Task Type
+
+        public const string TASK_TYPE_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.TaskType
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        public const string TASK_TYPE_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.TaskType 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.TaskType 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string TASK_TYPE_GET_BY_ID = @"SELECT * FROM dbo.CrmStatus WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string TASK_TYPE_INSERT = @"INSERT dbo.TaskType
+                                                        (Name,
+                                                         SortOrder,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @SortOrder,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string TASK_TYPE_UPDATE = @"  UPDATE dbo.TaskType
+                                                  SET Name = @Name,
+                                                      SortOrder = @SortOrder,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string TASK_TYPE_DELETE = @"  UPDATE dbo.TaskType
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
+
+        #region Task Loop
+
+        public const string TASK_LOOP_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.TaskLoop
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        public const string TASK_LOOP_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.TaskLoop 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.TaskLoop 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string TASK_LOOP_GET_BY_ID = @"SELECT * FROM dbo.CrmStatus WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string TASK_LOOP_INSERT = @"INSERT dbo.TaskLoop
+                                                        (Name,
+                                                         DayCount,
+                                                         SortOrder,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @DayCount,
+                                                         @SortOrder,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string TASK_LOOP_UPDATE = @"  UPDATE dbo.TaskLoop
+                                                  SET Name = @Name,
+                                                      SortOrder = @SortOrder,
+                                                      DayCount = @DayCount,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string TASK_LOOP_DELETE = @"  UPDATE dbo.TaskLoop
                                                   SET UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated,
                                                       IsDeleted = 1
