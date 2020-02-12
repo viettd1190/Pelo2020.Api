@@ -137,6 +137,7 @@ namespace Pelo.Api.Services.MasterServices
                                                                                                               new
                                                                                                               {
                                                                                                                   Name = $"%{request.Name}%",
+                                                                                                                  request.ProvinceId,
                                                                                                                   Skip = (request.Page - 1) * request.PageSize,
                                                                                                                   Take = request.PageSize
                                                                                                               });
