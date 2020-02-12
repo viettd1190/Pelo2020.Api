@@ -7,6 +7,7 @@ using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.CrmPriority;
 using Pelo.Common.Dtos.CandidateStatus;
 using Pelo.Common.Models;
+using Pelo.Api.Services.CandidateServices;
 
 namespace Pelo.Api.Controllers
 {
