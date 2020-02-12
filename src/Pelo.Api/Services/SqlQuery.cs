@@ -3052,5 +3052,70 @@ SELECT COUNT(*) FROM dbo.Role c
                                                   WHERE Id = @Id";
 
         #endregion
+
+        #region ReceiptStatus
+
+        public const string RECEIPT_STATUS_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.ReceiptStatus
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        public const string RECEIPT_STATUS_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.ReceiptStatus 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.CrmCandidateStatusStatus 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string RECEIPT_STATUS_GET_BY_ID = @"SELECT * FROM dbo.CrmStatus WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string RECEIPT_STATUS_INSERT = @"INSERT dbo.ReceiptStatus
+                                                        (Name,
+                                                         Color,
+                                                         IsSendSms,
+                                                         SmsContent,
+                                                         SortOrder,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @IsSendSms,
+                                                         @SmsContent,
+                                                         @SortOrder,                                                                                                                  
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string RECEIPT_STATUS_UPDATE = @"  UPDATE dbo.ReceiptStatus
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                      IsSendSms = @IsSendSms,
+                                                      SmsContent = @SmsContent,
+                                                      SortOrder=@SortOrder, 
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string RECEIPT_STATUS_DELETE = @"  UPDATE dbo.ReceiptStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
     }
 }
