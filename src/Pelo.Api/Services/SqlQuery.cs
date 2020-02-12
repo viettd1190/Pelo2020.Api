@@ -325,33 +325,33 @@
                                                   WHERE Id = @Id";
 
         public const string DISTRICT_PAGING = @"SELECT c.Id,
-                                                              c.Name,
-                                                              c.Type,
-                                                              c.SortOrder,
-                                                              p.Name AS Province,
-                                                              c.DateUpdated
-                                                       FROM dbo.District c
-                                                           LEFT JOIN dbo.ProvinceId p
-                                                               ON p.Id = c.ProvinceId
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND
-                                                             (
-                                                                 @ProvinceId = 0
-                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
-                                                             )
-                                                             AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
- SELECT COUNT(*) 
-FROM dbo.District c
-                                                           LEFT JOIN dbo.ProvinceId p
-                                                               ON p.Id = c.ProvinceId
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND
-                                                             (
-                                                                 @ProvinceId = 0
-                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
-                                                             )
-                                                             AND c.IsDeleted = 0";
+                                                       c.Name,
+                                                       c.Type,
+                                                       c.SortOrder,
+                                                       p.Name AS Province,
+                                                       c.DateUpdated
+                                                FROM dbo.District c
+                                                    LEFT JOIN dbo.Province p
+                                                        ON p.Id = c.ProvinceId
+                                                WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                      AND
+                                                      (
+                                                          @ProvinceId = 0
+                                                          OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                      )
+                                                      AND c.IsDeleted = 0
+                                                ORDER BY c.Id ASC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                SELECT COUNT(*)
+                                                FROM dbo.District c
+                                                    LEFT JOIN dbo.Province p
+                                                        ON p.Id = c.ProvinceId
+                                                WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                      AND
+                                                      (
+                                                          @ProvinceId = 0
+                                                          OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                      )
+                                                      AND c.IsDeleted = 0;";
 
         #endregion
 
