@@ -133,9 +133,7 @@ namespace Pelo.Api.Services.CandidateServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCandidateStatusPagingResponse, int>(string.Format(SqlQuery.CANDIDATE_STATUS_GET_BY_PAGING,
-                                                                                                                         request.ColumnOrder,
-                                                                                                                         request.SortDir.ToUpper()),
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCandidateStatusPagingResponse, int>(SqlQuery.CANDIDATE_STATUS_GET_BY_PAGING,
                                                                                                               new
                                                                                                               {
                                                                                                                   Name = $"%{request.Name}%",

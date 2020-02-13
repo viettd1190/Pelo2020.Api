@@ -2966,7 +2966,6 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          FROM dbo.WarrantyStatus 
                                                          WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                              AND IsDeleted = 0
-                                                        ORDER BY {0} {1}
                                                         OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
 
                                                         SELECT COUNT(*)
@@ -3192,7 +3191,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                        FROM dbo.ReceiptDescription c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
                                                              AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                       OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
                                                        SELECT COUNT(*)
                                                        FROM dbo.ReceiptDescription c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI

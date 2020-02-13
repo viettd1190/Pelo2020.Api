@@ -133,9 +133,7 @@ namespace Pelo.Api.Services.ReceiptServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetReceiptDescriptionPagingResponse, int>(string.Format(SqlQuery.RECEIPT_DESCRIPTION_PAGING,
-                                                                                                                         request.ColumnOrder,
-                                                                                                                         request.SortDir.ToUpper()),
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetReceiptDescriptionPagingResponse, int>(SqlQuery.RECEIPT_DESCRIPTION_PAGING,
                                                                                                               new
                                                                                                               {
                                                                                                                   Name = $"%{request.Name}%",
