@@ -3545,5 +3545,105 @@ SELECT COUNT(*) FROM dbo.Role c
                                                   WHERE Id = @Id";
 
         #endregion
+
+        #region Candidate
+
+        public const string CANDIDATE_GET_BY_ID = @"SELECT * FROM dbo.Candidate WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string CANDIDATE_INSERT = @"INSERT dbo.Candidate
+                                                        (Name,
+                                                         Color,
+                                                         Code,
+                                                         Address,
+                                                         Email,Description,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @Code,
+                                                         @Address,
+                                                         @Email,@Description,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string CANDIDATE_UPDATE = @"  UPDATE dbo.Candidate
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                         Code=@Code,
+                                                         Address=@Address,
+                                                         Email=@Email,Description=@Description,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string CANDIDATE_DELETE = @"  UPDATE dbo.Candidate
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string CANDIDATE_GET_BY_PAGING = @"SELECT c.Id,
+                                                             c.Code,
+                                                             c.Name,
+                                                             c.Phone,
+                                                             c.Address,
+                                                             c.Email,
+                                                             c.Description
+                                                             cd.Color
+                                                             cd.Name AS CandidateStatusName
+                                                             u.FullName AS UserNameCreated,
+                                                         FROM dbo.Candidate AS c
+                                                            LEFT JOIN dbo.CandidateStatus AS cd
+                                                               ON cd.Id = c.CandidateStatusId
+                                                         LEFT JOIN dbo.[User] As u
+                                                               ON u.Id = c.UserCreated
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND ISNULL(c.Phone, '') COLLATE Latin1_General_CI_AI LIKE @Phone COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @CandidateStatusId = 0
+                                                                 OR ISNULL(c.CandidateStatusId, 0) = @CandidateStatusId
+                                                             )
+                                                             
+                                                                AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT c.Id,
+                                                             c.Code,
+                                                             c.Name,
+                                                             c.Phone,
+                                                             c.Address,
+                                                             c.Email,
+                                                             c.Description
+                                                             cd.Color
+                                                             cd.Name AS CandidateStatusName
+                                                             u.FullName AS UserNameCreated,
+                                                         FROM dbo.Candidate AS c
+                                                            LEFT JOIN dbo.CandidateStatus AS cd
+                                                               ON cd.Id = c.CandidateStatusId
+                                                         LEFT JOIN dbo.[User] As u
+                                                               ON u.Id = c.UserCreated
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND ISNULL(c.Phone, '') COLLATE Latin1_General_CI_AI LIKE @Phone COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @CandidateStatusId = 0
+                                                                 OR ISNULL(c.CandidateStatusId, 0) = @CandidateStatusId
+                                                             )
+                                                             
+                                                                AND IsDeleted = 0;";
+
+        #endregion
     }
 }
