@@ -155,16 +155,15 @@
                                                   WHERE Id = @Id";
 
         public const string DEPARTMENT_PAGING = @"SELECT c.Id,
-                                                              c.Name,
-                                                              c.DateUpdated
-                                                       FROM dbo.Department c
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
-                                                       SELECT COUNT(*)
-                                                       FROM dbo.Department c
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND c.IsDeleted = 0;";
+                                                         c.Name
+                                                 FROM dbo.Department c
+                                                 WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                       AND c.IsDeleted = 0
+                                                 ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                 SELECT COUNT(*)
+                                                 FROM dbo.Department c
+                                                 WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                       AND c.IsDeleted = 0;";
 
         #endregion
         #region Manufacturer

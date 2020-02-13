@@ -131,10 +131,10 @@ namespace Pelo.Api.Services.MasterServices
                 var canGetAll = await _roleService.CheckPermission(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetDepartmentPagingResponse, int>(SqlQuery.DEPARTMENT_PAGING,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetDepartmentPagingResponse, int>(string.Format(SqlQuery.DEPARTMENT_PAGING,request.ColumnOrder,request.SortDir),
                                                                                                               new
                                                                                                               {
-                                                                                                                  request.Name,
+                                                                                                                  Name=$"%{request.Name}%",
                                                                                                                   Skip = (request.Page - 1) * request.PageSize,
                                                                                                                   Take = request.PageSize
                                                                                                               });
