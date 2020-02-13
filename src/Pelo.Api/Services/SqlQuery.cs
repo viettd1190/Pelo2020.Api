@@ -3036,11 +3036,11 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
 
                                                         SELECT COUNT(*)
-                                                        FROM dbo.CrmCandidateStatusStatus 
+                                                        FROM dbo.CandidateStatus 
                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                             AND IsDeleted = 0;";
 
-        public const string CANDIDATE_STATUS_GET_BY_ID = @"SELECT * FROM dbo.CrmStatus WHERE Id = @Id AND IsDeleted = 0";
+        public const string CANDIDATE_STATUS_GET_BY_ID = @"SELECT * FROM dbo.CandidateStatus WHERE Id = @Id AND IsDeleted = 0";
 
 
         public const string CANDIDATE_STATUS_INSERT = @"INSERT dbo.CandidateStatus
@@ -3328,7 +3328,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                             AND IsDeleted = 0;";
 
-        public const string TASK_STATUS_GET_BY_ID = @"SELECT * FROM dbo.CrmStatus WHERE Id = @Id AND IsDeleted = 0";
+        public const string TASK_STATUS_GET_BY_ID = @"SELECT * FROM dbo.TaskStatus WHERE Id = @Id AND IsDeleted = 0";
 
 
         public const string TASK_STATUS_INSERT = @"INSERT dbo.TaskStatus
@@ -3393,7 +3393,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                             AND IsDeleted = 0;";
 
-        public const string TASK_TYPE_GET_BY_ID = @"SELECT * FROM dbo.CrmStatus WHERE Id = @Id AND IsDeleted = 0";
+        public const string TASK_TYPE_GET_BY_ID = @"SELECT * FROM dbo.TaskType WHERE Id = @Id AND IsDeleted = 0";
 
 
         public const string TASK_TYPE_INSERT = @"INSERT dbo.TaskType
@@ -3449,7 +3449,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                             AND IsDeleted = 0;";
 
-        public const string TASK_LOOP_GET_BY_ID = @"SELECT * FROM dbo.CrmStatus WHERE Id = @Id AND IsDeleted = 0";
+        public const string TASK_LOOP_GET_BY_ID = @"SELECT * FROM dbo.TaskLoop WHERE Id = @Id AND IsDeleted = 0";
 
 
         public const string TASK_LOOP_INSERT = @"INSERT dbo.TaskLoop
@@ -3481,6 +3481,65 @@ SELECT COUNT(*) FROM dbo.Role c
                                                   WHERE Id = @Id";
 
         public const string TASK_LOOP_DELETE = @"  UPDATE dbo.TaskLoop
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
+
+        #region RecruitmentStatus
+
+        public const string RECRUITMENT_STATUS_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.RecruitmentStatus
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        public const string RECRUITMENT_STATUS_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.RecruitmentStatus 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.RecruitmentStatus 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string RECRUITMENT_STATUS_GET_BY_ID = @"SELECT * FROM dbo.RecruitmentStatus WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string RECRUITMENT_STATUS_INSERT = @"INSERT dbo.RecruitmentStatus
+                                                        (Name,
+                                                         Color,
+                                                         SortOrder,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @SortOrder,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string RECRUITMENT_STATUS_UPDATE = @"  UPDATE dbo.RecruitmentStatus
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                      SortOrder = @SortOrder,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string RECRUITMENT_STATUS_DELETE = @"  UPDATE dbo.RecruitmentStatus
                                                   SET UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated,
                                                       IsDeleted = 1
