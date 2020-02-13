@@ -362,7 +362,7 @@
                                                     Name
                                              FROM dbo.Ward
                                              WHERE IsDeleted = 0
-                                                   AND (@DistrictId = 0 OR DistrictId = @DistrictId)
+                                                   AND DistrictId = @DistrictId
                                              ORDER BY SortOrder;";
 
         public const string WARD_GET_BY_ID = @"SELECT * FROM dbo.Ward WHERE Id = @Id AND IsDeleted = 0";
