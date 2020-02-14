@@ -3486,7 +3486,157 @@ SELECT COUNT(*) FROM dbo.Role c
                                                   WHERE Id = @Id";
 
         #endregion
+        #region Task
 
+        public const string TASK_GET_ALL_BY_CUSTOMERID = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.Task
+                                                   WHERE IsDeleted = 0 AND CustomerId = @CustomerId
+                                                   ORDER BY Id;";
+
+        public const string TASK_GET_BY_PAGING = @"DROP TABLE IF EXISTS #tmpTask;
+                                                        SELECT t.Id,
+                                                         t.TaskStatusId,
+                                                         t.TaskPriorityId,
+                                                         t.TaskLoopId,
+                                                         t.TaskTypeId,
+                                                         t.UserCreated, 
+                                                         t.Code,
+                                                         t.Name,
+                                                         t.Content,
+                                                         t.Description,
+                                                         t.FromDateTime,
+                                                         t.ToDateTime,                                                       
+                                                         tl.Name AS TaskLoopName,
+                                                         tp.Name AS TaskPriorityName,
+                                                         tp.Color AS TaskPriorityColor,
+                                                         ts.Color AS TaskStatusColor,
+                                                         ts.Name AS TaskStatusName,
+                                                         u.FullName AS UserNameCreated,
+                                                         cs.Phone AS CustomerPhone,
+                                                         cs.Name AS CustomerName,
+                                                         cs.Address AS CustomerAddress,
+                                                       INTO #tmpTask
+                                                         FROM dbo.Task as t
+                                                         LEFT JOIN dbo.[User] AS u
+                                                               ON u.Id = t.UserCreated                                                         
+                                                         LEFT JOIN dbo.TaskLoop AS tl
+                                                               ON tl.Id = t.TaskLoopId
+                                                         LEFT JOIN dbo.TaskPriority AS tp
+                                                               ON tp.Id = t.TaskPriorityId
+                                                         LEFT JOIN dbo.TaskStatus AS ts
+                                                               ON ts.Id = t.TaskStatusId
+                                                         LEFT JOIN dbo.Customer AS cs
+                                                               ON cs.Id = t.CustomerId
+                                                         WHERE ISNULL(t.Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND ISNULL(t.Code,'') COLLATE Latin1_general_CI_AI LIKE @Code COLLATE Latin1_general_CI_AI
+                                                             AND ISNULL(CustomerPhone,'') COLLATE Latin1_general_CI_AI LIKE @Phone COLLATE Latin1_general_CI_AI
+                                                             AND
+                                                             (
+                                                                 @TaskStatusId = 0
+                                                                 OR ISNULL(t.TaskStatusId, 0) = @TaskStatusId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @TaskPriorityId = 0
+                                                                 OR ISNULL(t.TaskPriorityId, 0) = @TaskPriorityId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @TaskLoopId = 0
+                                                                 OR ISNULL(t.TaskLoopId, 0) = @TaskLoopId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @TaskTypeId = 0
+                                                                 OR ISNULL(t.TaskTypeId, 0) = @TaskTypeId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @UserCreatedId = 0
+                                                                 OR ISNULL(t.UserCreated, 0) = @UserCreatedId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @UserCaredId = 0
+                                                                 OR ISNULL(ut.UserCaredId, 0) = @UserCaredId
+                                                             )                                                             
+                                                             AND
+                                                             (
+                                                                (@FromTime ='' OR DATEDIFF(DAY,t.FromDateTime,convert(datetime, @FromTime, 0)) <= 0 OR DATEDIFF(DAY,t.ToDateTime,convert(datetime, @FromTime, 0)) <= 0) AND (@ToTime ='' OR DATEDIFF(DAY,t.ToDateTime,convert(datetime, @ToTime, 0)) >= 0)
+                                                             )           
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM #tmpTask";
+
+        public const string TASK_GET_BY_ID = @"SELECT * FROM dbo.TaskLoop WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string TASK_INSERT = @"INSERT dbo.Task
+                                                        (Name,
+                                                         Code,
+                                                         CustomerId,
+                                                         Content,
+                                                         Description,
+                                                         TaskStatusId,
+                                                         TaskPriorityId,
+                                                         TaskLoopId,
+                                                         TaskTypeId,
+                                                         FromDateTime,
+                                                         ToDateTime,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Code,
+                                                         @CustomerId,
+                                                         @Content,
+                                                         @Description,
+                                                         @TaskStatusId,
+                                                         @TaskPriorityId,
+                                                         @TaskLoopId,
+                                                         @TaskTypeId,
+                                                         @FromDateTime,
+                                                         @ToDateTime,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string TASK_UPDATE = @"UPDATE dbo.Task
+                                                  SET Name = @Name,
+                                                         Code=@Code,
+                                                         Content=@Content,
+                                                         Description=@Description,
+                                                         TaskStatusId=@TaskStatusId,
+                                                         TaskPriorityId=@TaskPriorityId,
+                                                         TaskLoopId=@TaskLoopId,
+                                                         TaskTypeId=@TaskTypeId,
+                                                         FromDateTime=@FromDateTime,
+                                                         ToDateTime=@ToDateTime,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string TASK_DELETE = @"  UPDATE dbo.Task
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string TASK_CURRENT_COUNT = @"SELECT COUNT(*) FROM dbo.Task
+                                                         WHERE @CurrentDate ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @CurrentDate, 0)) = 0                                                                                                                       
+                                                                AND IsDeleted = 0;";
+
+        #endregion
         #region RecruitmentStatus
 
         public const string RECRUITMENT_STATUS_GET_ALL = @"SELECT Id,
@@ -3631,7 +3781,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              )
                                                              AND
                                                              (
-                                                                (@FromTime = '' OR c.DateCreated >= @FromTime) AND (@ToTime ='' OR c.DateCreated <= @ToTime)
+                                                                (@FromTime ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @FromTime, 0)) <= 0) AND (@ToTime ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @ToTime, 0)) >= 0)
                                                              )
                                                                 AND IsDeleted = 0;";
 
@@ -3718,7 +3868,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              )
                                                              AND
                                                              (
-                                                                (@FromDate = '' OR c.DateCreated >= @FromDate) AND (@ToDate ='' OR c.DateCreated <= @ToDate)
+                                                                (@FromTime ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @FromTime, 0)) <= 0) AND (@ToTime ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @ToTime, 0)) >= 0)
                                                              )                                                             
                                                                 AND IsDeleted = 0;";
 
