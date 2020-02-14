@@ -3597,12 +3597,13 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              c.Address,
                                                              c.Email,
                                                              c.Description
-                                                             cd.Color
-                                                             cd.Name AS CandidateStatusName
+                                                             cs.Color
+                                                             cs.Name AS CandidateStatusName
                                                              u.FullName AS UserNameCreated,
+                                                             u.Phone AS UserPhoneCreated
                                                          FROM dbo.Candidate AS c
-                                                            LEFT JOIN dbo.CandidateStatus AS cd
-                                                               ON cd.Id = c.CandidateStatusId
+                                                            LEFT JOIN dbo.CandidateStatus AS cs
+                                                               ON cs.Id = c.CandidateStatusId
                                                          LEFT JOIN dbo.[User] As u
                                                                ON u.Id = c.UserCreated
                                                          WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
@@ -3612,6 +3613,10 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              (
                                                                  @CandidateStatusId = 0
                                                                  OR ISNULL(c.CandidateStatusId, 0) = @CandidateStatusId
+                                                             )
+                                                             AND
+                                                             (
+                                                                (@FromTime = '' OR c.DateCreated >= @FromTime) AND (@ToTime ='' OR c.DateCreated <= @ToTime)
                                                              )
                                                              
                                                                 AND IsDeleted = 0
@@ -3625,12 +3630,13 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              c.Address,
                                                              c.Email,
                                                              c.Description
-                                                             cd.Color
-                                                             cd.Name AS CandidateStatusName
+                                                             cs.Color
+                                                             cs.Name AS CandidateStatusName
                                                              u.FullName AS UserNameCreated,
+                                                             u.Phone AS UserPhoneCreated
                                                          FROM dbo.Candidate AS c
-                                                            LEFT JOIN dbo.CandidateStatus AS cd
-                                                               ON cd.Id = c.CandidateStatusId
+                                                            LEFT JOIN dbo.CandidateStatus AS cs
+                                                               ON cs.Id = c.CandidateStatusId
                                                          LEFT JOIN dbo.[User] As u
                                                                ON u.Id = c.UserCreated
                                                          WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
@@ -3641,7 +3647,10 @@ SELECT COUNT(*) FROM dbo.Role c
                                                                  @CandidateStatusId = 0
                                                                  OR ISNULL(c.CandidateStatusId, 0) = @CandidateStatusId
                                                              )
-                                                             
+                                                             AND
+                                                             (
+                                                                (@FromTime = '' OR c.DateCreated >= @FromTime) AND (@ToTime ='' OR c.DateCreated <= @ToTime)
+                                                             )
                                                                 AND IsDeleted = 0;";
 
         #endregion

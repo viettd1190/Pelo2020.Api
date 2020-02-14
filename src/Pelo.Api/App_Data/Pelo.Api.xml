@@ -82,6 +82,36 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CandidateController.GetPaging(Pelo.Common.Dtos.Candidate.GetCandidatePagingRequest)">
+            <summary>
+                Lấy tất cả trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CandidateController.GetById(System.Int32)">
+            <summary>
+                Lấy trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CandidateController.Insert(Pelo.Common.Dtos.Candidate.InsertCandidate)">
+            <summary>
+                insert trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CandidateController.Update(Pelo.Common.Dtos.Candidate.UpdateCandidate)">
+            <summary>
+                update trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CandidateController.Delete(System.Int32)">
+            <summary>
+                delete trạng thái Candidate
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CandidateStatusController.GetAll">
             <summary>
                 Lấy tất cả trạng thái Candidate
@@ -866,6 +896,42 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.GetAll">
+            <summary>
+                Lấy tất cả tuyển dụng Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.GetPaging(Pelo.Common.Dtos.RecruitmentStatus.GetRecruitmentStatusPagingRequest)">
+            <summary>
+                Lấy tất cả tuyển dụng Task/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.GetById(System.Int32)">
+            <summary>
+                Lấy tuyển dụng Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.Insert(Pelo.Common.Dtos.RecruitmentStatus.InsertRecruitmentStatus)">
+            <summary>
+                insert tuyển dụng Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.Update(Pelo.Common.Dtos.RecruitmentStatus.UpdateRecruitmentStatus)">
+            <summary>
+                insert tuyển dụng Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.Delete(System.Int32)">
+            <summary>
+                delete tuyển dụng Task
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.RoleController.GetAll">
             <summary>
                 Lấy tất cả role
@@ -972,42 +1038,6 @@
         <member name="M:Pelo.Api.Controllers.TaskPriorityController.Delete(System.Int32)">
             <summary>
                 delete trạng thái Task Priority
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.GetAll">
-            <summary>
-                Lấy tất cả tuyển dụng Task
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.GetPaging(Pelo.Common.Dtos.RecruitmentStatus.GetRecruitmentStatusPagingRequest)">
-            <summary>
-                Lấy tất cả tuyển dụng Task/page
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.GetById(System.Int32)">
-            <summary>
-                Lấy tuyển dụng Task
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.Insert(Pelo.Common.Dtos.RecruitmentStatus.InsertRecruitmentStatus)">
-            <summary>
-                insert tuyển dụng Task
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.Update(Pelo.Common.Dtos.RecruitmentStatus.UpdateRecruitmentStatus)">
-            <summary>
-                insert tuyển dụng Task
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.Delete(System.Int32)">
-            <summary>
-                delete tuyển dụng Task
             </summary>
             <returns></returns>
         </member>
