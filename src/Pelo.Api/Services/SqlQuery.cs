@@ -3552,7 +3552,6 @@ SELECT COUNT(*) FROM dbo.Role c
 
         public const string CANDIDATE_INSERT = @"INSERT dbo.Candidate
                                                         (Name,
-                                                         Color,
                                                          Code,
                                                          Address,
                                                          Email,Description,
@@ -3562,7 +3561,6 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          DateUpdated,
                                                          IsDeleted)
                                                  VALUES (@Name,
-                                                         @Color,
                                                          @Code,
                                                          @Address,
                                                          @Email,@Description,
@@ -3576,7 +3574,6 @@ SELECT COUNT(*) FROM dbo.Role c
 
         public const string CANDIDATE_UPDATE = @"  UPDATE dbo.Candidate
                                                   SET Name = @Name,
-                                                      Color = @Color,
                                                          Code=@Code,
                                                          Address=@Address,
                                                          Email=@Email,Description=@Description,
@@ -3623,22 +3620,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         ORDER BY {0} {1}
                                                         OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
 
-                                                        SELECT c.Id,
-                                                             c.Code,
-                                                             c.Name,
-                                                             c.Phone,
-                                                             c.Address,
-                                                             c.Email,
-                                                             c.Description
-                                                             cs.Color
-                                                             cs.Name AS CandidateStatusName
-                                                             u.FullName AS UserNameCreated,
-                                                             u.Phone AS UserPhoneCreated
-                                                         FROM dbo.Candidate AS c
-                                                            LEFT JOIN dbo.CandidateStatus AS cs
-                                                               ON cs.Id = c.CandidateStatusId
-                                                         LEFT JOIN dbo.[User] As u
-                                                               ON u.Id = c.UserCreated
+                                                        SELECT COUNT(*) FROM dbo.Candidate
                                                          WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                              AND ISNULL(c.Phone, '') COLLATE Latin1_General_CI_AI LIKE @Phone COLLATE Latin1_General_CI_AI
                                                              AND ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
@@ -3651,6 +3633,97 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              (
                                                                 (@FromTime = '' OR c.DateCreated >= @FromTime) AND (@ToTime ='' OR c.DateCreated <= @ToTime)
                                                              )
+                                                                AND IsDeleted = 0;";
+
+        public const string CANDIDATE_CURRENT_COUNT = @"SELECT COUNT(*) FROM dbo.Candidate
+                                                         WHERE @CurrentDate ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @CurrentDate, 0)) = 0                                                                                                                       
+                                                                AND IsDeleted = 0;";
+
+        #endregion
+
+        #region Recruitment
+
+        public const string RECRUITMENT_GET_BY_ID = @"SELECT * FROM dbo.Recruitment WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string RECRUITMENT_INSERT = @"INSERT dbo.Recruitment
+                                                        (Name,
+                                                         Code,
+                                                         Description,
+                                                         Content,
+                                                         RecruitmentStatusId,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @Code,
+                                                         @Description,
+                                                         @Content,
+                                                         @RecruitmentStatusId,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string RECRUITMENT_UPDATE = @"  UPDATE dbo.Recruitment
+                                                  SET RecruitmentStatusId = @RecruitmentStatusId,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string RECRUITMENT_DELETE = @"  UPDATE dbo.Recruitment
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string RECRUITMENT_GET_BY_PAGING = @"SELECT c.Id,
+                                                             c.Code,
+                                                             c.Name,
+                                                             c.Description
+                                                             cs.Color
+                                                             cs.Name AS RecruitmentStatusName
+                                                             u.FullName AS UserNameCreated,
+                                                             u.Phone AS UserPhoneCreated
+                                                         FROM dbo.Recruitment AS c
+                                                            LEFT JOIN dbo.RecruitmentStatus AS cs
+                                                               ON cs.Id = c.RecruitmentStatusId
+                                                         LEFT JOIN dbo.[User] As u
+                                                               ON u.Id = c.UserCreated
+                                                         WHERE ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @RecruitmentStatusId = 0
+                                                                 OR ISNULL(c.RecruitmentStatusId, 0) = @RecruitmentStatusId
+                                                             )
+                                                             AND
+                                                             (
+                                                                (@FromDate = '' OR c.DateCreated >= @FromDate) AND (@ToDate ='' OR c.DateCreated <= @ToDate)
+                                                             )                                                             
+                                                                AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*) FROM dbo.Recruitment
+                                                         WHERE ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @RecruitmentStatusId = 0
+                                                                 OR ISNULL(c.RecruitmentStatusId, 0) = @RecruitmentStatusId
+                                                             )
+                                                             AND
+                                                             (
+                                                                (@FromDate = '' OR c.DateCreated >= @FromDate) AND (@ToDate ='' OR c.DateCreated <= @ToDate)
+                                                             )                                                             
+                                                                AND IsDeleted = 0;";
+
+        public const string RECRUITMENT_CURRENT_COUNT = @"SELECT COUNT(*) FROM dbo.Recruitment 
+                                                         WHERE @CurrentDate ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @CurrentDate, 0)) = 0                                                                                                                       
                                                                 AND IsDeleted = 0;";
 
         #endregion

@@ -896,6 +896,36 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentController.GetPaging(Pelo.Common.Dtos.Recruitment.GetRecruitmentPagingRequest)">
+            <summary>
+                Lấy tất cả tuyển dụng Task/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentController.GetById(System.Int32)">
+            <summary>
+                Lấy tuyển dụng Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentController.Insert(Pelo.Common.Dtos.Recruitment.InsertRecruitment)">
+            <summary>
+                insert tuyển dụng Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentController.Update(Pelo.Common.Dtos.Recruitment.UpdateRecruitment)">
+            <summary>
+                insert tuyển dụng Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RecruitmentController.Delete(System.Int32)">
+            <summary>
+                delete tuyển dụng Task
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.RecruitmentStatusController.GetAll">
             <summary>
                 Lấy tất cả tuyển dụng Task

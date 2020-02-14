@@ -4,31 +4,31 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Pelo.Api.Services.BaseServices;
 using Pelo.Api.Services.UserServices;
-using Pelo.Common.Dtos.Candidate;
+using Pelo.Common.Dtos.Recruitment;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
-namespace Pelo.Api.Services.CandidateServices
+namespace Pelo.Api.Services.TaskServices
 {
-    public interface ICandidateService
+    public interface IRecruitmentService
     {
-        Task<TResponse<PageResult<GetCandidatePagingResponse>>> GetPaging(int v, GetCandidatePagingRequest request);
+        Task<TResponse<PageResult<GetRecruitmentPagingResponse>>> GetPaging(int v, GetRecruitmentPagingRequest request);
 
-        Task<TResponse<GetCandidateResponse>> GetById(int userId, int id);
+        Task<TResponse<RecruitmentSimpleModel>> GetById(int userId, int id);
 
-        Task<TResponse<bool>> Insert(int userId, InsertCandidate request);
+        Task<TResponse<bool>> Insert(int userId, InsertRecruitment request);
 
-        Task<TResponse<bool>> Update(int userId, UpdateCandidate request);
+        Task<TResponse<bool>> Update(int userId, UpdateRecruitment request);
 
         Task<TResponse<bool>> Delete(int userId, int id);
     }
 
-    public class CandidateService : BaseService,
-                                    ICandidateService
+    public class RecruitmentService : BaseService,
+                                    IRecruitmentService
     {
         readonly IRoleService _roleService;
 
-        public CandidateService(IDapperReadOnlyRepository readOnlyRepository,
+        public RecruitmentService(IDapperReadOnlyRepository readOnlyRepository,
                                 IDapperWriteRepository writeRepository,
                                 IHttpContextAccessor context,
                                 IRoleService roleService) : base(readOnlyRepository,
@@ -48,7 +48,7 @@ namespace Pelo.Api.Services.CandidateServices
                     var data = await GetById(userId, id);
                     if (data.IsSuccess)
                     {
-                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CANDIDATE_DELETE,
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.RECRUITMENT_DELETE,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -71,16 +71,16 @@ namespace Pelo.Api.Services.CandidateServices
             }
         }
 
-        #region ICandidateService Members
+        #region IRecruitmentService Members
 
-        public async Task<TResponse<GetCandidateResponse>> GetById(int userId, int id)
+        public async Task<TResponse<RecruitmentSimpleModel>> GetById(int userId, int id)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCandidateResponse>(SqlQuery.CANDIDATE_GET_BY_ID,
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<RecruitmentSimpleModel>(SqlQuery.RECRUITMENT_GET_BY_ID,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -90,25 +90,25 @@ namespace Pelo.Api.Services.CandidateServices
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<GetCandidateResponse>(result.Message);
+                    return await Fail<RecruitmentSimpleModel>(result.Message);
                 }
 
-                return await Fail<GetCandidateResponse>(canGetAll.Message);
+                return await Fail<RecruitmentSimpleModel>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<GetCandidateResponse>(exception);
+                return await Fail<RecruitmentSimpleModel>(exception);
             }
         }
 
-        public async Task<TResponse<PageResult<GetCandidatePagingResponse>>> GetPaging(int userId, GetCandidatePagingRequest request)
+        public async Task<TResponse<PageResult<GetRecruitmentPagingResponse>>> GetPaging(int userId, GetRecruitmentPagingRequest request)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCandidatePagingResponse, int>(string.Format(SqlQuery.CANDIDATE_GET_BY_PAGING, request.ColumnOrder, request.SortDir.ToUpper()),
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetRecruitmentPagingResponse, int>(string.Format(SqlQuery.RECRUITMENT_GET_BY_PAGING,request.ColumnOrder,request.SortDir.ToUpper()),
                                                                                                               new
                                                                                                               {
                                                                                                                   Name = $"%{request.Name}%",
@@ -119,24 +119,24 @@ namespace Pelo.Api.Services.CandidateServices
                                                                                                               });
                     if (result.IsSuccess)
                     {
-                        return await Ok(new PageResult<GetCandidatePagingResponse>(request.Page,
+                        return await Ok(new PageResult<GetRecruitmentPagingResponse>(request.Page,
                                                                                   request.PageSize,
                                                                                   result.Data.Item2,
                                                                                   result.Data.Item1));
                     }
 
-                    return await Fail<PageResult<GetCandidatePagingResponse>>(result.Message);
+                    return await Fail<PageResult<GetRecruitmentPagingResponse>>(result.Message);
                 }
 
-                return await Fail<PageResult<GetCandidatePagingResponse>>(canGetAll.Message);
+                return await Fail<PageResult<GetRecruitmentPagingResponse>>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<PageResult<GetCandidatePagingResponse>>(exception);
+                return await Fail<PageResult<GetRecruitmentPagingResponse>>(exception);
             }
         }
 
-        public async Task<TResponse<bool>> Insert(int userId, InsertCandidate request)
+        public async Task<TResponse<bool>> Insert(int userId, InsertRecruitment request)
         {
             try
             {
@@ -144,19 +144,18 @@ namespace Pelo.Api.Services.CandidateServices
                 if (canGetAll.IsSuccess)
                 {
                     string code = $"TD{DateTime.Today.ToString("yyMMdd")}001";
-                    var rs = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CANDIDATE_CURRENT_COUNT, new { CurrentDate = $"{DateTime.Today.ToString("yyyy-MM-dd")}" });
+                    var rs = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.RECRUITMENT_CURRENT_COUNT, new { CurrentDate = $"{DateTime.Today.ToString("yyyy-MM-dd")}" });
                     if (rs.IsSuccess)
                     {
-                        code = $"TD{DateTime.Today.ToString("yyMMdd")}{(rs.Data + 1).ToString("D3")}";
+                        code = $"TD{DateTime.Today.ToString("yyMMdd")}{(rs.Data+1).ToString("D3")}";
                     }
-                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CANDIDATE_INSERT,
+                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.RECRUITMENT_INSERT,
                                                                                                               new
                                                                                                               {
-                                                                                                                  request.Name,
+                                                                                                                  request.Name,                                                                                                                  
                                                                                                                   Code = code,
-                                                                                                                  request.Address,
-                                                                                                                  request.Email,
                                                                                                                   request.Description,
+                                                                                                                  request.Content,
                                                                                                                   UserCreated = userId,
                                                                                                                   DateCreated = DateTime.Now,
                                                                                                                   UserUpdated = userId,
@@ -176,7 +175,7 @@ namespace Pelo.Api.Services.CandidateServices
             }
         }
 
-        public async Task<TResponse<bool>> Update(int userId, UpdateCandidate request)
+        public async Task<TResponse<bool>> Update(int userId, UpdateRecruitment request)
         {
             try
             {
@@ -186,15 +185,11 @@ namespace Pelo.Api.Services.CandidateServices
                     var data = await GetById(userId, request.Id);
                     if (data.IsSuccess)
                     {
-                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CANDIDATE_UPDATE,
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.RECRUITMENT_UPDATE,
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Id,
-                                                                                                                  request.Name,
-                                                                                                                  request.Color,
-                                                                                                                  request.Address,
-                                                                                                                  request.Email,
-                                                                                                                  request.Description,
+                                                                                                                  request.RecruitmentStatusId,
                                                                                                                   UserUpdated = userId,
                                                                                                                   DateUpdated = DateTime.Now
                                                                                                               });
