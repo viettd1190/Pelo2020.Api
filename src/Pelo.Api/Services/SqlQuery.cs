@@ -3531,6 +3531,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          WHERE ISNULL(t.Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                              AND ISNULL(t.Code,'') COLLATE Latin1_general_CI_AI LIKE @Code COLLATE Latin1_general_CI_AI
                                                              AND ISNULL(CustomerPhone,'') COLLATE Latin1_general_CI_AI LIKE @Phone COLLATE Latin1_general_CI_AI
+                                                             AND ISNULL(CustomerName,'') COLLATE Latin1_general_CI_AI LIKE @CustomerName COLLATE Latin1_general_CI_AI
                                                              AND
                                                              (
                                                                  @TaskStatusId = 0
@@ -3563,7 +3564,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              )                                                             
                                                              AND
                                                              (
-                                                                (@FromTime ='' OR DATEDIFF(DAY,t.FromDateTime,convert(datetime, @FromTime, 0)) <= 0 OR DATEDIFF(DAY,t.ToDateTime,convert(datetime, @FromTime, 0)) <= 0) AND (@ToTime ='' OR DATEDIFF(DAY,t.ToDateTime,convert(datetime, @ToTime, 0)) >= 0)
+                                                                (@FromTime ='' OR DATEDIFF(DAY,t.FromDateTime,convert(datetime, @FromDate, 0)) <= 0 OR DATEDIFF(DAY,t.ToDateTime,convert(datetime, @FromDate, 0)) <= 0) AND (@ToTime ='' OR DATEDIFF(DAY,t.ToDateTime,convert(datetime, @ToDate, 0)) >= 0)
                                                              )           
                                                              AND IsDeleted = 0
                                                         ORDER BY {0} {1}

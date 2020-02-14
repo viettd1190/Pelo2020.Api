@@ -139,6 +139,7 @@ namespace Pelo.Api.Services.TaskServices
                                                                                                                   Name = $"%{request.Name}%",
                                                                                                                   Phone = $"%{request.Phone}%",
                                                                                                                   Code = $"%{request.Code}%",
+                                                                                                                  CustomerName = $"%{request.CustomerName}%",
                                                                                                                   request.TaskStatusId,
                                                                                                                   request.TaskLoopId,
                                                                                                                   request.TaskPriorityId,
