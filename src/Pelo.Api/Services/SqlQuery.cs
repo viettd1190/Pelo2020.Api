@@ -3616,7 +3616,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              )
                                                              AND
                                                              (
-                                                                (@FromTime = '' OR c.DateCreated >= @FromTime) AND (@ToTime ='' OR c.DateCreated <= @ToTime)
+                                                                (@FromDate = '' OR c.DateCreated >= @FromDate) AND (@ToDate ='' OR c.DateCreated <= @ToDate)
                                                              )
                                                              
                                                                 AND IsDeleted = 0

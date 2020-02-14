@@ -108,10 +108,12 @@ namespace Pelo.Api.Services.CandidateServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCandidatePagingResponse, int>(SqlQuery.CANDIDATE_GET_BY_PAGING,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCandidatePagingResponse, int>(string.Format(SqlQuery.CANDIDATE_GET_BY_PAGING, request.ColumnOrder, request.SortDir.ToUpper()),
                                                                                                               new
                                                                                                               {
                                                                                                                   Name = $"%{request.Name}%",
+                                                                                                                  FromDate = $"{request.FromDate}",
+                                                                                                                  ToDate = $"{request.ToDate}",
                                                                                                                   Skip = (request.Page - 1) * request.PageSize,
                                                                                                                   Take = request.PageSize
                                                                                                               });
