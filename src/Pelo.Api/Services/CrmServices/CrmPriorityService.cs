@@ -134,7 +134,7 @@ namespace Pelo.Api.Services.CrmServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPriorityPagingResponse, int>(SqlQuery.CRM_PRIORITY_GET_BY_PAGING,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPriorityPagingResponse, int>(string.Format(SqlQuery.CRM_PRIORITY_GET_BY_PAGING,request.ColumnOrder,request.SortDir),
                                                                                                               new
                                                                                                               {
                                                                                                                   Name = $"%{request.Name}%",
