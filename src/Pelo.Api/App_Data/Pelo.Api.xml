@@ -999,6 +999,36 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.TaskController.GetPaging(Pelo.Common.Dtos.Task.GetTaskPagingRequest)">
+            <summary>
+                Lấy tất cả  Task/page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskController.GetById(System.Int32)">
+            <summary>
+                Lấy  Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskController.Insert(Pelo.Common.Dtos.Task.InsertTask)">
+            <summary>
+                insert  Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskController.Update(Pelo.Common.Dtos.Task.UpdateTask)">
+            <summary>
+                insert  Task
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.TaskController.Delete(System.Int32)">
+            <summary>
+                delete  Task
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.TaskLoopController.GetAll">
             <summary>
                 Lấy tất cả Loop Task
