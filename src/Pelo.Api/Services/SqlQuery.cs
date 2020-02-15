@@ -1028,7 +1028,8 @@ SELECT COUNT(*) FROM dbo.ProductStatus c
                                                        AND IsDeleted = 0";
 
         public const string USER_GET_ALL = @"SELECT Id,
-                                                    DisplayName
+                                                    DisplayName,
+                                                    PhoneNumber
                                              FROM   dbo.[User]
                                              WHERE  IsDeleted = 0;";
 
