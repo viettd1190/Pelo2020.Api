@@ -2068,6 +2068,266 @@ SELECT COUNT(*) FROM dbo.Role c
       
                                                     DROP TABLE #tmpCrm;";
 
+        public const string CRM_KHACH_CHUA_XU_LY = @"DROP TABLE IF EXISTS #tmpCrm;
+
+                                                     SELECT c.Id
+                                                     INTO #tmpCrm
+                                                     FROM dbo.Crm c
+                                                         LEFT JOIN dbo.Customer cu
+                                                             ON cu.Id = c.CustomerId
+                                                         INNER JOIN dbo.CrmUser cru
+                                                             ON cru.CrmId = c.Id
+                                                     WHERE c.CrmStatusId = @CrmStatusId
+                                                           AND
+                                                           (
+                                                               @FromDate IS NULL
+                                                               OR c.ContactDate >= @FromDate
+                                                           )
+                                                           AND
+                                                           (
+                                                               @ToDate IS NULL
+                                                               OR c.ContactDate <= @ToDate
+                                                           )
+                                                           AND cru.UserId = @UserCareId
+                                                           AND cru.IsDeleted = 0
+                                                           AND c.IsDeleted = 0;
+  
+                                                     SELECT c.Id,
+                                                            c.Code,
+                                                            c.CustomerId,
+                                                            cs.Name AS CrmStatus,
+                                                            cs.Color AS CrmStatusColor,
+                                                            cu.Name AS CustomerName,
+                                                            cu.Phone AS CustomerPhone,
+                                                            cu.Phone2 AS CustomerPhone2,
+                                                            cu.Phone3 AS CustomerPhone3,
+                                                            cu.Address AS CustomerAddress,
+                                                            p.Type + ' ' + p.Name AS Province,
+                                                            d.Type + ' ' + d.Name AS District,
+                                                            w.Type + ' ' + w.Name AS Ward,
+                                                            cg.Name AS CustomerGroup,
+                                                            cv.Name AS CustomerVip,
+                                                            c.Need,
+                                                            c.Description,
+                                                            pg.Name AS ProductGroup,
+                                                            cp.Name AS CrmPriority,
+                                                            cus.Name AS CustomerSource,
+                                                            ct.Name AS CrmType,
+                                                            c.Visit,
+                                                            u.DisplayName AS UserCreated,
+                                                            u.PhoneNumber AS UserCreatedPhone,
+                                                            c.ContactDate,
+                                                            c.DateCreated
+                                                     FROM #tmpCrm t
+                                                         INNER JOIN dbo.Crm c
+                                                             ON c.Id = t.Id
+                                                         LEFT JOIN dbo.CrmStatus cs
+                                                             ON cs.Id = c.CrmStatusId
+                                                         LEFT JOIN dbo.CrmPriority cp
+                                                             ON cp.Id = c.CrmPriorityId
+                                                         LEFT JOIN dbo.CrmType ct
+                                                             ON ct.Id = c.CrmTypeId
+                                                         LEFT JOIN dbo.Customer cu
+                                                             ON cu.Id = c.CustomerId
+                                                         LEFT JOIN dbo.Province p
+                                                             ON p.Id = cu.ProvinceId
+                                                         LEFT JOIN dbo.District d
+                                                             ON d.Id = cu.DistrictId
+                                                         LEFT JOIN dbo.Ward w
+                                                             ON w.Id = cu.WardId
+                                                         LEFT JOIN dbo.CustomerGroup cg
+                                                             ON cg.Id = cu.CustomerGroupId
+                                                         LEFT JOIN dbo.CustomerSource cus
+                                                             ON cus.Id = c.CustomerSourceId
+                                                         LEFT JOIN dbo.CustomerVip cv
+                                                             ON cv.Id = cu.CustomerVipId
+                                                         LEFT JOIN dbo.ProductGroup pg
+                                                             ON pg.Id = c.ProductGroupId
+                                                         LEFT JOIN dbo.[User] u
+                                                             ON u.Id = c.UserCreated
+                                                     ORDER BY c.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+  
+                                                     SELECT COUNT(*)
+                                                     FROM #tmpCrm;
+  
+                                                     DROP TABLE #tmpCrm;";
+
+        public const string CRM_KHACH_TOI_HEN_CAN_CHAM_SOC = @"DROP TABLE IF EXISTS #tmpCrm;
+
+                                                               SELECT c.Id
+                                                               INTO #tmpCrm
+                                                               FROM dbo.Crm c
+                                                                   LEFT JOIN dbo.Customer cu
+                                                                       ON cu.Id = c.CustomerId
+                                                                   INNER JOIN dbo.CrmUser cru
+                                                                       ON cru.CrmId = c.Id
+                                                               WHERE c.CrmStatusId <> 1
+                                                                     AND c.CrmStatusId <> 2
+                                                                     AND c.CrmStatusId <> 5
+                                                                     AND c.CrmStatusId <> 7
+                                                                     AND c.CrmStatusId <> 8
+                                                                     AND c.CrmStatusId <> 9
+                                                                     AND
+                                                                     (
+                                                                         @FromDate IS NULL
+                                                                         OR c.ContactDate >= @FromDate
+                                                                     )
+                                                                     AND
+                                                                     (
+                                                                         @ToDate IS NULL
+                                                                         OR c.ContactDate <= @ToDate
+                                                                     )
+                                                                     AND cru.UserId = @UserCareId
+                                                                     AND cru.IsDeleted = 0
+                                                                     AND c.IsDeleted = 0;
+
+                                                               SELECT c.Id,
+                                                                      c.Code,
+                                                                      c.CustomerId,
+                                                                      cs.Name AS CrmStatus,
+                                                                      cs.Color AS CrmStatusColor,
+                                                                      cu.Name AS CustomerName,
+                                                                      cu.Phone AS CustomerPhone,
+                                                                      cu.Phone2 AS CustomerPhone2,
+                                                                      cu.Phone3 AS CustomerPhone3,
+                                                                      cu.Address AS CustomerAddress,
+                                                                      p.Type + ' ' + p.Name AS Province,
+                                                                      d.Type + ' ' + d.Name AS District,
+                                                                      w.Type + ' ' + w.Name AS Ward,
+                                                                      cg.Name AS CustomerGroup,
+                                                                      cv.Name AS CustomerVip,
+                                                                      c.Need,
+                                                                      c.Description,
+                                                                      pg.Name AS ProductGroup,
+                                                                      cp.Name AS CrmPriority,
+                                                                      cus.Name AS CustomerSource,
+                                                                      ct.Name AS CrmType,
+                                                                      c.Visit,
+                                                                      u.DisplayName AS UserCreated,
+                                                                      u.PhoneNumber AS UserCreatedPhone,
+                                                                      c.ContactDate,
+                                                                      c.DateCreated
+                                                               FROM #tmpCrm t
+                                                                   INNER JOIN dbo.Crm c
+                                                                       ON c.Id = t.Id
+                                                                   LEFT JOIN dbo.CrmStatus cs
+                                                                       ON cs.Id = c.CrmStatusId
+                                                                   LEFT JOIN dbo.CrmPriority cp
+                                                                       ON cp.Id = c.CrmPriorityId
+                                                                   LEFT JOIN dbo.CrmType ct
+                                                                       ON ct.Id = c.CrmTypeId
+                                                                   LEFT JOIN dbo.Customer cu
+                                                                       ON cu.Id = c.CustomerId
+                                                                   LEFT JOIN dbo.Province p
+                                                                       ON p.Id = cu.ProvinceId
+                                                                   LEFT JOIN dbo.District d
+                                                                       ON d.Id = cu.DistrictId
+                                                                   LEFT JOIN dbo.Ward w
+                                                                       ON w.Id = cu.WardId
+                                                                   LEFT JOIN dbo.CustomerGroup cg
+                                                                       ON cg.Id = cu.CustomerGroupId
+                                                                   LEFT JOIN dbo.CustomerSource cus
+                                                                       ON cus.Id = c.CustomerSourceId
+                                                                   LEFT JOIN dbo.CustomerVip cv
+                                                                       ON cv.Id = cu.CustomerVipId
+                                                                   LEFT JOIN dbo.ProductGroup pg
+                                                                       ON pg.Id = c.ProductGroupId
+                                                                   LEFT JOIN dbo.[User] u
+                                                                       ON u.Id = c.UserCreated
+                                                               ORDER BY c.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                               SELECT COUNT(*)
+                                                               FROM #tmpCrm;
+
+                                                               DROP TABLE #tmpCrm;";
+
+        public const string CRM_KHACH_QUA_HEN_CHAM_SOC = @"DROP TABLE IF EXISTS #tmpCrm;
+
+                                                           SELECT c.Id
+                                                           INTO #tmpCrm
+                                                           FROM dbo.Crm c
+                                                               LEFT JOIN dbo.Customer cu
+                                                                   ON cu.Id = c.CustomerId
+                                                               INNER JOIN dbo.CrmUser cru
+                                                                   ON cru.CrmId = c.Id
+                                                           WHERE c.CrmStatusId <> 5
+                                                                 AND c.CrmStatusId <> 7
+                                                                 AND c.CrmStatusId <> 8
+                                                                 AND c.CrmStatusId <> 9
+                                                                 AND
+                                                                 (
+                                                                     @FromDate IS NULL
+                                                                     OR c.ContactDate >= @ToDate
+                                                                 )
+                                                                 AND
+                                                                 (
+                                                                     @ToDate IS NULL
+                                                                     OR c.ContactDate <= @ToDate
+                                                                 )
+                                                                 AND cru.UserId = @UserCareId
+                                                                 AND cru.IsDeleted = 0
+                                                                 AND c.IsDeleted = 0;
+                               
+                                                           SELECT c.Id,
+                                                                  c.Code,
+                                                                  c.CustomerId,
+                                                                  cs.Name AS CrmStatus,
+                                                                  cs.Color AS CrmStatusColor,
+                                                                  cu.Name AS CustomerName,
+                                                                  cu.Phone AS CustomerPhone,
+                                                                  cu.Phone2 AS CustomerPhone2,
+                                                                  cu.Phone3 AS CustomerPhone3,
+                                                                  cu.Address AS CustomerAddress,
+                                                                  p.Type + ' ' + p.Name AS Province,
+                                                                  d.Type + ' ' + d.Name AS District,
+                                                                  w.Type + ' ' + w.Name AS Ward,
+                                                                  cg.Name AS CustomerGroup,
+                                                                  cv.Name AS CustomerVip,
+                                                                  c.Need,
+                                                                  c.Description,
+                                                                  pg.Name AS ProductGroup,
+                                                                  cp.Name AS CrmPriority,
+                                                                  cus.Name AS CustomerSource,
+                                                                  ct.Name AS CrmType,
+                                                                  c.Visit,
+                                                                  u.DisplayName AS UserCreated,
+                                                                  u.PhoneNumber AS UserCreatedPhone,
+                                                                  c.ContactDate,
+                                                                  c.DateCreated
+                                                           FROM #tmpCrm t
+                                                               INNER JOIN dbo.Crm c
+                                                                   ON c.Id = t.Id
+                                                               LEFT JOIN dbo.CrmStatus cs
+                                                                   ON cs.Id = c.CrmStatusId
+                                                               LEFT JOIN dbo.CrmPriority cp
+                                                                   ON cp.Id = c.CrmPriorityId
+                                                               LEFT JOIN dbo.CrmType ct
+                                                                   ON ct.Id = c.CrmTypeId
+                                                               LEFT JOIN dbo.Customer cu
+                                                                   ON cu.Id = c.CustomerId
+                                                               LEFT JOIN dbo.Province p
+                                                                   ON p.Id = cu.ProvinceId
+                                                               LEFT JOIN dbo.District d
+                                                                   ON d.Id = cu.DistrictId
+                                                               LEFT JOIN dbo.Ward w
+                                                                   ON w.Id = cu.WardId
+                                                               LEFT JOIN dbo.CustomerGroup cg
+                                                                   ON cg.Id = cu.CustomerGroupId
+                                                               LEFT JOIN dbo.CustomerSource cus
+                                                                   ON cus.Id = c.CustomerSourceId
+                                                               LEFT JOIN dbo.CustomerVip cv
+                                                                   ON cv.Id = cu.CustomerVipId
+                                                               LEFT JOIN dbo.ProductGroup pg
+                                                                   ON pg.Id = c.ProductGroupId
+                                                               LEFT JOIN dbo.[User] u
+                                                                   ON u.Id = c.UserCreated
+                                                           ORDER BY c.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                               
+                                                           SELECT COUNT(*)
+                                                           FROM #tmpCrm;
+                               
+                                                           DROP TABLE #tmpCrm;";
+
         public const string CRM_USER_CARE_GET_BY_CRM_ID = @"SELECT u.DisplayName,
                                                                    u.PhoneNumber,
                                                                    u.Id
@@ -2365,6 +2625,8 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          FROM #tmpCrm;
                 
                                                          DROP TABLE #tmpCrm;";
+
+
 
         #endregion
 

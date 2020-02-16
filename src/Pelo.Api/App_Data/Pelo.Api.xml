@@ -148,7 +148,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Pelo.Api.Controllers.CrmController.GetByPaging(Pelo.Common.Dtos.Crm.GetWarrantyPagingRequest)">
+        <member name="M:Pelo.Api.Controllers.CrmController.GetByPaging(Pelo.Common.Dtos.Crm.GetCrmPagingRequest)">
             <summary>
                 Lấy danh sách CRM có phân trang
             </summary>
@@ -1368,7 +1368,7 @@
             <param name="obj"></param>
             <returns></returns>
         </member>
-        <member name="M:Pelo.Api.Services.CrmServices.ICrmService.GetPaging(System.Int32,Pelo.Common.Dtos.Crm.GetWarrantyPagingRequest)">
+        <member name="M:Pelo.Api.Services.CrmServices.ICrmService.GetPaging(System.Int32,Pelo.Common.Dtos.Crm.GetCrmPagingRequest)">
             <summary>
                 Kiểm tra xem user đó có quyền xem hết các CRM hay không.
                 Nếu ko thì gán lại UserCreated = userId
@@ -1396,7 +1396,7 @@
             <param name="pageSize"></param>
             <returns></returns>
         </member>
-        <member name="M:Pelo.Api.Services.CrmServices.CrmService.GetPaging(System.Int32,Pelo.Common.Dtos.Crm.GetWarrantyPagingRequest)">
+        <member name="M:Pelo.Api.Services.CrmServices.CrmService.GetPaging(System.Int32,Pelo.Common.Dtos.Crm.GetCrmPagingRequest)">
             <summary>
                 Kiểm tra xem user đó có quyền xem hết các CRM hay không.
                 Nếu ko thì gán lại UserCreated = userId

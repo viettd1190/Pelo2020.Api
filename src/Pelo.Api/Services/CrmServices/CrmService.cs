@@ -9,8 +9,8 @@ using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.Crm;
 using Pelo.Common.Dtos.User;
 using Pelo.Common.Enums;
-using Pelo.Common.Models;
 using Pelo.Common.Extensions;
+using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
 namespace Pelo.Api.Services.CrmServices
@@ -25,7 +25,19 @@ namespace Pelo.Api.Services.CrmServices
         /// <param name="request"></param>
         /// <returns></returns>
         Task<TResponse<PageResult<GetCrmPagingResponse>>> GetPaging(int userId,
-                                                                    GetWarrantyPagingRequest request);
+                                                                    GetCrmPagingRequest request);
+
+        Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachChuaXuLyTrongNgay(int userId,
+                                                                                 GetPagingModel request);
+
+        Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachToiHenCanChamSoc(int userId,
+                                                                                 GetPagingModel request);
+
+        Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachQuaHenChamSoc(int userId,
+                                                                                GetPagingModel request);
+
+        Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachToiHenNgayMai(int userId,
+                                                                             GetPagingModel request);
 
         /// <summary>
         ///     Kiểm tra xem user đó có quyền add CRM hay không.
@@ -46,14 +58,18 @@ namespace Pelo.Api.Services.CrmServices
         /// <param name="pageSize"></param>
         /// <returns></returns>
         Task<TResponse<PageResult<GetCrmPagingResponse>>> GetByCustomerId(int userId,
-                                                                             int customerId,
-                                                                             int page,
-                                                                             int pageSize);
-        Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest request);
+                                                                          int customerId,
+                                                                          int page,
+                                                                          int pageSize);
 
-        Task<TResponse<GetCrmModelReponse>> GetById(int userId, int id);
+        Task<TResponse<bool>> UpdateCrm(int userId,
+                                        UpdateCrmRequest request);
 
-        Task<TResponse<bool>> UpdateComment(int userId, CommentCrmRequest comment);
+        Task<TResponse<GetCrmModelReponse>> GetById(int userId,
+                                                    int id);
+
+        Task<TResponse<bool>> UpdateComment(int userId,
+                                            CommentCrmRequest comment);
     }
 
     public class CrmService : BaseService,
@@ -89,21 +105,21 @@ namespace Pelo.Api.Services.CrmServices
         /// <param name="request"></param>
         /// <returns></returns>
         public async Task<TResponse<PageResult<GetCrmPagingResponse>>> GetPaging(int userId,
-                                                                                 GetWarrantyPagingRequest request)
+                                                                                 GetCrmPagingRequest request)
         {
             try
             {
                 var canGetPaging = await CanGetPaging(userId);
-                if (canGetPaging.IsSuccess)
+                if(canGetPaging.IsSuccess)
                 {
                     bool canGetAll = false;
 
                     var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
-                    if (canGetAllCrm.IsSuccess)
+                    if(canGetAllCrm.IsSuccess)
                     {
                         var defaultRoles = canGetAllCrm.Data.Split(" ");
                         var currentRole = await _roleService.GetNameByUserId(userId);
-                        if (currentRole.IsSuccess
+                        if(currentRole.IsSuccess
                            && !string.IsNullOrEmpty(currentRole.Data)
                            && defaultRoles.Contains(currentRole.Data))
                         {
@@ -111,50 +127,50 @@ namespace Pelo.Api.Services.CrmServices
                         }
                     }
 
-                    if (!canGetAll)
+                    if(!canGetAll)
                     {
                         request.UserCreatedId = userId;
                     }
 
                     var result = new TResponse<(IEnumerable<GetCrmPagingResponse>, int)>();
 
-                    if (request.UserCareId == 0)
+                    if(request.UserCareId == 0)
                     {
                         result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPagingResponse, int>(SqlQuery.CRM_GET_BY_PAGING,
                                                                                                           new
                                                                                                           {
-                                                                                                              Customercode = $"%{request.CustomerCode}%",
-                                                                                                              CustomerName = $"%{request.CustomerName}%",
-                                                                                                              CustomerPhone = $"%{request.CustomerPhone}%",
-                                                                                                              CustomerAddress = $"%{request.CustomerAddress}%",
-                                                                                                              request.ProvinceId,
-                                                                                                              request.DistrictId,
-                                                                                                              request.WardId,
-                                                                                                              request.CustomerGroupId,
-                                                                                                              request.CustomerVipId,
-                                                                                                              request.CustomerSourceId,
-                                                                                                              Code = $"%{request.Code}%",
-                                                                                                              Need = $"%{request.Need}%",
-                                                                                                              request.CrmPriorityId,
-                                                                                                              request.CrmStatusId,
-                                                                                                              request.CrmTypeId,
-                                                                                                              request.ProductGroupId,
-                                                                                                              request.Visit,
-                                                                                                              FromDate = request.FromDate ?? new DateTime(1990,
+                                                                                                                  Customercode = $"%{request.CustomerCode}%",
+                                                                                                                  CustomerName = $"%{request.CustomerName}%",
+                                                                                                                  CustomerPhone = $"%{request.CustomerPhone}%",
+                                                                                                                  CustomerAddress = $"%{request.CustomerAddress}%",
+                                                                                                                  request.ProvinceId,
+                                                                                                                  request.DistrictId,
+                                                                                                                  request.WardId,
+                                                                                                                  request.CustomerGroupId,
+                                                                                                                  request.CustomerVipId,
+                                                                                                                  request.CustomerSourceId,
+                                                                                                                  Code = $"%{request.Code}%",
+                                                                                                                  Need = $"%{request.Need}%",
+                                                                                                                  request.CrmPriorityId,
+                                                                                                                  request.CrmStatusId,
+                                                                                                                  request.CrmTypeId,
+                                                                                                                  request.ProductGroupId,
+                                                                                                                  request.Visit,
+                                                                                                                  FromDate = request.FromDate ?? new DateTime(1990,
                                                                                                                                                               1,
                                                                                                                                                               1),
-                                                                                                              ToDate = request.ToDate ?? new DateTime(2200,
+                                                                                                                  ToDate = request.ToDate ?? new DateTime(2200,
                                                                                                                                                           1,
                                                                                                                                                           1),
-                                                                                                              request.UserCreatedId,
-                                                                                                              DateCreated = request.DateCreated ?? new DateTime(2000,
+                                                                                                                  request.UserCreatedId,
+                                                                                                                  DateCreated = request.DateCreated ?? new DateTime(2000,
                                                                                                                                                                     1,
                                                                                                                                                                     1,
                                                                                                                                                                     0,
                                                                                                                                                                     0,
                                                                                                                                                                     0),
-                                                                                                              Skip = (request.Page - 1) * request.PageSize,
-                                                                                                              Take = request.PageSize
+                                                                                                                  Skip = (request.Page - 1) * request.PageSize,
+                                                                                                                  Take = request.PageSize
                                                                                                           });
                     }
                     else
@@ -162,35 +178,35 @@ namespace Pelo.Api.Services.CrmServices
                         result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPagingResponse, int>(SqlQuery.CRM_GET_BY_PAGING_2,
                                                                                                           new
                                                                                                           {
-                                                                                                              Customercode = $"%{request.CustomerCode}%",
-                                                                                                              CustomerName = $"%{request.CustomerName}%",
-                                                                                                              CustomerPhone = $"%{request.CustomerPhone}%",
-                                                                                                              CustomerAddress = $"%{request.CustomerAddress}%",
-                                                                                                              request.ProvinceId,
-                                                                                                              request.DistrictId,
-                                                                                                              request.WardId,
-                                                                                                              request.CustomerGroupId,
-                                                                                                              request.CustomerVipId,
-                                                                                                              request.CustomerSourceId,
-                                                                                                              Code = $"%{request.Code}%",
-                                                                                                              Need = $"%{request.Need}%",
-                                                                                                              request.CrmPriorityId,
-                                                                                                              request.CrmStatusId,
-                                                                                                              request.CrmTypeId,
-                                                                                                              request.ProductGroupId,
-                                                                                                              request.Visit,
-                                                                                                              request.FromDate,
-                                                                                                              request.ToDate,
-                                                                                                              ContactDate = request.DateCreated,
-                                                                                                              request.UserCreatedId,
-                                                                                                              request.DateCreated,
-                                                                                                              request.UserCareId,
-                                                                                                              Skip = (request.Page - 1) * request.PageSize,
-                                                                                                              Take = request.PageSize
+                                                                                                                  Customercode = $"%{request.CustomerCode}%",
+                                                                                                                  CustomerName = $"%{request.CustomerName}%",
+                                                                                                                  CustomerPhone = $"%{request.CustomerPhone}%",
+                                                                                                                  CustomerAddress = $"%{request.CustomerAddress}%",
+                                                                                                                  request.ProvinceId,
+                                                                                                                  request.DistrictId,
+                                                                                                                  request.WardId,
+                                                                                                                  request.CustomerGroupId,
+                                                                                                                  request.CustomerVipId,
+                                                                                                                  request.CustomerSourceId,
+                                                                                                                  Code = $"%{request.Code}%",
+                                                                                                                  Need = $"%{request.Need}%",
+                                                                                                                  request.CrmPriorityId,
+                                                                                                                  request.CrmStatusId,
+                                                                                                                  request.CrmTypeId,
+                                                                                                                  request.ProductGroupId,
+                                                                                                                  request.Visit,
+                                                                                                                  request.FromDate,
+                                                                                                                  request.ToDate,
+                                                                                                                  ContactDate = request.DateCreated,
+                                                                                                                  request.UserCreatedId,
+                                                                                                                  request.DateCreated,
+                                                                                                                  request.UserCareId,
+                                                                                                                  Skip = (request.Page - 1) * request.PageSize,
+                                                                                                                  Take = request.PageSize
                                                                                                           });
                     }
 
-                    if (result.IsSuccess)
+                    if(result.IsSuccess)
                     {
                         foreach (var crm in result.Data.Item1)
                         {
@@ -198,9 +214,9 @@ namespace Pelo.Api.Services.CrmServices
                             var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
                                                                                                      new
                                                                                                      {
-                                                                                                         CrmId = crm.Id
+                                                                                                             CrmId = crm.Id
                                                                                                      });
-                            if (crmUserCare.IsSuccess
+                            if(crmUserCare.IsSuccess
                                && crmUserCare.Data != null)
                             {
                                 crm.UserCares.AddRange(crmUserCare.Data);
@@ -224,6 +240,234 @@ namespace Pelo.Api.Services.CrmServices
             }
         }
 
+        public async Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachChuaXuLyTrongNgay(int userId,
+                                                                                              GetPagingModel request)
+        {
+            try
+            {
+                var now = DateTime.Now;
+
+                var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPagingResponse, int>(SqlQuery.CRM_KHACH_CHUA_XU_LY,
+                                                                                                      new
+                                                                                                      {
+                                                                                                              CrmStatusId = 2,
+                                                                                                              FromDate = new DateTime(now.Year,
+                                                                                                                                      now.Month,
+                                                                                                                                      now.Day,
+                                                                                                                                      0,
+                                                                                                                                      0,
+                                                                                                                                      0),
+                                                                                                              ToDate = new DateTime(now.Year,
+                                                                                                                                    now.Month,
+                                                                                                                                    now.Day,
+                                                                                                                                    23,
+                                                                                                                                    59,
+                                                                                                                                    59),
+                                                                                                              UserCareId = userId,
+                                                                                                              Skip = (request.Page - 1) * request.PageSize,
+                                                                                                              Take = request.PageSize
+                                                                                                      });
+
+                if(result.IsSuccess)
+                {
+                    foreach (var crm in result.Data.Item1)
+                    {
+                        crm.UserCares = new List<UserDisplaySimpleModel>();
+                        var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
+                                                                                                 new
+                                                                                                 {
+                                                                                                         CrmId = crm.Id
+                                                                                                 });
+                        if(crmUserCare.IsSuccess
+                           && crmUserCare.Data != null)
+                        {
+                            crm.UserCares.AddRange(crmUserCare.Data);
+                        }
+                    }
+
+                    return await Ok(new PageResult<GetCrmPagingResponse>(request.Page,
+                                                                         request.PageSize,
+                                                                         result.Data.Item2,
+                                                                         result.Data.Item1));
+                }
+
+                return await Fail<PageResult<GetCrmPagingResponse>>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<PageResult<GetCrmPagingResponse>>(exception);
+            }
+        }
+        public async Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachToiHenCanChamSoc(int userId,
+                                                                                              GetPagingModel request)
+        {
+            try
+            {
+                var now = DateTime.Now;
+
+                var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPagingResponse, int>(SqlQuery.CRM_KHACH_TOI_HEN_CAN_CHAM_SOC,
+                                                                                                      new
+                                                                                                      {
+                                                                                                          FromDate = new DateTime(now.Year,
+                                                                                                                                      now.Month,
+                                                                                                                                      now.Day,
+                                                                                                                                      0,
+                                                                                                                                      0,
+                                                                                                                                      0),
+                                                                                                          ToDate = new DateTime(now.Year,
+                                                                                                                                    now.Month,
+                                                                                                                                    now.Day,
+                                                                                                                                    23,
+                                                                                                                                    59,
+                                                                                                                                    59),
+                                                                                                          UserCareId = userId,
+                                                                                                          Skip = (request.Page - 1) * request.PageSize,
+                                                                                                          Take = request.PageSize
+                                                                                                      });
+
+                if (result.IsSuccess)
+                {
+                    foreach (var crm in result.Data.Item1)
+                    {
+                        crm.UserCares = new List<UserDisplaySimpleModel>();
+                        var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
+                                                                                                 new
+                                                                                                 {
+                                                                                                     CrmId = crm.Id
+                                                                                                 });
+                        if (crmUserCare.IsSuccess
+                           && crmUserCare.Data != null)
+                        {
+                            crm.UserCares.AddRange(crmUserCare.Data);
+                        }
+                    }
+
+                    return await Ok(new PageResult<GetCrmPagingResponse>(request.Page,
+                                                                         request.PageSize,
+                                                                         result.Data.Item2,
+                                                                         result.Data.Item1));
+                }
+
+                return await Fail<PageResult<GetCrmPagingResponse>>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<PageResult<GetCrmPagingResponse>>(exception);
+            }
+        }
+
+        public async Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachQuaHenChamSoc(int userId,
+                                                                                              GetPagingModel request)
+        {
+            try
+            {
+                var now = DateTime.Now;
+
+                var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPagingResponse, int>(SqlQuery.CRM_KHACH_QUA_HEN_CHAM_SOC,
+                                                                                                      new
+                                                                                                      {
+                                                                                                              FromDate=default(DateTime?),
+                                                                                                              ToDate = new DateTime(now.Year,
+                                                                                                                                    now.Month,
+                                                                                                                                    now.Day,
+                                                                                                                                    0,
+                                                                                                                                    0,
+                                                                                                                                    0),
+                                                                                                              UserCareId = userId,
+                                                                                                              Skip = (request.Page - 1) * request.PageSize,
+                                                                                                              Take = request.PageSize
+                                                                                                      });
+
+                if (result.IsSuccess)
+                {
+                    foreach (var crm in result.Data.Item1)
+                    {
+                        crm.UserCares = new List<UserDisplaySimpleModel>();
+                        var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
+                                                                                                 new
+                                                                                                 {
+                                                                                                     CrmId = crm.Id
+                                                                                                 });
+                        if (crmUserCare.IsSuccess
+                           && crmUserCare.Data != null)
+                        {
+                            crm.UserCares.AddRange(crmUserCare.Data);
+                        }
+                    }
+
+                    return await Ok(new PageResult<GetCrmPagingResponse>(request.Page,
+                                                                         request.PageSize,
+                                                                         result.Data.Item2,
+                                                                         result.Data.Item1));
+                }
+
+                return await Fail<PageResult<GetCrmPagingResponse>>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<PageResult<GetCrmPagingResponse>>(exception);
+            }
+        }
+
+        public async Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachToiHenNgayMai(int userId,
+                                                                                              GetPagingModel request)
+        {
+            try
+            {
+                var tomorrow = DateTime.Now.AddDays(1);
+
+                var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPagingResponse, int>(SqlQuery.CRM_KHACH_QUA_HEN_CHAM_SOC,
+                                                                                                      new
+                                                                                                      {
+                                                                                                              FromDate = new DateTime(tomorrow.Year,
+                                                                                                                                      tomorrow.Month,
+                                                                                                                                      tomorrow.Day,
+                                                                                                                                      0,
+                                                                                                                                      0,
+                                                                                                                                      0),
+                                                                                                              ToDate = new DateTime(tomorrow.Year,
+                                                                                                                                    tomorrow.Month,
+                                                                                                                                    tomorrow.Day,
+                                                                                                                                    23,
+                                                                                                                                    59,
+                                                                                                                                    59),
+                                                                                                              UserCareId = userId,
+                                                                                                              Skip = (request.Page - 1) * request.PageSize,
+                                                                                                              Take = request.PageSize
+                                                                                                      });
+
+                if (result.IsSuccess)
+                {
+                    foreach (var crm in result.Data.Item1)
+                    {
+                        crm.UserCares = new List<UserDisplaySimpleModel>();
+                        var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
+                                                                                                 new
+                                                                                                 {
+                                                                                                     CrmId = crm.Id
+                                                                                                 });
+                        if (crmUserCare.IsSuccess
+                           && crmUserCare.Data != null)
+                        {
+                            crm.UserCares.AddRange(crmUserCare.Data);
+                        }
+                    }
+
+                    return await Ok(new PageResult<GetCrmPagingResponse>(request.Page,
+                                                                         request.PageSize,
+                                                                         result.Data.Item2,
+                                                                         result.Data.Item1));
+                }
+
+                return await Fail<PageResult<GetCrmPagingResponse>>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<PageResult<GetCrmPagingResponse>>(exception);
+            }
+        }
+
+
         /// <summary>
         ///     Kiểm tra xem user đó có quyền xem hết các CRM hay không.
         ///     Nếu ko thì gán lại UserCreated = userId
@@ -237,7 +481,7 @@ namespace Pelo.Api.Services.CrmServices
             try
             {
                 var canGetPaging = await CanGetPaging(userId);
-                if (canGetPaging.IsSuccess)
+                if(canGetPaging.IsSuccess)
                 {
                     //bool canGetAll = false;
 
@@ -263,25 +507,25 @@ namespace Pelo.Api.Services.CrmServices
                     var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CRM_INSERT,
                                                                                new
                                                                                {
-                                                                                   request.CustomerId,
-                                                                                   request.CrmStatusId,
-                                                                                   request.ContactDate,
-                                                                                   request.ProductGroupId,
-                                                                                   request.Need,
-                                                                                   request.Description,
-                                                                                   request.CustomerSourceId,
-                                                                                   request.CrmPriorityId,
-                                                                                   request.CrmTypeId,
-                                                                                   Code = crmCodeResponse.Data,
-                                                                                   request.Visit,
-                                                                                   UserCreated = userId,
-                                                                                   DateCreated = DateTime.Now,
-                                                                                   UserUpdated = userId,
-                                                                                   DateUpdated = DateTime.Now
+                                                                                       request.CustomerId,
+                                                                                       request.CrmStatusId,
+                                                                                       request.ContactDate,
+                                                                                       request.ProductGroupId,
+                                                                                       request.Need,
+                                                                                       request.Description,
+                                                                                       request.CustomerSourceId,
+                                                                                       request.CrmPriorityId,
+                                                                                       request.CrmTypeId,
+                                                                                       Code = crmCodeResponse.Data,
+                                                                                       request.Visit,
+                                                                                       UserCreated = userId,
+                                                                                       DateCreated = DateTime.Now,
+                                                                                       UserUpdated = userId,
+                                                                                       DateUpdated = DateTime.Now
                                                                                });
-                    if (result.IsSuccess)
+                    if(result.IsSuccess)
                     {
-                        if (result.Data > 0)
+                        if(result.Data > 0)
                         {
                             var crmId = result.Data;
 
@@ -289,39 +533,39 @@ namespace Pelo.Api.Services.CrmServices
 
                             #region 3.1. Kiểm tra xem người tạo có trong danh sách người liên quan không, nếu không có thì thêm vào
 
-                            if (request.UserIds == null)
+                            if(request.UserIds == null)
                             {
                                 request.UserIds = new List<int>();
                             }
 
-                            if (!request.UserIds.Any())
+                            if(!request.UserIds.Any())
                             {
                                 request.UserIds.Add(userId);
                             }
 
-                            if (!request.UserIds.Contains(userId))
+                            if(!request.UserIds.Contains(userId))
                             {
                                 request.UserIds.Add(userId);
                             }
 
                             #endregion
 
-                            if (request.UserIds != null)
+                            if(request.UserIds != null)
                             {
-                                if (request.UserIds.Any())
+                                if(request.UserIds.Any())
                                 {
                                     foreach (var user in request.UserIds)
                                     {
                                         await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
                                                                            new
                                                                            {
-                                                                               CrmId = crmId,
-                                                                               UserId = user,
-                                                                               Type = 0,
-                                                                               UserCreated = userId,
-                                                                               DateCreated = DateTime.Now,
-                                                                               UserUpdated = userId,
-                                                                               DateUpdated = DateTime.Now
+                                                                                   CrmId = crmId,
+                                                                                   UserId = user,
+                                                                                   Type = 0,
+                                                                                   UserCreated = userId,
+                                                                                   DateCreated = DateTime.Now,
+                                                                                   UserUpdated = userId,
+                                                                                   DateUpdated = DateTime.Now
                                                                            });
                                     }
                                 }
@@ -334,9 +578,9 @@ namespace Pelo.Api.Services.CrmServices
                             #region 4.1. Kiểm tra xem user admin có trong danh sách người nhận thông báo không, nếu  không có thì thêm vào
 
                             var adminUserId = await _userService.GetByUsername("admin");
-                            if (adminUserId.IsSuccess)
+                            if(adminUserId.IsSuccess)
                             {
-                                if (!request.UserIds.Contains(adminUserId.Data.Id))
+                                if(!request.UserIds.Contains(adminUserId.Data.Id))
                                 {
                                     request.UserIds.Add(adminUserId.Data.Id);
                                 }
@@ -347,19 +591,19 @@ namespace Pelo.Api.Services.CrmServices
                             #region 4.2. hêm danh sách tài khoản mặc định nhận thông báo Crm
 
                             var notificationUserCrmsResponse = await _appConfigService.GetByName("NotificationCRMUsers");
-                            if (notificationUserCrmsResponse != null)
+                            if(notificationUserCrmsResponse != null)
                             {
-                                if (!string.IsNullOrEmpty(notificationUserCrmsResponse.Data))
+                                if(!string.IsNullOrEmpty(notificationUserCrmsResponse.Data))
                                 {
                                     var notificationUSerCrms = notificationUserCrmsResponse.Data.Split(' ');
-                                    if (notificationUSerCrms.Any())
+                                    if(notificationUSerCrms.Any())
                                     {
                                         foreach (var notificationUSerCrm in notificationUSerCrms)
                                         {
                                             var notificationUser = await _userService.GetByUsername(notificationUSerCrm);
-                                            if (notificationUser.IsSuccess)
+                                            if(notificationUser.IsSuccess)
                                             {
-                                                if (!request.UserIds.Contains(notificationUser.Data.Id))
+                                                if(!request.UserIds.Contains(notificationUser.Data.Id))
                                                 {
                                                     request.UserIds.Add(notificationUser.Data.Id);
                                                 }
@@ -377,7 +621,7 @@ namespace Pelo.Api.Services.CrmServices
                                                                   string.Empty,
                                                                   crmCodeResponse.Data,
                                                                   crmId);
-                            if (!resultNotification.IsSuccess)
+                            if(!resultNotification.IsSuccess)
                             {
                                 Log(resultNotification.Message);
                             }
@@ -418,9 +662,9 @@ namespace Pelo.Api.Services.CrmServices
         }
 
         public async Task<TResponse<PageResult<GetCrmPagingResponse>>> GetByCustomerId(int userId,
-                                                                                          int customerId,
-                                                                                          int page,
-                                                                                          int pageSize)
+                                                                                       int customerId,
+                                                                                       int page,
+                                                                                       int pageSize)
         {
             try
             {
@@ -429,11 +673,11 @@ namespace Pelo.Api.Services.CrmServices
                 bool canGetAll = false;
 
                 var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
-                if (canGetAllCrm.IsSuccess)
+                if(canGetAllCrm.IsSuccess)
                 {
                     var defaultRoles = canGetAllCrm.Data.Split(" ");
                     var currentRole = await _roleService.GetNameByUserId(userId);
-                    if (currentRole.IsSuccess
+                    if(currentRole.IsSuccess
                        && !string.IsNullOrEmpty(currentRole.Data)
                        && defaultRoles.Contains(currentRole.Data))
                     {
@@ -441,14 +685,14 @@ namespace Pelo.Api.Services.CrmServices
                     }
                 }
 
-                if (canGetAll)
+                if(canGetAll)
                 {
                     result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPagingResponse, int>(SqlQuery.CRM_GET_BY_CUSTOMER_ID,
                                                                                                       new
                                                                                                       {
-                                                                                                          CustomerId = customerId,
-                                                                                                          Skip = (page - 1) * pageSize,
-                                                                                                          Take = pageSize
+                                                                                                              CustomerId = customerId,
+                                                                                                              Skip = (page - 1) * pageSize,
+                                                                                                              Take = pageSize
                                                                                                       });
                 }
                 else
@@ -456,14 +700,14 @@ namespace Pelo.Api.Services.CrmServices
                     result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPagingResponse, int>(SqlQuery.CRM_GET_BY_CUSTOMER_ID_2,
                                                                                                       new
                                                                                                       {
-                                                                                                          CustomerId = customerId,
-                                                                                                          UserCareId = userId,
-                                                                                                          Skip = (page - 1) * pageSize,
-                                                                                                          Take = pageSize
+                                                                                                              CustomerId = customerId,
+                                                                                                              UserCareId = userId,
+                                                                                                              Skip = (page - 1) * pageSize,
+                                                                                                              Take = pageSize
                                                                                                       });
                 }
 
-                if (result.IsSuccess)
+                if(result.IsSuccess)
                 {
                     foreach (var crm in result.Data.Item1)
                     {
@@ -471,9 +715,9 @@ namespace Pelo.Api.Services.CrmServices
                         var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
                                                                                                  new
                                                                                                  {
-                                                                                                     CrmId = crm.Id
+                                                                                                         CrmId = crm.Id
                                                                                                  });
-                        if (crmUserCare.IsSuccess
+                        if(crmUserCare.IsSuccess
                            && crmUserCare.Data != null)
                         {
                             crm.UserCares.AddRange(crmUserCare.Data);
@@ -494,6 +738,281 @@ namespace Pelo.Api.Services.CrmServices
             }
         }
 
+        public async Task<TResponse<bool>> UpdateCrm(int userId,
+                                                     UpdateCrmRequest request)
+        {
+            try
+            {
+                var oldInformation = await CanUpdate(userId,
+                                                     request);
+                if(oldInformation.IsSuccess)
+                {
+                    var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_UPDATE,
+                                                                    new
+                                                                    {
+                                                                            request.Id,
+                                                                            request.ContactDate,
+                                                                            request.ProductGroupId,
+                                                                            request.CrmTypeId,
+                                                                            request.Need,
+                                                                            request.Description,
+                                                                            request.CustomerSourceId,
+                                                                            request.CrmPriorityId,
+                                                                            request.Visit,
+                                                                            UserUpdated = userId,
+                                                                            DateUpdated = DateTime.Now
+                                                                    });
+                    if(result.IsSuccess)
+                    {
+                        if(result.Data > 0)
+                        {
+                            if(oldInformation.Data.CrmPriorityId != request.CrmPriorityId)
+                            {
+                            }
+
+                            if(oldInformation.Data.CrmTypeId != request.CrmTypeId)
+                            {
+                            }
+
+                            if(oldInformation.Data.Visit != request.Visit)
+                            {
+                            }
+
+                            if(oldInformation.Data.Need != request.Need)
+                            {
+                            }
+
+                            if(oldInformation.Data.ProductGroupId != request.ProductGroupId)
+                            {
+                            }
+
+                            if(oldInformation.Data.CustomerSourceId != request.CustomerSourceId)
+                            {
+                            }
+
+                            if(oldInformation.Data.ContactDate != request.ContactDate)
+                            {
+                            }
+
+                            if(oldInformation.Data.Description != request.Description)
+                            {
+                            }
+
+                            var crmId = result.Data;
+                            var crmUser = await ReadOnlyRepository.QueryAsync<CrmUserResponse>(SqlQuery.GET_CRM_USER_BY_CRMID,
+                                                                                               new
+                                                                                               {
+                                                                                                       CrmId = crmId
+                                                                                               });
+                            if(request.UserIds == null)
+                            {
+                                request.UserIds = new List<int>();
+                            }
+
+                            if(crmUser.Data.Any()
+                               || request.UserIds.Any())
+                            {
+                                if(crmUser.Data.Any()
+                                   && (request.UserIds == null || !request.UserIds.Any()))
+                                {
+                                }
+                                else if(request.UserIds.Any()
+                                        && (crmUser.Data == null || !crmUser.Data.Any()))
+                                {
+                                }
+                            }
+
+                            if(crmUser != null)
+                            {
+                                if(request.UserIds.Any())
+                                {
+                                    CrmUserResponse[] crmUserResponse = crmUser.Data.Where(c => c.CrmId == request.Id && !request.UserIds.Contains(c.UserId))
+                                                                               .ToArray();
+                                    foreach (var item in crmUserResponse)
+                                    {
+                                        await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_DELETE,
+                                                                           new
+                                                                           {
+                                                                                   CrmId = request.Id,
+                                                                                   UserId = item.Id
+                                                                           });
+                                    }
+
+                                    foreach (var user in request.UserIds)
+                                    {
+                                        var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
+                                                                                    new
+                                                                                    {
+                                                                                            CrmId = request.Id,
+                                                                                            UserId = user,
+                                                                                            Type = 0,
+                                                                                            UserUpdated = userId,
+                                                                                            UserCreated = userId,
+                                                                                            DateUpdated = DateTime.Now,
+                                                                                            DateCreated = DateTime.Now
+                                                                                    });
+                                    }
+                                }
+                                else
+                                {
+                                    if(crmUser.IsSuccess)
+                                    {
+                                        foreach (var item in crmUser.Data)
+                                        {
+                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_DELETE,
+                                                                                        new
+                                                                                        {
+                                                                                                CrmId = request.Id,
+                                                                                                UserId = item.Id
+                                                                                        });
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (var user in request.UserIds)
+                                {
+                                    var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
+                                                                                new
+                                                                                {
+                                                                                        CrmId = request.Id,
+                                                                                        UserId = user,
+                                                                                        Type = 0,
+                                                                                        UserUpdated = userId,
+                                                                                        UserCreated = userId,
+                                                                                        DateUpdated = DateTime.Now,
+                                                                                        DateCreated = DateTime.Now
+                                                                                });
+                                }
+                            }
+
+                            return await Ok(true);
+                        }
+
+                        return await Fail<bool>("Can not execute CRM_UPDATE");
+                    }
+
+                    return await Fail<bool>(result.Message);
+                }
+
+                return await Fail<bool>(oldInformation.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        public async Task<TResponse<GetCrmModelReponse>> GetById(int userId,
+                                                                 int id)
+        {
+            try
+            {
+                var canGetPaging = await CanGetPaging(userId);
+                if(canGetPaging.IsSuccess)
+                {
+                    var result = new TResponse<GetCrmModelReponse>();
+                    var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
+                    if(canGetAllCrm.IsSuccess)
+                    {
+                        result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCrmModelReponse>(SqlQuery.GET_CRM_BY_ID,
+                                                                                                       new
+                                                                                                       {
+                                                                                                               Id = id
+                                                                                                       });
+                        if(result.IsSuccess)
+                        {
+                            if(result.Data != null)
+                            {
+                                result.Data.UserCares = new List<UserDisplaySimpleModel>();
+                                var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
+                                                                                                         new
+                                                                                                         {
+                                                                                                                 CrmId = id
+                                                                                                         });
+                                if(crmUserCare.IsSuccess
+                                   && crmUserCare.Data != null)
+                                {
+                                    result.Data.UserCares.AddRange(crmUserCare.Data);
+                                }
+
+                                return await Ok(result.Data);
+                            }
+                        }
+
+                        return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+                    }
+
+                    return await Fail<GetCrmModelReponse>(ErrorEnum.USER_DO_HAVE_NOT_PERMISSON_VIEW_THIS_CRM.GetStringValue());
+                }
+
+                return await Fail<GetCrmModelReponse>(canGetPaging.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<GetCrmModelReponse>(exception);
+            }
+        }
+
+        public async Task<TResponse<bool>> UpdateComment(int userId,
+                                                         CommentCrmRequest request)
+        {
+            try
+            {
+                var crm = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmDetailResponse>(SqlQuery.GET_CRM_BY_ID,
+                                                                                               new
+                                                                                               {
+                                                                                                       request.Id
+                                                                                               });
+                if(crm.IsSuccess)
+                {
+                    var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_UPDATE,
+                                                                    new
+                                                                    {
+                                                                            request.Id,
+                                                                            request.CrmStatusId,
+                                                                            UserUpdated = userId,
+                                                                            DateUpdated = DateTime.Now
+                                                                    });
+                    if(result.IsSuccess)
+                    {
+                        if(crm.Data != null)
+                        {
+                            bool isUpdate = false;
+                            if(crm.Data.CrmStatusId != request.CrmStatusId)
+                            {
+                                isUpdate = true;
+                            }
+
+                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_COMMENT_INSERT,
+                                                                        new
+                                                                        {
+                                                                                CrmId = request.Id,
+                                                                                request.Comment,
+                                                                                Type = isUpdate,
+                                                                                OldStatusId = crm.Data.CrmStatusId,
+                                                                                NewStatusId = crm.Data.CrmStatusId,
+                                                                                UserIds = "",
+                                                                                UserCreated = userId,
+                                                                                DateCreated = DateTime.Now
+                                                                        });
+                            if(rs.IsSuccess)
+                            {
+                                return await Ok(true);
+                            }
+                        }
+                    }
+                }
+
+                return await Fail<bool>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+            }
+            catch (Exception)
+            {
+                return await Fail<bool>(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue());
+            }
+        }
+
         #endregion
 
         private async Task<TResponse<bool>> CanGetPaging(int userId)
@@ -501,7 +1020,7 @@ namespace Pelo.Api.Services.CrmServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if (checkPermission.IsSuccess)
+                if(checkPermission.IsSuccess)
                 {
                     return await Ok(true);
                 }
@@ -569,7 +1088,7 @@ namespace Pelo.Api.Services.CrmServices
             {
                 var crmPrefixResponse = await _appConfigService.GetByName("CRMPrefix");
                 string crmPrefix = "CH";
-                if (crmPrefixResponse.IsSuccess)
+                if(crmPrefixResponse.IsSuccess)
                 {
                     crmPrefix = crmPrefixResponse.Data;
                 }
@@ -578,9 +1097,9 @@ namespace Pelo.Api.Services.CrmServices
                 var countResponses = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CRM_COUNT_BY_DATE,
                                                                                             new
                                                                                             {
-                                                                                                Code = $"{code}%"
+                                                                                                    Code = $"{code}%"
                                                                                             });
-                if (countResponses.IsSuccess)
+                if(countResponses.IsSuccess)
                 {
                     return await Ok($"{code}{(countResponses.Data + 1):000}");
                 }
@@ -593,202 +1112,47 @@ namespace Pelo.Api.Services.CrmServices
             }
         }
 
-        public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateCrmRequest request)
-        {
-            try
-            {
-                var oldInformation = await CanUpdate(userId,
-                                                request);
-                if (oldInformation.IsSuccess)
-                {
-                    var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_UPDATE,
-                                                                           new
-                                                                           {
-                                                                               request.Id,
-                                                                               request.ContactDate,
-                                                                               request.ProductGroupId,
-                                                                               request.CrmTypeId,
-                                                                               request.Need,
-                                                                               request.Description,
-                                                                               request.CustomerSourceId,
-                                                                               request.CrmPriorityId,
-                                                                               request.Visit,
-                                                                               UserUpdated = userId,
-                                                                               DateUpdated = DateTime.Now
-                                                                           });
-                    if (result.IsSuccess)
-                    {
-                        if (result.Data > 0)
-                        {
-                            if (oldInformation.Data.CrmPriorityId != request.CrmPriorityId)
-                            {
-
-                            }
-                            if (oldInformation.Data.CrmTypeId != request.CrmTypeId)
-                            {
-
-                            }
-                            if (oldInformation.Data.Visit != request.Visit)
-                            {
-
-                            }
-                            if (oldInformation.Data.Need != request.Need)
-                            {
-
-                            }
-                            if (oldInformation.Data.ProductGroupId != request.ProductGroupId)
-                            {
-
-                            }
-                            if (oldInformation.Data.CustomerSourceId != request.CustomerSourceId)
-                            {
-
-                            }
-                            if (oldInformation.Data.ContactDate != request.ContactDate)
-                            {
-
-                            }
-                            if (oldInformation.Data.Description != request.Description)
-                            {
-
-                            }
-                            var crmId = result.Data;
-                            var crmUser = await ReadOnlyRepository.QueryAsync<CrmUserResponse>(SqlQuery.GET_CRM_USER_BY_CRMID,
-                                                                           new
-                                                                           {
-                                                                               CrmId = crmId
-                                                                           });
-                            if (request.UserIds == null)
-                            {
-                                request.UserIds = new List<int>();
-                            }
-                            if (crmUser.Data.Any() || request.UserIds.Any())
-                            {
-                                if (crmUser.Data.Any() && (request.UserIds == null || !request.UserIds.Any()))
-                                {
-
-                                }
-                                else if (request.UserIds.Any() && (crmUser.Data == null || !crmUser.Data.Any()))
-                                {
-
-                                }
-                            }
-                            if (crmUser != null)
-                            {
-                                if (request.UserIds.Any())
-                                {
-                                    CrmUserResponse[] crmUserResponse = crmUser.Data.Where(c => c.CrmId == request.Id && !request.UserIds.Contains(c.UserId)).ToArray();
-                                    foreach (var item in crmUserResponse)
-                                    {
-                                        await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_DELETE,
-                                                                   new
-                                                                   {
-                                                                       CrmId = request.Id,
-                                                                       UserId = item.Id
-                                                                   });
-                                    }
-                                    foreach (var user in request.UserIds)
-                                    {
-                                        var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
-                                                                   new
-                                                                   {
-                                                                       CrmId = request.Id,
-                                                                       UserId = user,
-                                                                       Type = 0,
-                                                                       UserUpdated = userId,
-                                                                       UserCreated = userId,
-                                                                       DateUpdated = DateTime.Now,
-                                                                       DateCreated = DateTime.Now,
-                                                                   });
-                                    }
-                                }
-                                else
-                                {
-                                    if (crmUser.IsSuccess)
-                                    {
-                                        foreach (var item in crmUser.Data)
-                                        {
-                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_DELETE,
-                                                                   new
-                                                                   {
-                                                                       CrmId = request.Id,
-                                                                       UserId = item.Id
-                                                                   });
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                foreach (var user in request.UserIds)
-                                {
-                                    var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_INSERT,
-                                                               new
-                                                               {
-                                                                   CrmId = request.Id,
-                                                                   UserId = user,
-                                                                   Type = 0,
-                                                                   UserUpdated = userId,
-                                                                   UserCreated = userId,
-                                                                   DateUpdated = DateTime.Now,
-                                                                   DateCreated = DateTime.Now,
-                                                               });
-                                }
-                            }
-
-                            return await Ok(true);
-                        }
-
-                        return await Fail<bool>("Can not execute CRM_UPDATE");
-                    }
-
-                    return await Fail<bool>(result.Message);
-                }
-
-                return await Fail<bool>(oldInformation.Message);
-            }
-            catch (Exception exception)
-            {
-                return await Fail<bool>(exception);
-            }
-        }
-
-        private async Task<TResponse<GetCrmModelReponse>> CanUpdate(int userId, UpdateCrmRequest request)
+        private async Task<TResponse<GetCrmModelReponse>> CanUpdate(int userId,
+                                                                    UpdateCrmRequest request)
         {
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if (checkPermission.IsSuccess)
+                if(checkPermission.IsSuccess)
                 {
-                    if (request.Id == 0)
+                    if(request.Id == 0)
                     {
                         return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
                     }
 
-                    if (request.ProductGroupId == 0)
+                    if(request.ProductGroupId == 0)
                     {
                         return await Fail<GetCrmModelReponse>(ErrorEnum.PRODUCT_GROUP_HAS_NOT_EXIST.GetStringValue());
                     }
-                    if (request.CrmPriorityId == 0)
+
+                    if(request.CrmPriorityId == 0)
                     {
                         return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_PRIORITY_HAS_NOT_EXIST.GetStringValue());
                     }
-                    if (request.CrmTypeId == 0)
+
+                    if(request.CrmTypeId == 0)
                     {
                         return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_TYPE_HAS_NOT_EXIST.GetStringValue());
                     }
-                    if (request.CustomerSourceId == 0)
+
+                    if(request.CustomerSourceId == 0)
                     {
                         return await Fail<GetCrmModelReponse>(ErrorEnum.CUSTOMER_SOURCE_HAS_NOT_EXIST.GetStringValue());
                     }
+
                     var checkIdInvalid = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCrmModelReponse>(SqlQuery.GET_CRM_BY_ID,
-                                                                                                new
-                                                                                                {
-                                                                                                    request.Id
-                                                                                                });
-                    if (checkIdInvalid.IsSuccess)
+                                                                                                               new
+                                                                                                               {
+                                                                                                                       request.Id
+                                                                                                               });
+                    if(checkIdInvalid.IsSuccess)
                     {
-                        if (checkIdInvalid.Data != null)
+                        if(checkIdInvalid.Data != null)
                         {
                             return await Ok(checkIdInvalid.Data);
                         }
@@ -806,107 +1170,5 @@ namespace Pelo.Api.Services.CrmServices
                 return await Fail<GetCrmModelReponse>(exception);
             }
         }
-        public async Task<TResponse<GetCrmModelReponse>> GetById(int userId, int id)
-        {
-            try
-            {
-                var canGetPaging = await CanGetPaging(userId);
-                if (canGetPaging.IsSuccess)
-                {
-                    var result = new TResponse<GetCrmModelReponse>();
-                    var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
-                    if (canGetAllCrm.IsSuccess)
-                    {
-                        result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCrmModelReponse>(SqlQuery.GET_CRM_BY_ID,
-                                                                                                              new
-                                                                                                              {
-                                                                                                                  Id = id
-                                                                                                              });
-                        if (result.IsSuccess)
-                        {
-                            if (result.Data != null)
-                            {
-                                result.Data.UserCares = new List<UserDisplaySimpleModel>();
-                                var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
-                                                                                                         new
-                                                                                                         {
-                                                                                                             CrmId = id
-                                                                                                         });
-                                if (crmUserCare.IsSuccess
-                                   && crmUserCare.Data != null)
-                                {
-                                    result.Data.UserCares.AddRange(crmUserCare.Data);
-                                }
-                                return await Ok(result.Data);
-                            }
-                        }
-                        return await Fail<GetCrmModelReponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
-                    }
-                    return await Fail<GetCrmModelReponse>(ErrorEnum.USER_DO_HAVE_NOT_PERMISSON_VIEW_THIS_CRM.GetStringValue());
-                }
-                return await Fail<GetCrmModelReponse>(canGetPaging.Message);
-            }
-            catch (Exception exception)
-            {
-                return await Fail<GetCrmModelReponse>(exception);
-            }
-        }
-
-        public async Task<TResponse<bool>> UpdateComment(int userId, CommentCrmRequest request)
-        {
-            try
-            {
-                var crm = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmDetailResponse>(SqlQuery.GET_CRM_BY_ID,
-                                                                                                new
-                                                                                                {
-                                                                                                    request.Id
-                                                                                                });
-                if (crm.IsSuccess)
-                {
-                    var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_UPDATE,
-                                                                           new
-                                                                           {
-                                                                               request.Id,
-                                                                               request.CrmStatusId,
-                                                                               UserUpdated = userId,
-                                                                               DateUpdated = DateTime.Now
-                                                                           });
-                    if (result.IsSuccess)
-                    {
-                        if (crm.Data != null)
-                        {
-                            bool isUpdate = false;
-                            if (crm.Data.CrmStatusId != request.CrmStatusId)
-                            {
-                                isUpdate = true;
-                            }
-                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_COMMENT_INSERT,
-                                                                           new
-                                                                           {
-                                                                               CrmId = request.Id,
-                                                                               request.Comment,
-                                                                               Type = isUpdate,
-                                                                               OldStatusId = crm.Data.CrmStatusId,
-                                                                               NewStatusId = crm.Data.CrmStatusId,
-                                                                               UserIds = "",
-                                                                               UserCreated = userId,
-                                                                               DateCreated = DateTime.Now
-                                                                           });
-                            if (rs.IsSuccess)
-                            {
-                                return await Ok(true);
-                            }
-                        }
-                    }
-                }
-                return await Fail<bool>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
-            }
-            catch (Exception)
-            {
-                return await Fail<bool>(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue());
-            }
-        }
-
-
     }
 }

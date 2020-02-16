@@ -27,10 +27,42 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/crm")]
-        public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> GetByPaging([FromQuery] GetWarrantyPagingRequest request)
+        public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> GetByPaging([FromQuery] GetCrmPagingRequest request)
         {
             return Ok(await _crmService.GetPaging(await GetUserId(),
                                                   request));
+        }
+
+        [HttpGet]
+        [Route("api/khach_chua_xu_ly_trong_ngay")]
+        public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> KhachChuaXuLyTrongNgay([FromQuery] GetPagingModel request)
+        {
+            return Ok(await _crmService.KhachChuaXuLyTrongNgay(await GetUserId(),
+                                                               request));
+        }
+
+        [HttpGet]
+        [Route("api/khach_toi_hen_can_cham_soc")]
+        public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> KhachToiHenCanChamSoc([FromQuery] GetPagingModel request)
+        {
+            return Ok(await _crmService.KhachToiHenCanChamSoc(await GetUserId(),
+                                                              request));
+        }
+
+        [HttpGet]
+        [Route("api/khach_qua_hen_cham_soc")]
+        public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> KhachQuaHenChamSoc([FromQuery] GetPagingModel request)
+        {
+            return Ok(await _crmService.KhachQuaHenChamSoc(await GetUserId(),
+                                                           request));
+        }
+
+        [HttpGet]
+        [Route("api/khach_toi_hen_ngay_mai")]
+        public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> KhachToiHenNgayMai([FromQuery] GetPagingModel request)
+        {
+            return Ok(await _crmService.KhachToiHenNgayMai(await GetUserId(),
+                                                           request));
         }
 
         /// <summary>
@@ -57,12 +89,15 @@ namespace Pelo.Api.Controllers
                                                         page,
                                                         pageSize));
         }
+
         [HttpGet]
         [Route("api/crm/{id}")]
         public async Task<ActionResult<GetCrmModelReponse>> GetCrmById(int id)
         {
-            return Ok(await _crmService.GetById(await GetUserId(), id));
+            return Ok(await _crmService.GetById(await GetUserId(),
+                                                id));
         }
+
         /// <summary>
         ///     Update CRM
         /// </summary>
@@ -75,6 +110,7 @@ namespace Pelo.Api.Controllers
             return Ok(await _crmService.UpdateCrm(await GetUserId(),
                                                   request));
         }
+
         /// <summary>
         ///     Them CRM Comment
         /// </summary>
@@ -85,7 +121,7 @@ namespace Pelo.Api.Controllers
         public async Task<ActionResult<bool>> Comment([FromForm] CommentCrmRequest request)
         {
             return Ok(await _crmService.UpdateComment(await GetUserId(),
-                                                  request));
+                                                      request));
         }
     }
 }
