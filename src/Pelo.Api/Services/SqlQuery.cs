@@ -3781,7 +3781,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          u.FullName AS UserNameCreated,
                                                          cs.Phone AS CustomerPhone,
                                                          cs.Name AS CustomerName,
-                                                         cs.Address AS CustomerAddress,
+                                                         cs.Address AS CustomerAddress
                                                        INTO #tmpTask
                                                          FROM dbo.Task as t
                                                          LEFT JOIN dbo.[User] AS u

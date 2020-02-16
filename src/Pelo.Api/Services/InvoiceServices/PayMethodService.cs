@@ -134,7 +134,7 @@ namespace Pelo.Api.Services.InvoiceServices
                 var canGetAll = await _roleService.CheckPermission(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetPayMethodPagingResponse, int>(SqlQuery.PAY_METHOD_GET_BY_PAGING,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetPayMethodPagingResponse, int>(string.Format(SqlQuery.PAY_METHOD_GET_BY_PAGING,request.ColumnOrder,request.SortDir),
                                                                                                               new
                                                                                                               {
                                                                                                                   Name = $"%{request.Name}%",
