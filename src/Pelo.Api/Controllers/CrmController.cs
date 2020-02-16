@@ -34,7 +34,7 @@ namespace Pelo.Api.Controllers
         }
 
         [HttpGet]
-        [Route("api/khach_chua_xu_ly_trong_ngay")]
+        [Route("api/crm/khach_chua_xu_ly_trong_ngay")]
         public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> KhachChuaXuLyTrongNgay([FromQuery] GetPagingModel request)
         {
             return Ok(await _crmService.KhachChuaXuLyTrongNgay(await GetUserId(),
@@ -42,7 +42,7 @@ namespace Pelo.Api.Controllers
         }
 
         [HttpGet]
-        [Route("api/khach_toi_hen_can_cham_soc")]
+        [Route("api/crm/khach_toi_hen_can_cham_soc")]
         public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> KhachToiHenCanChamSoc([FromQuery] GetPagingModel request)
         {
             return Ok(await _crmService.KhachToiHenCanChamSoc(await GetUserId(),
@@ -50,7 +50,7 @@ namespace Pelo.Api.Controllers
         }
 
         [HttpGet]
-        [Route("api/khach_qua_hen_cham_soc")]
+        [Route("api/crm/khach_qua_hen_cham_soc")]
         public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> KhachQuaHenChamSoc([FromQuery] GetPagingModel request)
         {
             return Ok(await _crmService.KhachQuaHenChamSoc(await GetUserId(),
@@ -58,7 +58,7 @@ namespace Pelo.Api.Controllers
         }
 
         [HttpGet]
-        [Route("api/khach_toi_hen_ngay_mai")]
+        [Route("api/crm/khach_toi_hen_ngay_mai")]
         public async Task<ActionResult<PageResult<GetCrmPagingResponse>>> KhachToiHenNgayMai([FromQuery] GetPagingModel request)
         {
             return Ok(await _crmService.KhachToiHenNgayMai(await GetUserId(),
