@@ -133,7 +133,7 @@ namespace Pelo.Api.Services.TaskServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetTaskTypePagingResponse, int>(SqlQuery.TASK_TYPE_GET_BY_PAGING,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetTaskTypePagingResponse, int>(string.Format(SqlQuery.TASK_TYPE_GET_BY_PAGING,request.ColumnOrder,request.SortDir),
                                                                                                               new
                                                                                                               {
                                                                                                                   Name = $"%{request.Name}%",

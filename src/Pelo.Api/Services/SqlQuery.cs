@@ -166,6 +166,7 @@
                                                        AND c.IsDeleted = 0;";
 
         #endregion
+
         #region Manufacturer
 
         public const string MANUFACTURER_GET_ALL = @"SELECT Id,
@@ -215,6 +216,7 @@
                                                              AND c.IsDeleted = 0;";
 
         #endregion
+
         #region Province
 
         public const string PROVINCE_GET_ALL = @"SELECT Id,
@@ -3749,6 +3751,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                   WHERE Id = @Id";
 
         #endregion
+
         #region Task
 
         public const string TASK_GET_ALL_BY_CUSTOMERID = @"SELECT Id,
@@ -3901,6 +3904,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                                 AND IsDeleted = 0;";
 
         #endregion
+
         #region RecruitmentStatus
 
         public const string RECRUITMENT_STATUS_GET_ALL = @"SELECT Id,
