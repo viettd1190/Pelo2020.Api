@@ -3456,6 +3456,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                        FROM dbo.ReceiptDescription c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
                                                              AND c.IsDeleted = 0
+                                                       ORDER BY Name
                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
                                                        SELECT COUNT(*)
                                                        FROM dbo.ReceiptDescription c
