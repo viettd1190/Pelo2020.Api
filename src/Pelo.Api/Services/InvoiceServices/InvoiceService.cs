@@ -476,7 +476,7 @@ namespace Pelo.Api.Services.InvoiceServices
             var isDefaultInvoiceRoles = await _userService.IsBelongDefaultInvoiceRole(userId);
             if(!isDefaultInvoiceRoles.IsSuccess)
             {
-                whereBuilder.AppendFormat("{0}(i.UserCreatedId = @UserCreatedId OR i.UserSellId = @UserSellId OR uii.UserId = @UserDeliveryId)",
+                whereBuilder.AppendFormat("{0}(i.UserCreated = @UserCreatedId OR i.UserSellId = @UserSellId OR uii.UserId = @UserDeliveryId)",
                                           whereCondition);
                 whereCondition = "AND ";
             }
@@ -484,7 +484,7 @@ namespace Pelo.Api.Services.InvoiceServices
             {
                 if(request.UserCreatedId > 0)
                 {
-                    whereBuilder.AppendFormat("{0}i.UserCreatedId = @UserCreatedId",
+                    whereBuilder.AppendFormat("{0}i.UserCreated = @UserCreatedId",
                                               whereCondition);
                     whereCondition = "AND ";
                 }
