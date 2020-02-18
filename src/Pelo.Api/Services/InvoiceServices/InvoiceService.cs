@@ -151,6 +151,8 @@ namespace Pelo.Api.Services.InvoiceServices
         {
             try
             {
+                userId = 1;
+
                 var canGetPaging = await CanGetPaging(userId);
                 if(canGetPaging.IsSuccess)
                 {
@@ -435,42 +437,42 @@ namespace Pelo.Api.Services.InvoiceServices
             {
                 whereBuilder.AppendFormat("{0}ISNULL(c.Code, '') LIKE @CustomerCode ",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(!string.IsNullOrEmpty(request.CustomerName))
             {
                 whereBuilder.AppendFormat("{0}ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(!string.IsNullOrEmpty(request.CustomerPhone))
             {
                 whereBuilder.AppendFormat("{0}(ISNULL(c.Phone, '') LIKE @CustomerPhone OR ISNULL(c.Phone2, '') LIKE @CustomerPhone OR ISNULL(c.Phone3, '') LIKE @CustomerPhone)",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(!string.IsNullOrEmpty(request.Code))
             {
                 whereBuilder.AppendFormat("{0}i.Code LIKE @Code",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(request.BranchId > 0)
             {
                 whereBuilder.AppendFormat("{0}ISNULL(i.BranchId, 0) = @BranchId",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(request.InvoiceStatusId > 0)
             {
                 whereBuilder.AppendFormat("{0}ISNULL(i.InvoiceStatusId, 0) = @InvoiceStatusId",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             var isDefaultInvoiceRoles = await _userService.IsBelongDefaultInvoiceRole(userId);
@@ -478,7 +480,7 @@ namespace Pelo.Api.Services.InvoiceServices
             {
                 whereBuilder.AppendFormat("{0}(i.UserCreated = @UserCreatedId OR i.UserSellId = @UserSellId OR uii.UserId = @UserDeliveryId)",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
             else
             {
@@ -486,21 +488,21 @@ namespace Pelo.Api.Services.InvoiceServices
                 {
                     whereBuilder.AppendFormat("{0}i.UserCreated = @UserCreatedId",
                                               whereCondition);
-                    whereCondition = "AND ";
+                    whereCondition = " AND ";
                 }
 
                 if(request.UserSellId > 0)
                 {
                     whereBuilder.AppendFormat("{0}i.UserSellId = @UserSellId",
                                               whereCondition);
-                    whereCondition = "AND ";
+                    whereCondition = " AND ";
                 }
 
                 if(request.UserDeliveryId > 0)
                 {
                     whereBuilder.AppendFormat("{0}uii.UserId = @UserDeliveryId AND uii.Type = 0",
                                               whereCondition);
-                    whereCondition = "AND ";
+                    whereCondition = " AND ";
                 }
             }
 
@@ -508,14 +510,14 @@ namespace Pelo.Api.Services.InvoiceServices
             {
                 whereBuilder.AppendFormat("{0}i.DateCreated >= @FromDate",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(request.ToDate != null)
             {
                 whereBuilder.AppendFormat("{0}i.DateCreated <= @ToDate",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             whereBuilder.AppendFormat("{0}i.IsDeleted = 0 AND c.IsDeleted = 0 AND uii.IsDeleted = 0",
@@ -523,7 +525,7 @@ namespace Pelo.Api.Services.InvoiceServices
 
             if(!string.IsNullOrEmpty(whereBuilder.ToString()))
             {
-                sqlBuilder.AppendFormat("WHERE {0} ",
+                sqlBuilder.AppendFormat( "WHERE {0} ",
                                         whereBuilder);
             }
 
