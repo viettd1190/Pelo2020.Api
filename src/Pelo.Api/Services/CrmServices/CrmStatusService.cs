@@ -174,6 +174,8 @@ namespace Pelo.Api.Services.CrmServices
                                                                                                               {
                                                                                                                   request.Name,
                                                                                                                   request.Color,
+                                                                                                                  request.IsSendSms,
+                                                                                                                  request.SmsContent,
                                                                                                                   UserCreated = userId,
                                                                                                                   DateCreated = DateTime.Now,
                                                                                                                   UserUpdated = userId,
@@ -209,6 +211,8 @@ namespace Pelo.Api.Services.CrmServices
                                                                                                                   request.Id,
                                                                                                                   request.Name,
                                                                                                                   request.Color,
+                                                                                                                  request.IsSendSms,
+                                                                                                                  request.SmsContent,
                                                                                                                   UserUpdated = userId,
                                                                                                                   DateUpdated = DateTime.Now
                                                                                                               });
