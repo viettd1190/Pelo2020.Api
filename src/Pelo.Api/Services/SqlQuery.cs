@@ -834,7 +834,7 @@ SELECT COUNT(*) FROM dbo.ProductStatus c
                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                             AND IsDeleted = 0;";
 
-        public const string CRM_PRIORITY_GET_BY_ID = @"SELECT * FROM dbo.InvoiceStatus WHERE Id = @Id AND IsDeleted = 0";
+        public const string CRM_PRIORITY_GET_BY_ID = @"SELECT * FROM dbo.CrmPriority WHERE Id = @Id AND IsDeleted = 0";
 
         #endregion
 
