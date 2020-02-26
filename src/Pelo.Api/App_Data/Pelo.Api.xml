@@ -148,6 +148,42 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CountryController.GetAll">
+            <summary>
+                Lấy tất cả quoc gia
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CountryController.GetPaging(Pelo.Common.Dtos.Country.GetCountryPagingRequest)">
+            <summary>
+                Lấy tất cả quoc gia
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CountryController.GetById(System.Int32)">
+            <summary>
+                Lấy quoc gia
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CountryController.Insert(Pelo.Common.Dtos.Country.InsertCountry)">
+            <summary>
+                insert quoc gia
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CountryController.Update(Pelo.Common.Dtos.Country.UpdateCountry)">
+            <summary>
+                update quoc gia
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CountryController.Delete(System.Int32)">
+            <summary>
+                delete quoc gia
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CrmController.GetByPaging(Pelo.Common.Dtos.Crm.GetCrmPagingRequest)">
             <summary>
                 Lấy danh sách CRM có phân trang
