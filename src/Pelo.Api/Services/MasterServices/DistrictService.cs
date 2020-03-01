@@ -162,7 +162,7 @@ namespace Pelo.Api.Services.MasterServices
                 var canGetAll = await _roleService.CheckPermission(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.ROLE_INSERT,
+                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.DISTRICT_INSERT,
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Type,
@@ -198,7 +198,7 @@ namespace Pelo.Api.Services.MasterServices
                     var data = await GetById(userId, request.Id);
                     if (data.IsSuccess)
                     {
-                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.ROLE_UPDATE,
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.DISTRICT_UPDATE,
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Id,
