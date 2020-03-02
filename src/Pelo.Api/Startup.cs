@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pelo.Api.Commons;
 using Pelo.Api.Services.UserServices;
+using Pelo.Common.BackgroundServices;
 using Pelo.Common.Extensions;
 using Pelo.Common.Kafka;
 using Pelo.Common.Repositories;

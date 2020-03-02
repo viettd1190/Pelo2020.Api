@@ -9,7 +9,9 @@ using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.Crm;
 using Pelo.Common.Dtos.User;
 using Pelo.Common.Enums;
+using Pelo.Common.Events.Crm;
 using Pelo.Common.Extensions;
+using Pelo.Common.Kafka;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
@@ -81,18 +83,22 @@ namespace Pelo.Api.Services.CrmServices
 
         private readonly IUserService _userService;
 
+        private IBusPublisher _busPublisher;
+
         public CrmService(IDapperReadOnlyRepository readOnlyRepository,
                           IDapperWriteRepository writeRepository,
                           IHttpContextAccessor context,
                           IRoleService roleService,
                           IAppConfigService appConfigService,
-                          IUserService userService) : base(readOnlyRepository,
+                          IUserService userService,
+                          IBusPublisher busPublisher) : base(readOnlyRepository,
                                                            writeRepository,
                                                            context)
         {
             _roleService = roleService;
             _appConfigService = appConfigService;
             _userService = userService;
+            _busPublisher = busPublisher;
         }
 
         #region ICrmService Members
@@ -575,58 +581,67 @@ namespace Pelo.Api.Services.CrmServices
 
                             #region 4. Thêm thông báo
 
-                            #region 4.1. Kiểm tra xem user admin có trong danh sách người nhận thông báo không, nếu  không có thì thêm vào
+                            await _busPublisher.SendEventAsync(new CrmInsertSuccessEvent
+                                                               {
+                                                                       Id = crmId,
+                                                                       Code = crmCodeResponse.Data,
+                                                                       CrmStatusId = request.CrmStatusId,
+                                                                       UserId = userId,
+                                                                       UserIds = request.UserIds
+                                                               });
 
-                            var adminUserId = await _userService.GetByUsername("admin");
-                            if(adminUserId.IsSuccess)
-                            {
-                                if(!request.UserIds.Contains(adminUserId.Data.Id))
-                                {
-                                    request.UserIds.Add(adminUserId.Data.Id);
-                                }
-                            }
+                            //#region 4.1. Kiểm tra xem user admin có trong danh sách người nhận thông báo không, nếu  không có thì thêm vào
 
-                            #endregion
+                            //var adminUserId = await _userService.GetByUsername("admin");
+                            //if(adminUserId.IsSuccess)
+                            //{
+                            //    if(!request.UserIds.Contains(adminUserId.Data.Id))
+                            //    {
+                            //        request.UserIds.Add(adminUserId.Data.Id);
+                            //    }
+                            //}
 
-                            #region 4.2. hêm danh sách tài khoản mặc định nhận thông báo Crm
+                            //#endregion
 
-                            var notificationUserCrmsResponse = await _appConfigService.GetByName("NotificationCRMUsers");
-                            if(notificationUserCrmsResponse != null)
-                            {
-                                if(!string.IsNullOrEmpty(notificationUserCrmsResponse.Data))
-                                {
-                                    var notificationUSerCrms = notificationUserCrmsResponse.Data.Split(' ');
-                                    if(notificationUSerCrms.Any())
-                                    {
-                                        foreach (var notificationUSerCrm in notificationUSerCrms)
-                                        {
-                                            var notificationUser = await _userService.GetByUsername(notificationUSerCrm);
-                                            if(notificationUser.IsSuccess)
-                                            {
-                                                if(!request.UserIds.Contains(notificationUser.Data.Id))
-                                                {
-                                                    request.UserIds.Add(notificationUser.Data.Id);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            //#region 4.2. hêm danh sách tài khoản mặc định nhận thông báo Crm
 
-                            #endregion
+                            //var notificationUserCrmsResponse = await _appConfigService.GetByName("NotificationCRMUsers");
+                            //if(notificationUserCrmsResponse != null)
+                            //{
+                            //    if(!string.IsNullOrEmpty(notificationUserCrmsResponse.Data))
+                            //    {
+                            //        var notificationUSerCrms = notificationUserCrmsResponse.Data.Split(' ');
+                            //        if(notificationUSerCrms.Any())
+                            //        {
+                            //            foreach (var notificationUSerCrm in notificationUSerCrms)
+                            //            {
+                            //                var notificationUser = await _userService.GetByUsername(notificationUSerCrm);
+                            //                if(notificationUser.IsSuccess)
+                            //                {
+                            //                    if(!request.UserIds.Contains(notificationUser.Data.Id))
+                            //                    {
+                            //                        request.UserIds.Add(notificationUser.Data.Id);
+                            //                    }
+                            //                }
+                            //            }
+                            //        }
+                            //    }
+                            //}
 
-                            var resultNotification = await Notify(userId,
-                                                                  request.UserIds,
-                                                                  "đã thêm CRM mới",
-                                                                  string.Empty,
-                                                                  crmCodeResponse.Data,
-                                                                  crmId);
-                            if(!resultNotification.IsSuccess)
-                            {
-                                Log(resultNotification.Message);
-                            }
+                            //#endregion
 
-                            #endregion
+                            //var resultNotification = await Notify(userId,
+                            //                                      request.UserIds,
+                            //                                      "đã thêm CRM mới",
+                            //                                      string.Empty,
+                            //                                      crmCodeResponse.Data,
+                            //                                      crmId);
+                            //if(!resultNotification.IsSuccess)
+                            //{
+                            //    Log(resultNotification.Message);
+                            //}
+
+                            //#endregion
 
                             //#region 5. Thêm lịch sử chỉnh sửa Crm
 
