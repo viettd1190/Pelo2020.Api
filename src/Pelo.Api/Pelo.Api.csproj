@@ -12,6 +12,7 @@
   <ItemGroup>
     <PackageReference Include="autofac" Version="4.9.4" />
     <PackageReference Include="autofac.extensions.dependencyinjection" Version="5.0.0" />
+    <PackageReference Include="Confluent.kafka" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="microsoft.aspnetcore.mvc.versioning" Version="3.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />

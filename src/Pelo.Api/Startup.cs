@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +15,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pelo.Api.Commons;
 using Pelo.Api.Services.UserServices;
+using Pelo.Common.Extensions;
+using Pelo.Common.Kafka;
 using Pelo.Common.Repositories;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -41,6 +44,13 @@ namespace Pelo.Api
 
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            var producerConfig = new ProducerConfig();
+            var consumerConfig = new ConsumerConfig();
+            Configuration.Bind("producer", producerConfig);
+            Configuration.Bind("consumer", consumerConfig);
+            services.AddSingleton(producerConfig);
+            services.AddSingleton(consumerConfig);
 
             #region Swagger
 
@@ -125,6 +135,12 @@ namespace Pelo.Api
             builder.RegisterType<HttpContextAccessor>()
                 .As<IHttpContextAccessor>()
                 .SingleInstance();
+
+            // Đăng ký tự động các Services Kafka trong project common
+            builder.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(BusPublisher)))
+                   .AsImplementedInterfaces();
+
+            builder.AddDispatchers();
 
             builder.Populate(services);
             var container = builder.Build();
