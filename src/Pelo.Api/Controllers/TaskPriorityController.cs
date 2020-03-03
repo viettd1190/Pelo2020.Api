@@ -46,7 +46,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/task_priority/{id}")]
-        public async Task<ActionResult<TaskPrioritySimpleModel>> GetById(int id)
+        public async Task<ActionResult<GetTaskPriorityResponse>> GetById(int id)
         {
             return Ok(await _TaskPriorityService.GetById(await GetUserId(), id));
         }

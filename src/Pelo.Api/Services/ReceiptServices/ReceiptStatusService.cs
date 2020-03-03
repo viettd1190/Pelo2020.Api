@@ -15,7 +15,7 @@ namespace Pelo.Api.Services.ReceiptServices
         Task<TResponse<IEnumerable<ReceiptStatusSimpleModel>>> GetAll(int userId);
         Task<TResponse<PageResult<GetReceiptStatusPagingResponse>>> GetPaging(int v, GetReceiptStatusPagingRequest request);
 
-        Task<TResponse<ReceiptStatusSimpleModel>> GetById(int userId, int id);
+        Task<TResponse<GetReceiptStatusResponse>> GetById(int userId, int id);
 
         Task<TResponse<bool>> Insert(int userId, InsertReceiptStatus request);
 
@@ -98,14 +98,14 @@ namespace Pelo.Api.Services.ReceiptServices
             }
         }
 
-        public async Task<TResponse<ReceiptStatusSimpleModel>> GetById(int userId, int id)
+        public async Task<TResponse<GetReceiptStatusResponse>> GetById(int userId, int id)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<ReceiptStatusSimpleModel>(SqlQuery.RECEIPT_STATUS_GET_BY_ID,
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetReceiptStatusResponse>(SqlQuery.RECEIPT_STATUS_GET_BY_ID,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -115,14 +115,14 @@ namespace Pelo.Api.Services.ReceiptServices
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<ReceiptStatusSimpleModel>(result.Message);
+                    return await Fail<GetReceiptStatusResponse>(result.Message);
                 }
 
-                return await Fail<ReceiptStatusSimpleModel>(canGetAll.Message);
+                return await Fail<GetReceiptStatusResponse>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<ReceiptStatusSimpleModel>(exception);
+                return await Fail<GetReceiptStatusResponse>(exception);
             }
         }
 

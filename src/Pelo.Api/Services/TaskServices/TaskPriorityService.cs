@@ -15,7 +15,7 @@ namespace Pelo.Api.Services.TaskServices
         Task<TResponse<IEnumerable<TaskPrioritySimpleModel>>> GetAll(int userId);
         Task<TResponse<PageResult<GetTaskPriorityPagingResponse>>> GetPaging(int v, GetTaskPriorityPagingRequest request);
 
-        Task<TResponse<TaskPrioritySimpleModel>> GetById(int userId, int id);
+        Task<TResponse<GetTaskPriorityResponse>> GetById(int userId, int id);
 
         Task<TResponse<bool>> Insert(int userId, InsertTaskPriority request);
 
@@ -98,14 +98,14 @@ namespace Pelo.Api.Services.TaskServices
             }
         }
 
-        public async Task<TResponse<TaskPrioritySimpleModel>> GetById(int userId, int id)
+        public async Task<TResponse<GetTaskPriorityResponse>> GetById(int userId, int id)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<TaskPrioritySimpleModel>(SqlQuery.TASK_PRIORITY_GET_BY_ID,
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetTaskPriorityResponse>(SqlQuery.TASK_PRIORITY_GET_BY_ID,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -115,14 +115,14 @@ namespace Pelo.Api.Services.TaskServices
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<TaskPrioritySimpleModel>(result.Message);
+                    return await Fail<GetTaskPriorityResponse>(result.Message);
                 }
 
-                return await Fail<TaskPrioritySimpleModel>(canGetAll.Message);
+                return await Fail<GetTaskPriorityResponse>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<TaskPrioritySimpleModel>(exception);
+                return await Fail<GetTaskPriorityResponse>(exception);
             }
         }
 
