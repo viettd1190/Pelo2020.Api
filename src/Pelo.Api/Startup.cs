@@ -137,9 +137,12 @@ namespace Pelo.Api
                 .As<IHttpContextAccessor>()
                 .SingleInstance();
 
-            // Đăng ký tự động các Services Kafka trong project common
-            builder.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(BusPublisher)))
-                   .AsImplementedInterfaces();
+            builder.RegisterType<BusPublisher>()
+                   .As<IBusPublisher>()
+                   .InstancePerLifetimeScope();
+            builder.RegisterType<BusSubscriber>()
+                   .As<IBusSubscriber>()
+                   .InstancePerLifetimeScope();
 
             builder.AddDispatchers();
 
