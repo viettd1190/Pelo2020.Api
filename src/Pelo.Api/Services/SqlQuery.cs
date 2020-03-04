@@ -1320,12 +1320,12 @@ SELECT COUNT(*) FROM dbo.Role c
 
         public const string CUSTOMER_VIP_CHECK_PROFIT_INVALID = @"SELECT Id
                                                                   FROM dbo.CustomerVip
-                                                                  WHERE Profit = @Profit
+                                                                  WHERE Id!=@Id AND Profit = @Profit
                                                                         AND IsDeleted = 0;";
 
         public const string CUSTOMER_VIP_CHJECK_NAME_INVALID = @"SELECT Id
                                                                  FROM dbo.CustomerVip
-                                                                 WHERE Name = @Name
+                                                                 WHERE Id!=@Id AND Name = @Name
                                                                        AND IsDeleted = 0;";
 
         public const string CUSTOMER_VIP_CHECK_PROFIT_INVALID_2 = @"SELECT Id

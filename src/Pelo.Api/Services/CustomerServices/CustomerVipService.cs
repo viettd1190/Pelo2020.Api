@@ -371,6 +371,7 @@ namespace Pelo.Api.Services.CustomerServices
                         var checkInvalidName = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_VIP_CHJECK_NAME_INVALID,
                                                                                                       new
                                                                                                       {
+                                                                                                          request.Id,
                                                                                                           request.Name
                                                                                                       });
                         if (checkInvalidName.IsSuccess)
@@ -383,6 +384,7 @@ namespace Pelo.Api.Services.CustomerServices
                             var checkInvalidProfit = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.CUSTOMER_VIP_CHECK_PROFIT_INVALID,
                                                                                                             new
                                                                                                             {
+                                                                                                                request.Id,
                                                                                                                 request.Profit
                                                                                                             });
 
