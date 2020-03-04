@@ -4149,8 +4149,7 @@ SELECT COUNT(*) FROM dbo.Role c
 
         #region Country
 
-        public const string COUNTRY_GET_ALL = @"SELECT Id,
-                                                        Name
+        public const string COUNTRY_GET_ALL = @"SELECT *
                                                  FROM dbo.Country
                                                  WHERE IsDeleted = 0;";
 
