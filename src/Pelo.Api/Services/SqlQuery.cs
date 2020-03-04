@@ -1345,6 +1345,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         Name,
                                                         Color,
                                                         Profit,
+                                                        SortOrder,
                                                         UserCreated,
                                                         DateCreated,
                                                         UserUpdated,
@@ -1355,6 +1356,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                     (   @Name,       -- Name - nvarchar(200)
                                                         @Color,       -- Color - nvarchar(10)
                                                         @Profit,         -- Profit - int
+                                                        @SortOrder, -- SortOrder - int
                                                         @UserCreated,         -- UserCreated - int
                                                         GETDATE(), -- DateCreated - datetime
                                                         @UserUpdated,         -- UserUpdated - int
@@ -1366,6 +1368,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                     SET Name = @Name,
                                                         Color = @Color,
                                                         Profit = @Profit,
+                                                        SortOrder = @SortOrder,
                                                         UserUpdated = @UserUpdated,
                                                         DateUpdated = GETDATE()
                                                     WHERE Id = @Id

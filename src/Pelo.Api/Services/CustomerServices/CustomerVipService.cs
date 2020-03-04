@@ -99,6 +99,7 @@ namespace Pelo.Api.Services.CustomerServices
                                                                         request.Name,
                                                                         request.Color,
                                                                         request.Profit,
+                                                                        request.SortOder,
                                                                         UserCreated = userId,
                                                                         DateCreated = DateTime.Now,
                                                                         UserUpdated = userId,
