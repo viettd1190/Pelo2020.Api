@@ -4150,11 +4150,11 @@ SELECT COUNT(*) FROM dbo.Role c
         #region Country
 
         public const string COUNTRY_GET_ALL = @"SELECT *
-                                                 FROM dbo.Country
+                                                 FROM [dbo].[Country]
                                                  WHERE IsDeleted = 0;";
 
         public const string COUNTRY_GET_BY_PAGING = @"  SELECT *
-                                                         FROM dbo.Country 
+                                                         FROM [dbo].[Country] 
                                                          WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                              AND IsDeleted = 0
                                                         ORDER BY {0} {1}
@@ -4165,10 +4165,10 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                             AND IsDeleted = 0;";
 
-        public const string COUNTRY_GET_BY_ID = @"SELECT * FROM dbo.Country WHERE Id = @Id AND IsDeleted = 0";
+        public const string COUNTRY_GET_BY_ID = @"SELECT * FROM [dbo].[Country] WHERE Id = @Id AND IsDeleted = 0";
 
 
-        public const string COUNTRY_INSERT = @"INSERT dbo.Country
+        public const string COUNTRY_INSERT = @"INSERT [dbo].[Country]
                                                         (Name,
                                                          Code,
                                                          Region,
@@ -4188,7 +4188,7 @@ SELECT COUNT(*) FROM dbo.Role c
 
                                                  SELECT CAST(SCOPE_IDENTITY() as int);";
 
-        public const string COUNTRY_UPDATE = @"  UPDATE dbo.Country
+        public const string COUNTRY_UPDATE = @"  UPDATE [dbo].[Country]
                                                   SET Name = @Name,
                                                       Code = @Code,
                                                       Region = @Region,
@@ -4196,7 +4196,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                       DateUpdated = @DateUpdated
                                                   WHERE Id = @Id";
 
-        public const string COUNTRY_DELETE = @"  UPDATE dbo.Country
+        public const string COUNTRY_DELETE = @"  UPDATE [dbo].[Country]
                                                   SET UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated,
                                                       IsDeleted = 1
