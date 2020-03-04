@@ -143,6 +143,7 @@ namespace Pelo.Api.Services.CustomerServices
                                                                         request.Name,
                                                                         request.Color,
                                                                         request.Profit,
+                                                                        request.SortOder,
                                                                         UserUpdated = userId
                                                                     });
                     if (result.IsSuccess)
