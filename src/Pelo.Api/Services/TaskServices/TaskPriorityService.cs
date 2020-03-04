@@ -170,6 +170,8 @@ namespace Pelo.Api.Services.TaskServices
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Name,
+                                                                                                                  request.Color,
+                                                                                                                  request.SortOrder,
                                                                                                                   UserCreated = userId,
                                                                                                                   DateCreated = DateTime.Now,
                                                                                                                   UserUpdated = userId,
@@ -204,6 +206,8 @@ namespace Pelo.Api.Services.TaskServices
                                                                                                               {
                                                                                                                   request.Id,
                                                                                                                   request.Name,
+                                                                                                                  request.Color,
+                                                                                                                  request.SortOrder,
                                                                                                                   UserUpdated = userId,
                                                                                                                   DateUpdated = DateTime.Now
                                                                                                               });

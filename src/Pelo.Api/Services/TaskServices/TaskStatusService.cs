@@ -172,6 +172,8 @@ namespace Pelo.Api.Services.TaskServices
                                                                                                                   request.Name,
                                                                                                                   request.Color,
                                                                                                                   request.SortOrder,
+                                                                                                                  request.IsSendSms,
+                                                                                                                  request.SmsContent,
                                                                                                                   UserCreated = userId,
                                                                                                                   DateCreated = DateTime.Now,
                                                                                                                   UserUpdated = userId,
@@ -208,6 +210,8 @@ namespace Pelo.Api.Services.TaskServices
                                                                                                                   request.Name,
                                                                                                                   request.Color,
                                                                                                                   request.SortOrder,
+                                                                                                                  request.IsSendSms,
+                                                                                                                  request.SmsContent,
                                                                                                                   UserUpdated = userId,
                                                                                                                   DateUpdated = DateTime.Now
                                                                                                               });
