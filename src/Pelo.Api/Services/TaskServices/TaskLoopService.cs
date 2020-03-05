@@ -15,7 +15,7 @@ namespace Pelo.Api.Services.TaskServices
         Task<TResponse<IEnumerable<TaskLoopSimpleModel>>> GetAll(int userId);
         Task<TResponse<PageResult<GetTaskLoopPagingResponse>>> GetPaging(int v, GetTaskLoopPagingRequest request);
 
-        Task<TResponse<TaskLoopSimpleModel>> GetById(int userId, int id);
+        Task<TResponse<GetTaskLoopPagingResponse>> GetById(int userId, int id);
 
         Task<TResponse<bool>> Insert(int userId, InsertTaskLoop request);
 
@@ -98,14 +98,14 @@ namespace Pelo.Api.Services.TaskServices
             }
         }
 
-        public async Task<TResponse<TaskLoopSimpleModel>> GetById(int userId, int id)
+        public async Task<TResponse<GetTaskLoopPagingResponse>> GetById(int userId, int id)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<TaskLoopSimpleModel>(SqlQuery.TASK_LOOP_GET_BY_ID,
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetTaskLoopPagingResponse>(SqlQuery.TASK_LOOP_GET_BY_ID,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -115,14 +115,14 @@ namespace Pelo.Api.Services.TaskServices
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<TaskLoopSimpleModel>(result.Message);
+                    return await Fail<GetTaskLoopPagingResponse>(result.Message);
                 }
 
-                return await Fail<TaskLoopSimpleModel>(canGetAll.Message);
+                return await Fail<GetTaskLoopPagingResponse>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<TaskLoopSimpleModel>(exception);
+                return await Fail<GetTaskLoopPagingResponse>(exception);
             }
         }
 
