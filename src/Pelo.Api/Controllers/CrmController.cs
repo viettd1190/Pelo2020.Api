@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Pelo.Api.Services.CrmServices;
 using Pelo.Api.Services.UserServices;
@@ -122,6 +123,18 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _crmService.UpdateComment(await GetUserId(),
                                                       request));
+        }
+
+        /// <summary>
+        ///     Lấy danh sách log crm
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/crm/log/{id}")]
+        public async Task<ActionResult<TResponse<IEnumerable<CrmLogResponse>>>> GetLog([FromRoute] int id)
+        {
+            return Ok(await _crmService.GetCrmLogs(await GetUserId(), id));
         }
     }
 }

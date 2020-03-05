@@ -33,10 +33,10 @@ namespace Pelo.Api.Services.CrmServices
                                                                                  GetPagingModel request);
 
         Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachToiHenCanChamSoc(int userId,
-                                                                                 GetPagingModel request);
+                                                                                GetPagingModel request);
 
         Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachQuaHenChamSoc(int userId,
-                                                                                GetPagingModel request);
+                                                                             GetPagingModel request);
 
         Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachToiHenNgayMai(int userId,
                                                                              GetPagingModel request);
@@ -72,6 +72,9 @@ namespace Pelo.Api.Services.CrmServices
 
         Task<TResponse<bool>> UpdateComment(int userId,
                                             CommentCrmRequest comment);
+
+        Task<TResponse<IEnumerable<CrmLogResponse>>> GetCrmLogs(int userId,
+                                                                int crmId);
     }
 
     public class CrmService : BaseService,
@@ -79,11 +82,11 @@ namespace Pelo.Api.Services.CrmServices
     {
         private readonly IAppConfigService _appConfigService;
 
+        private readonly IBusPublisher _busPublisher;
+
         private readonly IRoleService _roleService;
 
         private readonly IUserService _userService;
-
-        private IBusPublisher _busPublisher;
 
         public CrmService(IDapperReadOnlyRepository readOnlyRepository,
                           IDapperWriteRepository writeRepository,
@@ -92,8 +95,8 @@ namespace Pelo.Api.Services.CrmServices
                           IAppConfigService appConfigService,
                           IUserService userService,
                           IBusPublisher busPublisher) : base(readOnlyRepository,
-                                                           writeRepository,
-                                                           context)
+                                                             writeRepository,
+                                                             context)
         {
             _roleService = roleService;
             _appConfigService = appConfigService;
@@ -304,8 +307,9 @@ namespace Pelo.Api.Services.CrmServices
                 return await Fail<PageResult<GetCrmPagingResponse>>(exception);
             }
         }
+
         public async Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachToiHenCanChamSoc(int userId,
-                                                                                              GetPagingModel request)
+                                                                                             GetPagingModel request)
         {
             try
             {
@@ -314,24 +318,24 @@ namespace Pelo.Api.Services.CrmServices
                 var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPagingResponse, int>(SqlQuery.CRM_KHACH_TOI_HEN_CAN_CHAM_SOC,
                                                                                                       new
                                                                                                       {
-                                                                                                          FromDate = new DateTime(now.Year,
+                                                                                                              FromDate = new DateTime(now.Year,
                                                                                                                                       now.Month,
                                                                                                                                       now.Day,
                                                                                                                                       0,
                                                                                                                                       0,
                                                                                                                                       0),
-                                                                                                          ToDate = new DateTime(now.Year,
+                                                                                                              ToDate = new DateTime(now.Year,
                                                                                                                                     now.Month,
                                                                                                                                     now.Day,
                                                                                                                                     23,
                                                                                                                                     59,
                                                                                                                                     59),
-                                                                                                          UserCareId = userId,
-                                                                                                          Skip = (request.Page - 1) * request.PageSize,
-                                                                                                          Take = request.PageSize
+                                                                                                              UserCareId = userId,
+                                                                                                              Skip = (request.Page - 1) * request.PageSize,
+                                                                                                              Take = request.PageSize
                                                                                                       });
 
-                if (result.IsSuccess)
+                if(result.IsSuccess)
                 {
                     foreach (var crm in result.Data.Item1)
                     {
@@ -339,9 +343,9 @@ namespace Pelo.Api.Services.CrmServices
                         var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
                                                                                                  new
                                                                                                  {
-                                                                                                     CrmId = crm.Id
+                                                                                                         CrmId = crm.Id
                                                                                                  });
-                        if (crmUserCare.IsSuccess
+                        if(crmUserCare.IsSuccess
                            && crmUserCare.Data != null)
                         {
                             crm.UserCares.AddRange(crmUserCare.Data);
@@ -363,7 +367,7 @@ namespace Pelo.Api.Services.CrmServices
         }
 
         public async Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachQuaHenChamSoc(int userId,
-                                                                                              GetPagingModel request)
+                                                                                          GetPagingModel request)
         {
             try
             {
@@ -372,7 +376,7 @@ namespace Pelo.Api.Services.CrmServices
                 var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmPagingResponse, int>(SqlQuery.CRM_KHACH_QUA_HEN_CHAM_SOC,
                                                                                                       new
                                                                                                       {
-                                                                                                              FromDate=default(DateTime?),
+                                                                                                              FromDate = default(DateTime?),
                                                                                                               ToDate = new DateTime(now.Year,
                                                                                                                                     now.Month,
                                                                                                                                     now.Day,
@@ -384,7 +388,7 @@ namespace Pelo.Api.Services.CrmServices
                                                                                                               Take = request.PageSize
                                                                                                       });
 
-                if (result.IsSuccess)
+                if(result.IsSuccess)
                 {
                     foreach (var crm in result.Data.Item1)
                     {
@@ -392,9 +396,9 @@ namespace Pelo.Api.Services.CrmServices
                         var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
                                                                                                  new
                                                                                                  {
-                                                                                                     CrmId = crm.Id
+                                                                                                         CrmId = crm.Id
                                                                                                  });
-                        if (crmUserCare.IsSuccess
+                        if(crmUserCare.IsSuccess
                            && crmUserCare.Data != null)
                         {
                             crm.UserCares.AddRange(crmUserCare.Data);
@@ -416,7 +420,7 @@ namespace Pelo.Api.Services.CrmServices
         }
 
         public async Task<TResponse<PageResult<GetCrmPagingResponse>>> KhachToiHenNgayMai(int userId,
-                                                                                              GetPagingModel request)
+                                                                                          GetPagingModel request)
         {
             try
             {
@@ -442,7 +446,7 @@ namespace Pelo.Api.Services.CrmServices
                                                                                                               Take = request.PageSize
                                                                                                       });
 
-                if (result.IsSuccess)
+                if(result.IsSuccess)
                 {
                     foreach (var crm in result.Data.Item1)
                     {
@@ -450,9 +454,9 @@ namespace Pelo.Api.Services.CrmServices
                         var crmUserCare = await ReadOnlyRepository.Query<UserDisplaySimpleModel>(SqlQuery.CRM_USER_CARE_GET_BY_CRM_ID,
                                                                                                  new
                                                                                                  {
-                                                                                                     CrmId = crm.Id
+                                                                                                         CrmId = crm.Id
                                                                                                  });
-                        if (crmUserCare.IsSuccess
+                        if(crmUserCare.IsSuccess
                            && crmUserCare.Data != null)
                         {
                             crm.UserCares.AddRange(crmUserCare.Data);
@@ -472,7 +476,6 @@ namespace Pelo.Api.Services.CrmServices
                 return await Fail<PageResult<GetCrmPagingResponse>>(exception);
             }
         }
-
 
         /// <summary>
         ///     Kiểm tra xem user đó có quyền xem hết các CRM hay không.
@@ -1025,6 +1028,69 @@ namespace Pelo.Api.Services.CrmServices
             catch (Exception)
             {
                 return await Fail<bool>(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue());
+            }
+        }
+
+        public async Task<TResponse<IEnumerable<CrmLogResponse>>> GetCrmLogs(int userId,
+                                                                             int crmId)
+        {
+            try
+            {
+                var result = await ReadOnlyRepository.QueryAsync<CrmLogResponse>(SqlQuery.CRM_GET_LOGS, new
+                                                                                                        {
+                                                                                                                CrmId = crmId
+                                                                                                        });
+                if(result.IsSuccess)
+                {
+                    foreach (var log in result.Data)
+                    {
+                        var user = await ReadOnlyRepository.QueryFirstOrDefaultAsync<UserInLog>(SqlQuery.GET_USER_IN_LOG, new
+                                                                                                                          {
+                                                                                                                                  Id = log.UserId
+                                                                                                                          });
+                        if(user.IsSuccess
+                           && user.Data != null)
+                        {
+                            log.User = user.Data;
+                        }
+
+                        var oldCrmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmStatusInLog>(SqlQuery.GET_CRM_STATUS_IN_LOG, new
+                                                                                                                                             {
+                                                                                                                                                     Id = log.OldCrmStatusId
+                                                                                                                                             });
+                        if(oldCrmStatus.IsSuccess)
+                        {
+                            log.OldCrmStatus = oldCrmStatus.Data;
+                        }
+
+                        var crmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmStatusInLog>(SqlQuery.GET_CRM_STATUS_IN_LOG, new
+                                                                                                                                          {
+                                                                                                                                                  Id = log.CrmStatusId
+                                                                                                                                          });
+                        if(crmStatus.IsSuccess)
+                        {
+                            log.CrmStatus = crmStatus.Data;
+                        }
+
+                        var attachments = await ReadOnlyRepository.QueryAsync<CrmLogAttachment>(SqlQuery.GET_CRM_ATTACHMENT_IN_LOG, new
+                                                                                                                                    {
+                                                                                                                                            CrmLogId = log.Id
+                                                                                                                                    });
+
+                        if(attachments.IsSuccess)
+                        {
+                            log.Attachments = attachments.Data.ToList();
+                        }
+                    }
+
+                    return await Ok(result.Data);
+                }
+
+                return await Fail<IEnumerable<CrmLogResponse>>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<IEnumerable<CrmLogResponse>>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(), "GetCrmLog"));
             }
         }
 

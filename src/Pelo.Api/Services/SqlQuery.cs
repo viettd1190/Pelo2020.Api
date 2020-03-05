@@ -2427,6 +2427,37 @@ SELECT COUNT(*) FROM dbo.Role c
                                                             @DateCreated,
                                                             @UserUpdated;
                                                         SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string CRM_GET_LOGS = @"SELECT Id,
+                                                    CrmId,
+                                                    UserId,
+                                                    Comment,
+                                                    LogDate,
+                                                    OldCrmStatusId,
+                                                    CrmStatusId
+                                             FROM dbo.CrmLog
+                                             WHERE CrmId = @CrmId
+                                             ORDER BY LogDate DESC;";
+
+        public const string GET_USER_IN_LOG = @"SELECT Id,
+                                                       DisplayName,
+                                                       PhoneNumber,
+                                                       Avatar
+                                                FROM dbo.[User]
+                                                WHERE Id = @Id
+                                                      AND IsDeleted = 0;";
+
+        public const string GET_CRM_STATUS_IN_LOG = @"SELECT Id,
+                                                             Name
+                                                      FROM dbo.CrmStatus
+                                                      WHERE Id = @Id
+                                                            AND IsDeleted = 0;";
+
+        public const string GET_CRM_ATTACHMENT_IN_LOG = @"SELECT Attachment,
+                                                                 AttachmentName
+                                                          FROM dbo.CrmLogAttachment
+                                                          WHERE CrmLogId = @CrmLogId;";
+
         public const string GET_CRM_BY_ID = @"SELECT c.Id,
 		                                        c.Code,
 		                                        c.CustomerId,
