@@ -209,6 +209,7 @@ namespace Pelo.Api.Services.MasterServices
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Id,
+                                                                                                                  request.Name,
                                                                                                                   request.ProvinceId,
                                                                                                                   request.DistrictId,
                                                                                                                   request.Hotline,
