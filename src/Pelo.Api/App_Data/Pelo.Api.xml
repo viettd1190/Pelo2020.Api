@@ -212,6 +212,13 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CrmController.GetLog(System.Int32)">
+            <summary>
+                Lấy danh sách log crm
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CrmPriorityController.GetAll">
             <summary>
                 Lấy tất cả mức độ khẩn cấp CRM

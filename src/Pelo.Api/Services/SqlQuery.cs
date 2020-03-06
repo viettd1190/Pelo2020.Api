@@ -2440,7 +2440,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                              ORDER BY LogDate DESC;";
 
         public const string GET_USER_IN_LOG = @"SELECT Id,
-                                                       DisplayName,
+                                                       DisplayName AS Name,
                                                        PhoneNumber,
                                                        Avatar
                                                 FROM dbo.[User]
