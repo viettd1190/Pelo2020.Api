@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -70,8 +71,8 @@ namespace Pelo.Api.Services.CrmServices
         Task<TResponse<GetCrmModelReponse>> GetById(int userId,
                                                     int id);
 
-        Task<TResponse<bool>> UpdateComment(int userId,
-                                            CommentCrmRequest comment);
+        Task<TResponse<bool>> Comment(int userId,
+                                      CommentCrmRequest comment);
 
         Task<TResponse<IEnumerable<CrmLogResponse>>> GetCrmLogs(int userId,
                                                                 int crmId);
@@ -973,8 +974,8 @@ namespace Pelo.Api.Services.CrmServices
             }
         }
 
-        public async Task<TResponse<bool>> UpdateComment(int userId,
-                                                         CommentCrmRequest request)
+        public async Task<TResponse<bool>> Comment(int userId,
+                                                   CommentCrmRequest request)
         {
             try
             {
@@ -985,40 +986,55 @@ namespace Pelo.Api.Services.CrmServices
                                                                                                });
                 if(crm.IsSuccess)
                 {
-                    var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_UPDATE,
-                                                                    new
-                                                                    {
-                                                                            request.Id,
-                                                                            request.CrmStatusId,
-                                                                            UserUpdated = userId,
-                                                                            DateUpdated = DateTime.Now
-                                                                    });
-                    if(result.IsSuccess)
+                    if(crm.Data != null)
                     {
-                        if(crm.Data != null)
+                        var rs = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CRM_INSERT_COMMENT,
+                                                                               new
+                                                                               {
+                                                                                       CrmId = request.Id,
+                                                                                       request.Comment,
+                                                                                       UserId = userId
+                                                                               });
+                        if(rs.IsSuccess)
                         {
-                            bool isUpdate = false;
-                            if(crm.Data.CrmStatusId != request.CrmStatusId)
+                            if(request.Files != null
+                               && request.Files.Any())
                             {
-                                isUpdate = true;
-                            }
+                                var crmLogId = rs.Data;
 
-                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.CRM_COMMENT_INSERT,
-                                                                        new
-                                                                        {
-                                                                                CrmId = request.Id,
-                                                                                request.Comment,
-                                                                                Type = isUpdate,
-                                                                                OldStatusId = crm.Data.CrmStatusId,
-                                                                                NewStatusId = crm.Data.CrmStatusId,
-                                                                                UserIds = "",
-                                                                                UserCreated = userId,
-                                                                                DateCreated = DateTime.Now
-                                                                        });
-                            if(rs.IsSuccess)
-                            {
+                                var path = "\\wwwroot\\Attachments";
+
+                                if(!Directory.Exists(path))
+                                {
+                                    Directory.CreateDirectory(path);
+                                }
+
+                                foreach (var file in request.Files)
+                                {
+                                    var newFileName = RenameFile(file.FileName);
+
+                                    using (FileStream fileStream = File.Create(Path.Combine(path,
+                                                                                            newFileName) + Path.GetExtension(file.FileName)))
+                                    {
+                                        file.CopyTo(fileStream);
+                                        fileStream.Flush();
+
+                                        var result = await WriteRepository.ExecuteAsync(SqlQuery.CRM_LOG_ATTACHMENT_INSERT,
+                                                                                        new
+                                                                                        {
+                                                                                                CrmLogId = crmLogId,
+                                                                                                Attachment = $"{newFileName}{Path.GetExtension(file.FileName)}",
+                                                                                                AttachmentName = file.FileName,
+                                                                                                UserCreated = userId,
+                                                                                                UserUpdated = userId
+                                                                                        });
+                                    }
+                                }
+
                                 return await Ok(true);
                             }
+
+                            return await Ok(true);
                         }
                     }
                 }
@@ -1036,46 +1052,51 @@ namespace Pelo.Api.Services.CrmServices
         {
             try
             {
-                var result = await ReadOnlyRepository.QueryAsync<CrmLogResponse>(SqlQuery.CRM_GET_LOGS, new
-                                                                                                        {
-                                                                                                                CrmId = crmId
-                                                                                                        });
+                var result = await ReadOnlyRepository.QueryAsync<CrmLogResponse>(SqlQuery.CRM_GET_LOGS,
+                                                                                 new
+                                                                                 {
+                                                                                         CrmId = crmId
+                                                                                 });
                 if(result.IsSuccess)
                 {
                     foreach (var log in result.Data)
                     {
-                        var user = await ReadOnlyRepository.QueryFirstOrDefaultAsync<UserInLog>(SqlQuery.GET_USER_IN_LOG, new
-                                                                                                                          {
-                                                                                                                                  Id = log.UserId
-                                                                                                                          });
+                        var user = await ReadOnlyRepository.QueryFirstOrDefaultAsync<UserInLog>(SqlQuery.GET_USER_IN_LOG,
+                                                                                                new
+                                                                                                {
+                                                                                                        Id = log.UserId
+                                                                                                });
                         if(user.IsSuccess
                            && user.Data != null)
                         {
                             log.User = user.Data;
                         }
 
-                        var oldCrmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmStatusInLog>(SqlQuery.GET_CRM_STATUS_IN_LOG, new
-                                                                                                                                             {
-                                                                                                                                                     Id = log.OldCrmStatusId
-                                                                                                                                             });
+                        var oldCrmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmStatusInLog>(SqlQuery.GET_CRM_STATUS_IN_LOG,
+                                                                                                             new
+                                                                                                             {
+                                                                                                                     Id = log.OldCrmStatusId
+                                                                                                             });
                         if(oldCrmStatus.IsSuccess)
                         {
                             log.OldCrmStatus = oldCrmStatus.Data;
                         }
 
-                        var crmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmStatusInLog>(SqlQuery.GET_CRM_STATUS_IN_LOG, new
-                                                                                                                                          {
-                                                                                                                                                  Id = log.CrmStatusId
-                                                                                                                                          });
+                        var crmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmStatusInLog>(SqlQuery.GET_CRM_STATUS_IN_LOG,
+                                                                                                          new
+                                                                                                          {
+                                                                                                                  Id = log.CrmStatusId
+                                                                                                          });
                         if(crmStatus.IsSuccess)
                         {
                             log.CrmStatus = crmStatus.Data;
                         }
 
-                        var attachments = await ReadOnlyRepository.QueryAsync<CrmLogAttachment>(SqlQuery.GET_CRM_ATTACHMENT_IN_LOG, new
-                                                                                                                                    {
-                                                                                                                                            CrmLogId = log.Id
-                                                                                                                                    });
+                        var attachments = await ReadOnlyRepository.QueryAsync<CrmLogAttachment>(SqlQuery.GET_CRM_ATTACHMENT_IN_LOG,
+                                                                                                new
+                                                                                                {
+                                                                                                        CrmLogId = log.Id
+                                                                                                });
 
                         if(attachments.IsSuccess)
                         {
@@ -1090,11 +1111,21 @@ namespace Pelo.Api.Services.CrmServices
             }
             catch (Exception exception)
             {
-                return await Fail<IEnumerable<CrmLogResponse>>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(), "GetCrmLog"));
+                return await Fail<IEnumerable<CrmLogResponse>>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(),
+                                                                             "GetCrmLog"));
             }
         }
 
         #endregion
+
+        private string RenameFile(string fileName)
+        {
+            var newName = Guid.NewGuid()
+                              .ToString()
+                              .Replace("-",
+                                       string.Empty);
+            return newName;
+        }
 
         private async Task<TResponse<bool>> CanGetPaging(int userId)
         {

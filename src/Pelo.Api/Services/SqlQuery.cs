@@ -2428,6 +2428,52 @@ SELECT COUNT(*) FROM dbo.Role c
                                                             @UserUpdated;
                                                         SELECT CAST(SCOPE_IDENTITY() as int);";
 
+        public const string CRM_INSERT_COMMENT= @"INSERT dbo.CrmLog
+                                                  (
+                                                      CrmId,
+                                                      Comment,
+                                                      LogDate,
+                                                      UserId,
+                                                      Attachment,
+                                                      OldCrmStatusId,
+                                                      CrmStatusId,
+                                                      AttachmentName
+                                                  )
+                                                  VALUES
+                                                  (   @CrmId,         -- CrmId - int
+                                                      @Comment,       -- Comment - nvarchar(1500)
+                                                      GETDATE(), -- LogDate - datetime
+                                                      @UserId,         -- UserId - int
+                                                      N'',       -- Attachment - nvarchar(50)
+                                                      0,         -- OldCrmStatusId - int
+                                                      0,         -- CrmStatusId - int
+                                                      N''        -- AttachmentName - nvarchar(300)
+                                                      );
+
+                                                  SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string CRM_LOG_ATTACHMENT_INSERT = @"INSERT dbo.CrmLogAttachment
+                                                          (
+                                                              CrmLogId,
+                                                              Attachment,
+                                                              AttachmentName,
+                                                              UserCreated,
+                                                              DateCreated,
+                                                              UserUpdated,
+                                                              DateUpdated,
+                                                              IsDeleted
+                                                          )
+                                                          VALUES
+                                                          (   @CrmLogId,         -- CrmLogId - int
+                                                              @Attachment,       -- Attachment - nvarchar(max)
+                                                              @AttachmentName,       -- AttachmentName - nvarchar(max)
+                                                              @UserCreated,         -- UserCreated - int
+                                                              GETDATE(), -- DateCreated - datetime
+                                                              @UserUpdated,         -- UserUpdated - int
+                                                              GETDATE(), -- DateUpdated - datetime
+                                                              0       -- IsDeleted - bit
+                                                              )";
+
         public const string CRM_GET_LOGS = @"SELECT Id,
                                                     CrmId,
                                                     UserId,

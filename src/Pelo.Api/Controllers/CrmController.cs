@@ -117,7 +117,7 @@ namespace Pelo.Api.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPut]
+        [HttpPost]
         [Route("api/crm/comment")]
         public async Task<ActionResult<bool>> Comment([FromForm] CommentCrmRequest request)
         {
@@ -136,5 +136,6 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _crmService.GetCrmLogs(await GetUserId(), id));
         }
+
     }
 }
