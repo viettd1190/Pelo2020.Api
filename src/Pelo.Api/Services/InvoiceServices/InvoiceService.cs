@@ -9,6 +9,8 @@ using Pelo.Api.Services.MasterServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.Invoice;
 using Pelo.Common.Dtos.User;
+using Pelo.Common.Events.Invoice;
+using Pelo.Common.Kafka;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
@@ -37,7 +39,9 @@ namespace Pelo.Api.Services.InvoiceServices
 
         private readonly IUserService _userService;
 
-        private IProductService _productService;
+        private readonly IBusPublisher _busPublisher;
+
+        private readonly IProductService _productService;
 
         public InvoiceService(IDapperReadOnlyRepository readOnlyRepository,
                               IDapperWriteRepository writeRepository,
@@ -45,14 +49,16 @@ namespace Pelo.Api.Services.InvoiceServices
                               IRoleService roleService,
                               IUserService userService,
                               IProductService productService,
-                              IAppConfigService appConfigService) : base(readOnlyRepository,
-                                                                         writeRepository,
-                                                                         context)
+                              IAppConfigService appConfigService,
+                              IBusPublisher busPublisher) : base(readOnlyRepository,
+                                                                 writeRepository,
+                                                                 context)
         {
             _roleService = roleService;
             _appConfigService = appConfigService;
             _userService = userService;
             _productService = productService;
+            _busPublisher = busPublisher;
         }
 
         #region IInvoiceService Members
@@ -241,7 +247,7 @@ namespace Pelo.Api.Services.InvoiceServices
                     var invoiceCode = await BuildInvoiceCode(DateTime.Now);
                     var invoiceStatusId = await GetDefaultInvoiceStatus();
                     int totalAmount = 0;
-                    if(request.Products!=null)
+                    if(request.Products != null)
                     {
                         totalAmount = request.Products.Sum(c => c.Price * c.Quantity);
                     }
@@ -271,23 +277,23 @@ namespace Pelo.Api.Services.InvoiceServices
 
                         #region 1. Thêm sản phẩm
 
-                        if(request.Products!=null)
+                        if(request.Products != null)
                         {
                             foreach (var productInInvoiceRequest in request.Products)
                             {
                                 var product = await _productService.GetSimpleById(productInInvoiceRequest.Id);
-                                if (product != null)
+                                if(product != null)
                                 {
                                     await WriteRepository.ExecuteAsync(SqlQuery.PRODUCT_IN_INVOICE_INSERT,
                                                                        new
                                                                        {
                                                                                ProductId = productInInvoiceRequest.Id,
                                                                                InvoiceId = invoiceId,
-                                                                               Price = productInInvoiceRequest.Price,
-                                                                               Quantity = productInInvoiceRequest.Quantity,
-                                                                               ImportPrice = product.ImportPrice,
+                                                                               productInInvoiceRequest.Price,
+                                                                               productInInvoiceRequest.Quantity,
+                                                                               product.ImportPrice,
                                                                                ProductName = product.Name,
-                                                                               Description = productInInvoiceRequest.Description,
+                                                                               productInInvoiceRequest.Description,
                                                                                UserCreated = userId,
                                                                                UserUpdated = userId
                                                                        });
@@ -299,57 +305,67 @@ namespace Pelo.Api.Services.InvoiceServices
 
                         #region 2. Thêm thông báo
 
-                        List<int> receiveNotificationUserIds=new List<int>();
-
-                        #region 2.1. Kiểm tra xem user admin có trong danh sách người nhận thông báo không, nếu  không có thì thêm vào
-
-                        var adminUserId = await _userService.GetByUsername("admin");
-                        if (adminUserId.IsSuccess)
-                        {
-                            receiveNotificationUserIds.Add(adminUserId.Data.Id);
-                        }
+                        await _busPublisher.SendEventAsync(new InvoiceInsertSuccessEvent
+                                                           {
+                                                                   Id = invoiceId,
+                                                                   Code = invoiceCode
+                                                           });
 
                         #endregion
 
-                        #region 4.2. Thêm danh sách tài khoản mặc định nhận thông báo Crm
+                        //#region 2. Thêm thông báo
 
-                        var notificationUserInvoicesResponse = await _appConfigService.GetByName("NotificationInvoiceUsers");
-                        if (notificationUserInvoicesResponse != null)
-                        {
-                            if (!string.IsNullOrEmpty(notificationUserInvoicesResponse.Data))
-                            {
-                                var notificationUSerCrms = notificationUserInvoicesResponse.Data.Split(' ');
-                                if (notificationUSerCrms.Any())
-                                {
-                                    foreach (var notificationUSerCrm in notificationUSerCrms)
-                                    {
-                                        var notificationUser = await _userService.GetByUsername(notificationUSerCrm);
-                                        if (notificationUser.IsSuccess)
-                                        {
-                                            if (!receiveNotificationUserIds.Contains(notificationUser.Data.Id))
-                                            {
-                                                receiveNotificationUserIds.Add(notificationUser.Data.Id);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        //List<int> receiveNotificationUserIds=new List<int>();
 
-                        #endregion
+                        //#region 2.1. Kiểm tra xem user admin có trong danh sách người nhận thông báo không, nếu  không có thì thêm vào
 
-                        var resultNotification = await Notify(userId,
-                                                              receiveNotificationUserIds,
-                                                              "đã thêm đơn hàng mới",
-                                                              string.Empty,
-                                                              invoiceCode,
-                                                              invoiceId);
-                        //if (!resultNotification.IsSuccess)
+                        //var adminUserId = await _userService.GetByUsername("admin");
+                        //if (adminUserId.IsSuccess)
                         //{
-                        //    Log(resultNotification.Message);
+                        //    receiveNotificationUserIds.Add(adminUserId.Data.Id);
                         //}
 
-                        #endregion
+                        //#endregion
+
+                        //#region 4.2. Thêm danh sách tài khoản mặc định nhận thông báo Crm
+
+                        //var notificationUserInvoicesResponse = await _appConfigService.GetByName("NotificationInvoiceUsers");
+                        //if (notificationUserInvoicesResponse != null)
+                        //{
+                        //    if (!string.IsNullOrEmpty(notificationUserInvoicesResponse.Data))
+                        //    {
+                        //        var notificationUSerCrms = notificationUserInvoicesResponse.Data.Split(' ');
+                        //        if (notificationUSerCrms.Any())
+                        //        {
+                        //            foreach (var notificationUSerCrm in notificationUSerCrms)
+                        //            {
+                        //                var notificationUser = await _userService.GetByUsername(notificationUSerCrm);
+                        //                if (notificationUser.IsSuccess)
+                        //                {
+                        //                    if (!receiveNotificationUserIds.Contains(notificationUser.Data.Id))
+                        //                    {
+                        //                        receiveNotificationUserIds.Add(notificationUser.Data.Id);
+                        //                    }
+                        //                }
+                        //            }
+                        //        }
+                        //    }
+                        //}
+
+                        //#endregion
+
+                        //var resultNotification = await Notify(userId,
+                        //                                      receiveNotificationUserIds,
+                        //                                      "đã thêm đơn hàng mới",
+                        //                                      string.Empty,
+                        //                                      invoiceCode,
+                        //                                      invoiceId);
+                        ////if (!resultNotification.IsSuccess)
+                        ////{
+                        ////    Log(resultNotification.Message);
+                        ////}
+
+                        //#endregion
 
                         //#region 5. Thêm lịch sử chỉnh sửa Crm
 
@@ -408,7 +424,7 @@ namespace Pelo.Api.Services.InvoiceServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if (checkPermission.IsSuccess)
+                if(checkPermission.IsSuccess)
                 {
                     return await Ok(true);
                 }
@@ -525,7 +541,7 @@ namespace Pelo.Api.Services.InvoiceServices
 
             if(!string.IsNullOrEmpty(whereBuilder.ToString()))
             {
-                sqlBuilder.AppendFormat( "WHERE {0} ",
+                sqlBuilder.AppendFormat("WHERE {0} ",
                                         whereBuilder);
             }
 
@@ -583,7 +599,7 @@ namespace Pelo.Api.Services.InvoiceServices
             {
                 var invoicePrefixResponse = await _appConfigService.GetByName("InvoicePrefix");
                 string invoicePrefix = "HD";
-                if (invoicePrefixResponse.IsSuccess)
+                if(invoicePrefixResponse.IsSuccess)
                 {
                     invoicePrefix = invoicePrefixResponse.Data;
                 }
@@ -594,7 +610,7 @@ namespace Pelo.Api.Services.InvoiceServices
                                                                                             {
                                                                                                     Code = $"{code}%"
                                                                                             });
-                if (countResponses.IsSuccess)
+                if(countResponses.IsSuccess)
                 {
                     return $"{code}{(countResponses.Data + 1):000}";
                 }
@@ -617,7 +633,7 @@ namespace Pelo.Api.Services.InvoiceServices
                 int invoiceStatusId = 0;
                 if(defaultInvoiceStatus.IsSuccess)
                 {
-                    if(int.TryParse(defaultInvoiceStatus.Data,out invoiceStatusId))
+                    if(int.TryParse(defaultInvoiceStatus.Data, out invoiceStatusId))
                     {
                         return invoiceStatusId;
                     }

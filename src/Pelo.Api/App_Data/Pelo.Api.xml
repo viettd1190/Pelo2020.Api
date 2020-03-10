@@ -46,6 +46,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.AppConfigController.GetByName(System.String)">
+            <summary>
+                Get value of app config by name
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.BranchController.GetAll">
             <summary>
                 Lấy tất cả chi nhánh
@@ -1014,31 +1021,37 @@
         </member>
         <member name="M:Pelo.Api.Controllers.RoleController.GetPaging(Pelo.Common.Dtos.Role.GetRolePagingRequest)">
             <summary>
-                Lấy tất cả phường xã
+                Lấy tất cả role có phân trang
             </summary>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.RoleController.GetById(System.Int32)">
             <summary>
-                Lấy phường xã
+                Lấy role by id
             </summary>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.RoleController.Insert(Pelo.Common.Dtos.Role.InsertRole)">
             <summary>
-                insert phường xã
+                insert role
             </summary>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.RoleController.Update(Pelo.Common.Dtos.Role.UpdateRole)">
             <summary>
-                update phường xã
+                update role
             </summary>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.RoleController.Delete(System.Int32)">
             <summary>
-                delete phường xã
+                delete role
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.RoleController.GetCurrentRole">
+            <summary>
+                Lấy role name của user đăng nhập
             </summary>
             <returns></returns>
         </member>
