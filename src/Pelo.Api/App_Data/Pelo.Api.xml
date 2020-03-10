@@ -586,6 +586,13 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.InvoiceController.Insert(Pelo.Common.Dtos.Invoice.InsertInvoiceRequest)">
+            <summary>
+                Thêm mới đơn hàng
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.InvoiceStatusController.GetAll">
             <summary>
                 Lấy tất cả trạng thái đơn hàng

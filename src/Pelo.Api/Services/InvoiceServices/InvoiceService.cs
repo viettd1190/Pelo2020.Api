@@ -35,13 +35,13 @@ namespace Pelo.Api.Services.InvoiceServices
     {
         private readonly IAppConfigService _appConfigService;
 
-        private readonly IRoleService _roleService;
-
-        private readonly IUserService _userService;
-
         private readonly IBusPublisher _busPublisher;
 
         private readonly IProductService _productService;
+
+        private readonly IRoleService _roleService;
+
+        private readonly IUserService _userService;
 
         public InvoiceService(IDapperReadOnlyRepository readOnlyRepository,
                               IDapperWriteRepository writeRepository,
