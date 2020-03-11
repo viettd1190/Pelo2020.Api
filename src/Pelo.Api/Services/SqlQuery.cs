@@ -372,8 +372,8 @@
         public const string WARD_INSERT = @"INSERT dbo.Ward
                                                         (Type,
                                                          Name,                                                                                                                  
-                                                         DistrictId,                                                         
                                                          ProvinceId,                                                         
+                                                         DistrictId,                                                         
                                                          SortOrder,                                                         
                                                          UserCreated,
                                                          DateCreated,
