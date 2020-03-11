@@ -49,7 +49,7 @@ namespace Pelo.Api.Services.MasterServices
                     var data = await GetById(userId, id);
                     if (data.IsSuccess)
                     {
-                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.PROVINCE_DELETE,
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.DISTRICT_DELETE,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,

@@ -371,8 +371,9 @@
 
         public const string WARD_INSERT = @"INSERT dbo.Ward
                                                         (Type,
-                                                         Name,
+                                                         Name,                                                                                                                  
                                                          DistrictId,                                                         
+                                                         ProvinceId,                                                         
                                                          SortOrder,                                                         
                                                          UserCreated,
                                                          DateCreated,
@@ -381,6 +382,7 @@
                                                          IsDeleted)
                                                  VALUES (@Type,
                                                          @Name,
+                                                         @ProvinceId,                                                                                                                                                                           
                                                          @DistrictId,
                                                          @SortOrder,                                                         
                                                          @UserCreated,
@@ -394,6 +396,7 @@
                                                   SET Name = @Name,
                                                       Type = @Type,
                                                       DistrictId = @DistrictId,
+                                                      ProvinceId = @ProvinceId,
                                                       SortOrder = @SortOrder,                                                         
                                                       UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated
