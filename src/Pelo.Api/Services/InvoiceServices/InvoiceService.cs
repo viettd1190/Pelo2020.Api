@@ -262,7 +262,7 @@ namespace Pelo.Api.Services.InvoiceServices
                                                                                        request.PayMethodId,
                                                                                        Total = totalAmount,
                                                                                        request.Deposit,
-                                                                                       DeliveryCode = 0,
+                                                                                       DeliveryCost = 0,
                                                                                        request.Discount,
                                                                                        request.UserSellId,
                                                                                        request.DeliveryDate,
