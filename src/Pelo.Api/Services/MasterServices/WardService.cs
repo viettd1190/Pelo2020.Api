@@ -168,6 +168,7 @@ namespace Pelo.Api.Services.MasterServices
                                                                                                               {
                                                                                                                   request.Type,
                                                                                                                   request.Name,
+                                                                                                                  request.ProvinceId,
                                                                                                                   request.DistrictId,
                                                                                                                   request.SortOrder,
                                                                                                                   UserCreated = userId,
