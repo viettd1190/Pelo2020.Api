@@ -604,6 +604,11 @@ namespace Pelo.Api.Services.InvoiceServices
                     invoicePrefix = invoicePrefixResponse.Data;
                 }
 
+                if(string.IsNullOrEmpty(invoicePrefix))
+                {
+                    invoicePrefix = "HD";
+                }
+
                 var code = $"{invoicePrefix}{(date.Year % 100):00}{date.Month:00}{date.Day:00}";
                 var countResponses = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.INVOICE_COUNT_BY_DATE,
                                                                                             new
