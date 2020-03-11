@@ -284,19 +284,19 @@ namespace Pelo.Api.Services.InvoiceServices
                                 var product = await _productService.GetSimpleById(productInInvoiceRequest.Id);
                                 if(product != null)
                                 {
-                                    await WriteRepository.ExecuteAsync(SqlQuery.PRODUCT_IN_INVOICE_INSERT,
-                                                                       new
-                                                                       {
-                                                                               ProductId = productInInvoiceRequest.Id,
-                                                                               InvoiceId = invoiceId,
-                                                                               productInInvoiceRequest.Price,
-                                                                               productInInvoiceRequest.Quantity,
-                                                                               product.ImportPrice,
-                                                                               ProductName = product.Name,
-                                                                               productInInvoiceRequest.Description,
-                                                                               UserCreated = userId,
-                                                                               UserUpdated = userId
-                                                                       });
+                                    var resultAddProduct = await WriteRepository.ExecuteAsync(SqlQuery.PRODUCT_IN_INVOICE_INSERT,
+                                                                                              new
+                                                                                              {
+                                                                                                      ProductId = productInInvoiceRequest.Id,
+                                                                                                      InvoiceId = invoiceId,
+                                                                                                      productInInvoiceRequest.Price,
+                                                                                                      productInInvoiceRequest.Quantity,
+                                                                                                      product.ImportPrice,
+                                                                                                      ProductName = product.Name,
+                                                                                                      productInInvoiceRequest.Description,
+                                                                                                      UserCreated = userId,
+                                                                                                      UserUpdated = userId
+                                                                                              });
                                 }
                             }
                         }
@@ -308,7 +308,9 @@ namespace Pelo.Api.Services.InvoiceServices
                         await _busPublisher.SendEventAsync(new InvoiceInsertSuccessEvent
                                                            {
                                                                    Id = invoiceId,
-                                                                   Code = invoiceCode
+                                                                   Code = invoiceCode,
+                                                                   InvoiceStatusId = invoiceStatusId,
+                                                                   UserId = userId
                                                            });
 
                         #endregion
