@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Pelo.Api.Services.CrmServices;
 using Pelo.Api.Services.UserServices;
@@ -115,14 +117,27 @@ namespace Pelo.Api.Controllers
         /// <summary>
         ///     Them CRM Comment
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="paras"></param>
+        /// <param name="files"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("api/crm/comment")]
-        public async Task<ActionResult<bool>> Comment([FromForm] CommentCrmRequest request)
+        //public async Task<ActionResult<bool>> Comment([FromForm] CommentCrmRequest request)
+        public async Task<ActionResult<bool>> Comment([FromForm] string paras, [FromForm] IFormFileCollection files)
         {
+            var parametes = paras.Split('&');
+            int id = Convert.ToInt32(parametes[0]
+                                             .Replace("id=", ""));
+            string comment = parametes[1]
+                    .Replace("comment=", "");
+
             return Ok(await _crmService.Comment(await GetUserId(),
-                                                      request));
+                                                new CommentCrmRequest
+                                                {
+                                                        Id = id,
+                                                        Comment = comment,
+                                                        Files = files
+                                                }));
         }
 
         /// <summary>

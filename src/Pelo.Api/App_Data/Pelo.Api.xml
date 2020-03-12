@@ -212,11 +212,12 @@
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:Pelo.Api.Controllers.CrmController.Comment(Pelo.Common.Dtos.Crm.CommentCrmRequest)">
+        <member name="M:Pelo.Api.Controllers.CrmController.Comment(System.String,Microsoft.AspNetCore.Http.IFormFileCollection)">
             <summary>
                 Them CRM Comment
             </summary>
-            <param name="request"></param>
+            <param name="paras"></param>
+            <param name="files"></param>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.CrmController.GetLog(System.Int32)">

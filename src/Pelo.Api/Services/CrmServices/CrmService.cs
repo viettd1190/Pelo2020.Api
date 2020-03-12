@@ -910,7 +910,7 @@ namespace Pelo.Api.Services.CrmServices
         {
             try
             {
-                var crm = await ReadOnlyRepository.QueryFirstOrDefaultAsync<CrmDetailResponse>(SqlQuery.GET_CRM_BY_ID,
+                var crm = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCrmModelReponse>(SqlQuery.GET_CRM_BY_ID,
                                                                                                new
                                                                                                {
                                                                                                        request.Id
