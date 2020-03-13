@@ -87,11 +87,11 @@ namespace Pelo.Api.Services.CrmServices
 
         private readonly IBusPublisher _busPublisher;
 
+        private readonly IConfiguration _configuration;
+
         private readonly IRoleService _roleService;
 
         private readonly IUserService _userService;
-
-        private readonly IConfiguration _configuration;
 
         public CrmService(IDapperReadOnlyRepository readOnlyRepository,
                           IDapperWriteRepository writeRepository,
@@ -929,8 +929,11 @@ namespace Pelo.Api.Services.CrmServices
                                                                                new
                                                                                {
                                                                                        CrmId = request.Id,
-                                                                                       request.Comment,
-                                                                                       UserId = userId
+                                                                                       Comment = string.IsNullOrEmpty(request.Comment)
+                                                                                                         ? "đã đính kèm file"
+                                                                                                         : request.Comment,
+                                                                                       UserId = userId,
+                                                                                       crm.Data.CrmStatusId
                                                                                });
                         if(rs.IsSuccess)
                         {
@@ -967,6 +970,15 @@ namespace Pelo.Api.Services.CrmServices
                                                                                         });
                                     }
                                 }
+
+                                await _busPublisher.SendEventAsync(new CrmCommentSuccessEvent
+                                                                   {
+                                                                           Id = request.Id,
+                                                                           Code = crm.Data.Code,
+                                                                           Comment = request.Comment,
+                                                                           HasAttachmentFile = request.Files != null && request.Files.Any(),
+                                                                           UserId = userId
+                                                                   });
 
                                 return await Ok(true);
                             }
@@ -1080,55 +1092,6 @@ namespace Pelo.Api.Services.CrmServices
             {
                 return await Fail<bool>(exception);
             }
-        }
-
-        private async Task<TResponse<bool>> Notify(int userId,
-                                                   List<int> userReceiveIds,
-                                                   string title,
-                                                   string message,
-                                                   string code,
-                                                   int crmId)
-        {
-            return await Ok(true);
-            //try
-            //{
-            //    var disableNotifications = await _notificationService.DisableNotification();
-            //    if (disableNotifications.IsSuccess)
-            //    {
-            //        foreach (var userReceiveId in userReceiveIds)
-            //        {
-            //            InsertNotificationModel notification = new InsertNotificationModel
-            //            {
-            //                UserId = userId,
-            //                UserReceiveId = userReceiveId,
-            //                Title = $"{title} <b>{code}</b>",
-            //                Message = message,
-            //                Action = $"/Crm/Detail/{crmId}",
-            //                Type = (int)NotificationTypeEnum.CRM,
-            //                Status = userReceiveId == userId
-            //                                                                            ? 1
-            //                                                                            : 0
-            //            };
-            //            var result = await _notificationService.Add(notification);
-            //            if (result.IsSuccess)
-            //            {
-            //                KafkaHelper.PublishMessage(Constants.KAFKA_URL_SERVER,
-            //                                           Constants.TOPIC_UPDATE_NOTIFICATION,
-            //                                           new UpdateNotificationKafkaMessage
-            //                                           {
-            //                                               UserId = userReceiveId,
-            //                                               Status = UpdateUserNotificationEnum.INSERT
-            //                                           });
-            //            }
-            //        }
-            //    }
-
-            //    return await Fail<bool>(disableNotifications.Message);
-            //}
-            //catch (Exception exception)
-            //{
-            //    return await Fail<bool>(exception);
-            //}
         }
 
         private async Task<TResponse<string>> BuildCrmCode(DateTime date)

@@ -2448,8 +2448,8 @@ SELECT COUNT(*) FROM dbo.Role c
                                                       GETDATE(), -- LogDate - datetime
                                                       @UserId,         -- UserId - int
                                                       N'',       -- Attachment - nvarchar(50)
-                                                      0,         -- OldCrmStatusId - int
-                                                      0,         -- CrmStatusId - int
+                                                      @CrmStatusId,         -- OldCrmStatusId - int
+                                                      @CrmStatusId,         -- CrmStatusId - int
                                                       N''        -- AttachmentName - nvarchar(300)
                                                       );
 
