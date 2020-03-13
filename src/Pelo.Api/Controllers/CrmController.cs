@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Pelo.Api.Services.CrmServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.Crm;
+using Pelo.Common.Extensions;
 using Pelo.Common.Models;
 
 namespace Pelo.Api.Controllers
@@ -125,17 +127,22 @@ namespace Pelo.Api.Controllers
         //public async Task<ActionResult<bool>> Comment([FromForm] CommentCrmRequest request)
         public async Task<ActionResult<bool>> Comment([FromForm] string paras, [FromForm] IFormFileCollection files)
         {
-            var parametes = paras.Split('&');
-            int id = Convert.ToInt32(parametes[0]
-                                             .Replace("id=", ""));
-            string comment = parametes[1]
-                    .Replace("comment=", "");
+            //var parametes = paras.Split('&');
+            //int id = Convert.ToInt32(parametes[0]
+            //                                 .Replace("id=", ""));
+            //string comment = parametes[1]
+            //        .Replace("comment=", "");
+
+            var parameters = WebUtility.UrlDecode(paras)
+                                       .Replace("para=", "")
+                                       .ToObject<Tuple<int, string>>();
+            
 
             return Ok(await _crmService.Comment(await GetUserId(),
                                                 new CommentCrmRequest
                                                 {
-                                                        Id = id,
-                                                        Comment = comment,
+                                                        Id = parameters.Item1,
+                                                        Comment = parameters.Item2,
                                                         Files = files
                                                 }));
         }

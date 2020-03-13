@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Pelo.Api.Services.BaseServices;
 using Pelo.Api.Services.MasterServices;
 using Pelo.Api.Services.UserServices;
@@ -89,12 +91,15 @@ namespace Pelo.Api.Services.CrmServices
 
         private readonly IUserService _userService;
 
+        private readonly IConfiguration _configuration;
+
         public CrmService(IDapperReadOnlyRepository readOnlyRepository,
                           IDapperWriteRepository writeRepository,
                           IHttpContextAccessor context,
                           IRoleService roleService,
                           IAppConfigService appConfigService,
                           IUserService userService,
+                          IConfiguration configuration,
                           IBusPublisher busPublisher) : base(readOnlyRepository,
                                                              writeRepository,
                                                              context)
@@ -103,6 +108,7 @@ namespace Pelo.Api.Services.CrmServices
             _appConfigService = appConfigService;
             _userService = userService;
             _busPublisher = busPublisher;
+            _configuration = configuration;
         }
 
         #region ICrmService Members
@@ -911,10 +917,10 @@ namespace Pelo.Api.Services.CrmServices
             try
             {
                 var crm = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCrmModelReponse>(SqlQuery.GET_CRM_BY_ID,
-                                                                                               new
-                                                                                               {
-                                                                                                       request.Id
-                                                                                               });
+                                                                                                new
+                                                                                                {
+                                                                                                        request.Id
+                                                                                                });
                 if(crm.IsSuccess)
                 {
                     if(crm.Data != null)
@@ -933,7 +939,7 @@ namespace Pelo.Api.Services.CrmServices
                             {
                                 var crmLogId = rs.Data;
 
-                                var path = "\\wwwroot\\Attachments";
+                                var path = _configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "\\wwwroot\\Attachments";
 
                                 if(!Directory.Exists(path))
                                 {
