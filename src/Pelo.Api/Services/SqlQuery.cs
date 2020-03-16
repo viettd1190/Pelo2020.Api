@@ -2390,6 +2390,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                 ProductGroupId = @ProductGroupId,
                                                 CrmPriorityId = @CrmPriorityId,
                                                 CrmTypeId = @CrmTypeId,
+                                                CrmStatusId = @CrmStatusId,
                                                 Need = @Need,
                                                 Description = @Description,
                                                 CustomerSourceId = @CustomerSourceId,
@@ -2397,6 +2398,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                 UserUpdated = @UserUpdated,
                                                 DateUpdated = @DateUpdated
                                                WHERE Id = @Id";
+
         public const string STATUS_CRM_UPDATE = @"UPDATE dbo.Crm
                                             SET ContactDate = @ContactDate,
                                                 ProductGroupId = @ProductGroupId,
@@ -2709,8 +2711,6 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          FROM #tmpCrm;
                 
                                                          DROP TABLE #tmpCrm;";
-
-
 
         #endregion
 

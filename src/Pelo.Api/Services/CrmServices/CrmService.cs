@@ -710,6 +710,7 @@ namespace Pelo.Api.Services.CrmServices
                                                                             request.ContactDate,
                                                                             request.ProductGroupId,
                                                                             request.CrmTypeId,
+                                                                            request.CrmStatusId,
                                                                             request.Need,
                                                                             request.Description,
                                                                             request.CustomerSourceId,
@@ -722,39 +723,7 @@ namespace Pelo.Api.Services.CrmServices
                     {
                         if(result.Data > 0)
                         {
-                            if(oldInformation.Data.CrmPriorityId != request.CrmPriorityId)
-                            {
-                            }
-
-                            if(oldInformation.Data.CrmTypeId != request.CrmTypeId)
-                            {
-                            }
-
-                            if(oldInformation.Data.Visit != request.Visit)
-                            {
-                            }
-
-                            if(oldInformation.Data.Need != request.Need)
-                            {
-                            }
-
-                            if(oldInformation.Data.ProductGroupId != request.ProductGroupId)
-                            {
-                            }
-
-                            if(oldInformation.Data.CustomerSourceId != request.CustomerSourceId)
-                            {
-                            }
-
-                            if(oldInformation.Data.ContactDate != request.ContactDate)
-                            {
-                            }
-
-                            if(oldInformation.Data.Description != request.Description)
-                            {
-                            }
-
-                            var crmId = result.Data;
+                            var crmId = request.Id;
                             var crmUser = await ReadOnlyRepository.QueryAsync<CrmUserResponse>(SqlQuery.GET_CRM_USER_BY_CRMID,
                                                                                                new
                                                                                                {
@@ -778,12 +747,15 @@ namespace Pelo.Api.Services.CrmServices
                                 }
                             }
 
+                            List<int> userIds = new List<int>();
+
                             if(crmUser != null)
                             {
                                 if(request.UserIds.Any())
                                 {
                                     CrmUserResponse[] crmUserResponse = crmUser.Data.Where(c => c.CrmId == request.Id && !request.UserIds.Contains(c.UserId))
                                                                                .ToArray();
+                                    userIds.AddRange(crmUserResponse.Select(c => c.UserId));
                                     foreach (var item in crmUserResponse)
                                     {
                                         await WriteRepository.ExecuteAsync(SqlQuery.CRM_USER_DELETE,
@@ -842,6 +814,40 @@ namespace Pelo.Api.Services.CrmServices
                                                                                 });
                                 }
                             }
+
+                            await _busPublisher.SendEventAsync(new CrmUpdateSuccessEvent
+                                                               {
+                                                                       Id = oldInformation.Data.Id,
+                                                                       Code = oldInformation.Data.Code,
+                                                                       BeforeUpdated = new CrmUpdateSuccessModel
+                                                                                       {
+                                                                                               CrmStatusId = oldInformation.Data.CrmStatusId,
+                                                                                               ContactDate = oldInformation.Data.ContactDate,
+                                                                                               CrmPriorityId = oldInformation.Data.CrmPriorityId,
+                                                                                               CrmTypeId = oldInformation.Data.CrmTypeId,
+                                                                                               CustomerSourceId = oldInformation.Data.CustomerSourceId,
+                                                                                               Description = oldInformation.Data.Description,
+                                                                                               Need = oldInformation.Data.Need,
+                                                                                               ProductGroupId = oldInformation.Data.ProductGroupId,
+                                                                                               UserIds = userIds,
+                                                                                               Visit = oldInformation.Data.Visit
+                                                                                       },
+                                                                       AfterUpdated = new CrmUpdateSuccessModel
+                                                                                      {
+                                                                                              CrmStatusId = request.CrmStatusId,
+                                                                                              ContactDate = request.ContactDate,
+                                                                                              CrmPriorityId = request.CrmPriorityId,
+                                                                                              CrmTypeId = request.CrmTypeId,
+                                                                                              CustomerSourceId = request.CustomerSourceId,
+                                                                                              Description = request.Description,
+                                                                                              Need = request.Need,
+                                                                                              ProductGroupId = request.ProductGroupId,
+                                                                                              UserIds = request.UserIds,
+                                                                                              Visit = request.Visit
+                                                                                      },
+                                                                       Reason = "",
+                                                                       UserId = userId
+                                                               });
 
                             return await Ok(true);
                         }
