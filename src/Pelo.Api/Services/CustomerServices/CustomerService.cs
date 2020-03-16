@@ -330,7 +330,7 @@ namespace Pelo.Api.Services.CustomerServices
                                                                                                               });
                     if(result.IsSuccess)
                     {
-                        if(result.Data!=null)
+                        if(result.Data != null)
                         {
                             return await Ok(result.Data);
                         }
@@ -579,7 +579,7 @@ namespace Pelo.Api.Services.CustomerServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if (checkPermission.IsSuccess)
+                if(checkPermission.IsSuccess)
                 {
                     return await Ok(true);
                 }
