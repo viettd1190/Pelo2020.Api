@@ -499,26 +499,6 @@ namespace Pelo.Api.Services.CrmServices
                 var canGetPaging = await CanGetPaging(userId);
                 if(canGetPaging.IsSuccess)
                 {
-                    //bool canGetAll = false;
-
-                    //var canGetAllCrm = await _appConfigService.GetByName("DefaultCRMAcceptRoles");
-                    //if (canGetAllCrm.IsSuccess)
-                    //{
-                    //    var defaultRoles = canGetAllCrm.Data.Split(" ");
-                    //    var currentRole = await _roleService.GetNameByUserId(userId);
-                    //    if (currentRole.IsSuccess
-                    //       && !string.IsNullOrEmpty(currentRole.Data)
-                    //       && defaultRoles.Contains(currentRole.Data))
-                    //    {
-                    //        canGetAll = true;
-                    //    }
-                    //}
-
-                    //if (!canGetAll)
-                    //{
-                    //    request.UserCreatedId = userId;
-                    //}
-
                     var crmCodeResponse = await BuildCrmCode(DateTime.Now);
                     var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CRM_INSERT,
                                                                                new
@@ -547,24 +527,24 @@ namespace Pelo.Api.Services.CrmServices
 
                             #region 3. Thêm người liên quan
 
-                            #region 3.1. Kiểm tra xem người tạo có trong danh sách người liên quan không, nếu không có thì thêm vào
+                            //#region 3.1. Kiểm tra xem người tạo có trong danh sách người liên quan không, nếu không có thì thêm vào
 
-                            if(request.UserIds == null)
-                            {
-                                request.UserIds = new List<int>();
-                            }
+                            //if(request.UserIds == null)
+                            //{
+                            //    request.UserIds = new List<int>();
+                            //}
 
-                            if(!request.UserIds.Any())
-                            {
-                                request.UserIds.Add(userId);
-                            }
+                            //if(!request.UserIds.Any())
+                            //{
+                            //    request.UserIds.Add(userId);
+                            //}
 
-                            if(!request.UserIds.Contains(userId))
-                            {
-                                request.UserIds.Add(userId);
-                            }
+                            //if(!request.UserIds.Contains(userId))
+                            //{
+                            //    request.UserIds.Add(userId);
+                            //}
 
-                            #endregion
+                            //#endregion
 
                             if(request.UserIds != null)
                             {
@@ -762,7 +742,7 @@ namespace Pelo.Api.Services.CrmServices
                                                                            new
                                                                            {
                                                                                    CrmId = request.Id,
-                                                                                   UserId = item.Id
+                                                                                   UserId = item.UserId
                                                                            });
                                     }
 
