@@ -1632,6 +1632,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              c.Code,
                                                              c.Name,
                                                              c.Address,
+                                                             c.Email,
                                                              p.Type AS ProvinceType,
                                                              p.Name AS Province,
                                                              d.Type AS DistrictType,
@@ -1645,6 +1646,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              c.Phone2,
                                                              c.Phone3,
                                                              u.DisplayName AS UserCreated,
+                                                             u.PhoneNumber AS UserCreatedPhone,
                                                              c.DateCreated
                                                       FROM dbo.Customer c
                                                           LEFT JOIN dbo.Province p
