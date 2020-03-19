@@ -310,82 +310,11 @@ namespace Pelo.Api.Services.InvoiceServices
                                                                    Id = invoiceId,
                                                                    Code = invoiceCode,
                                                                    InvoiceStatusId = invoiceStatusId,
-                                                                   UserId = userId
+                                                                   UserId = userId,
+                                                                   CustomerId = request.CustomerId
                                                            });
 
                         #endregion
-
-                        //#region 2. Thêm thông báo
-
-                        //List<int> receiveNotificationUserIds=new List<int>();
-
-                        //#region 2.1. Kiểm tra xem user admin có trong danh sách người nhận thông báo không, nếu  không có thì thêm vào
-
-                        //var adminUserId = await _userService.GetByUsername("admin");
-                        //if (adminUserId.IsSuccess)
-                        //{
-                        //    receiveNotificationUserIds.Add(adminUserId.Data.Id);
-                        //}
-
-                        //#endregion
-
-                        //#region 4.2. Thêm danh sách tài khoản mặc định nhận thông báo Crm
-
-                        //var notificationUserInvoicesResponse = await _appConfigService.GetByName("NotificationInvoiceUsers");
-                        //if (notificationUserInvoicesResponse != null)
-                        //{
-                        //    if (!string.IsNullOrEmpty(notificationUserInvoicesResponse.Data))
-                        //    {
-                        //        var notificationUSerCrms = notificationUserInvoicesResponse.Data.Split(' ');
-                        //        if (notificationUSerCrms.Any())
-                        //        {
-                        //            foreach (var notificationUSerCrm in notificationUSerCrms)
-                        //            {
-                        //                var notificationUser = await _userService.GetByUsername(notificationUSerCrm);
-                        //                if (notificationUser.IsSuccess)
-                        //                {
-                        //                    if (!receiveNotificationUserIds.Contains(notificationUser.Data.Id))
-                        //                    {
-                        //                        receiveNotificationUserIds.Add(notificationUser.Data.Id);
-                        //                    }
-                        //                }
-                        //            }
-                        //        }
-                        //    }
-                        //}
-
-                        //#endregion
-
-                        //var resultNotification = await Notify(userId,
-                        //                                      receiveNotificationUserIds,
-                        //                                      "đã thêm đơn hàng mới",
-                        //                                      string.Empty,
-                        //                                      invoiceCode,
-                        //                                      invoiceId);
-                        ////if (!resultNotification.IsSuccess)
-                        ////{
-                        ////    Log(resultNotification.Message);
-                        ////}
-
-                        //#endregion
-
-                        //#region 5. Thêm lịch sử chỉnh sửa Crm
-
-                        //KafkaHelper.PublishMessage(Constants.KAFKA_URL_SERVER,
-                        //                           Constants.TOPIC_AUDIT_TABLE,
-                        //                           new AuditTableKafkaMessage<AuditCrm>
-                        //                           {
-                        //                               Table = AuditTableTypeEnum.CRM,
-                        //                               LogType = LogTypeEnum.INSERT,
-                        //                               Id = crmId,
-                        //                               OldValue = null,
-                        //                               Value = null,
-                        //                               Comment = string.Empty,
-                        //                               UserId = userId,
-                        //                               Attachments = new Dictionary<string, string>()
-                        //                           });
-
-                        //#endregion
 
                         return await Ok(true);
                     }
