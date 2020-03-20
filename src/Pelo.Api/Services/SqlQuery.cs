@@ -3232,6 +3232,46 @@ SELECT COUNT(*) FROM dbo.Role c
                                                               0       -- IsDeleted - bit
                                                               )";
 
+        public const string INVOICE_GET_BY_ID = @"SELECT i.Id,
+                                                         i.Code,
+                                                         i.DateCreated,
+                                                         i.CustomerId,
+                                                         i.DeliveryCost,
+                                                         i.DeliveryDate,
+                                                         i.Discount,
+                                                         i.Deposit,
+                                                         i.InvoiceStatusId,
+                                                         u1.DisplayName AS UserCreated,
+                                                         u1.PhoneNumber AS UserCreatedPhone,
+                                                         u2.DisplayName AS UserSell,
+                                                         u2.PhoneNumber AS UserSellPhone,
+                                                         p.Name AS PayMethod
+                                                  FROM dbo.Invoice i
+                                                      INNER JOIN dbo.[User] u1
+                                                          ON u1.Id = i.UserCreated
+                                                      INNER JOIN dbo.[User] u2
+                                                          ON u2.Id = i.UserSellId
+                                                      INNER JOIN dbo.PayMethod p
+                                                          ON p.Id = i.PayMethodId
+                                                  WHERE i.Id = @Id AND i.IsDeleted = 0;";
+
+        public const string GET_PRODUCTS_IN_INVOICE = @"SELECT ProductId AS Id,
+                                                               ProductName AS Name,
+                                                               ImportPrice,
+                                                               Price,
+                                                               Quantity
+                                                        FROM dbo.ProductInInvoice
+                                                        WHERE InvoiceId = @InvoiceId
+                                                              AND IsDeleted = 0;";
+
+        public const string GET_USERS_IN_INVOICE = @"SELECT u.DisplayName,
+                                                            u.PhoneNumber
+                                                     FROM dbo.UserInInvoice i
+                                                         INNER JOIN dbo.[User] u
+                                                             ON i.UserId = u.Id
+                                                                AND i.IsDeleted = 0
+                                                                AND i.Type = @Type
+                                                                AND i.InvoiceId = @InvoiceId;";
 
         #endregion
 

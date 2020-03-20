@@ -28,6 +28,9 @@ namespace Pelo.Api.Services.InvoiceServices
 
         Task<TResponse<bool>> Insert(int userId,
                                      InsertInvoiceRequest request);
+
+        Task<TResponse<GetInvoiceByIdResponse>> GetById(int userId,
+                                                        int id);
     }
 
     public class InvoiceService : BaseService,
