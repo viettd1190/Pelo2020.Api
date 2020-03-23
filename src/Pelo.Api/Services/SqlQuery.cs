@@ -3260,7 +3260,8 @@ SELECT COUNT(*) FROM dbo.Role c
                                                                ProductName AS Name,
                                                                ImportPrice,
                                                                Price,
-                                                               Quantity
+                                                               Quantity,
+                                                               Description
                                                         FROM dbo.ProductInInvoice
                                                         WHERE InvoiceId = @InvoiceId
                                                               AND IsDeleted = 0;";

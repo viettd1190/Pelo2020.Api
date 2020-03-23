@@ -333,6 +333,71 @@ namespace Pelo.Api.Services.InvoiceServices
             }
         }
 
+        public async Task<TResponse<GetInvoiceByIdResponse>> GetById(int userId,
+                                                                     int id)
+        {
+            try
+            {
+                var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetInvoiceByIdResponse>(SqlQuery.INVOICE_GET_BY_ID, new
+                                                                                                                                   {
+                                                                                                                                           Id = id
+                                                                                                                                   });
+                if(result.IsSuccess)
+                {
+                    if(result.Data != null)
+                    {
+                        var invoice = result.Data;
+
+                        invoice.Products = new List<ProductInInvoice>();
+                        invoice.UserCares = new List<UserDisplaySimpleModel>();
+                        invoice.UserDeliveries = new List<UserDisplaySimpleModel>();
+
+                        var products = await ReadOnlyRepository.QueryAsync<ProductInInvoice>(SqlQuery.GET_PRODUCTS_IN_INVOICE, new
+                                                                                                                               {
+                                                                                                                                       InvoiceId = id
+                                                                                                                               });
+                        if(products.IsSuccess
+                           && products.Data != null)
+                        {
+                            invoice.Products.AddRange(products.Data);
+                        }
+
+                        var userCares = await ReadOnlyRepository.QueryAsync<UserDisplaySimpleModel>(SqlQuery.GET_USERS_IN_INVOICE, new
+                                                                                                                                   {
+                                                                                                                                           InvoiceId = id,
+                                                                                                                                           Type = 1
+                                                                                                                                   });
+                        if(userCares.IsSuccess
+                           && userCares.Data != null)
+                        {
+                            invoice.UserCares.AddRange(userCares.Data);
+                        }
+
+                        var userDeliveries = await ReadOnlyRepository.QueryAsync<UserDisplaySimpleModel>(SqlQuery.GET_USERS_IN_INVOICE, new
+                                                                                                                                        {
+                                                                                                                                                InvoiceId = id,
+                                                                                                                                                Type = 0
+                                                                                                                                        });
+                        if(userDeliveries.IsSuccess
+                           && userDeliveries.Data != null)
+                        {
+                            invoice.UserDeliveries.AddRange(userDeliveries.Data);
+                        }
+
+                        return await Ok(invoice);
+                    }
+
+                    return await Fail<GetInvoiceByIdResponse>("Not found");
+                }
+
+                return await Fail<GetInvoiceByIdResponse>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<GetInvoiceByIdResponse>(exception);
+            }
+        }
+
         #endregion
 
         private async Task<TResponse<bool>> CanGetPaging(int userId)
