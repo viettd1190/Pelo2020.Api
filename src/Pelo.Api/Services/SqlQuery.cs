@@ -3241,6 +3241,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          i.Discount,
                                                          i.Deposit,
                                                          i.InvoiceStatusId,
+                                                         i.Description,
                                                          u1.DisplayName AS UserCreated,
                                                          u1.PhoneNumber AS UserCreatedPhone,
                                                          u2.DisplayName AS UserSell,
