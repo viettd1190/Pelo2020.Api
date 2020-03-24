@@ -322,6 +322,7 @@ FROM dbo.District c
                                                         (Type,
                                                          Name,
                                                          DistrictId,                                                         
+                                                         ProvinceId,                                                         
                                                          SortOrder,                                                         
                                                          UserCreated,
                                                          DateCreated,
@@ -331,6 +332,7 @@ FROM dbo.District c
                                                  VALUES (@Type,
                                                          @Name,
                                                          @DistrictId,
+                                                         @ProvinceId,                                                         
                                                          @SortOrder,                                                         
                                                          @UserCreated,
                                                          @DateCreated,
@@ -343,6 +345,7 @@ FROM dbo.District c
                                                   SET Name = @Name,
                                                       Type = @Type,
                                                       DistrictId = @DistrictId,
+                                                      ProvinceId = @ProvinceId,
                                                       SortOrder = @SortOrder,                                                         
                                                       UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated
