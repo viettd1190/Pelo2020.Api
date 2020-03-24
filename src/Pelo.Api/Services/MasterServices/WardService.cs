@@ -170,7 +170,6 @@ namespace Pelo.Api.Services.MasterServices
                                                                                                                   request.Name,
                                                                                                                   request.ProvinceId,
                                                                                                                   request.DistrictId,
-                                                                                                                  request.ProvinceId,
                                                                                                                   request.SortOrder,
                                                                                                                   UserCreated = userId,
                                                                                                                   DateCreated = DateTime.Now,
