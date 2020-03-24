@@ -136,8 +136,8 @@ namespace Pelo.Api.Services.MasterServices
                                                                                                                          request.SortDir.ToUpper()),
                                                                                                               new
                                                                                                               {
-                                                                                                                  request.Name,
-                                                                                                                  request.Hotline,
+                                                                                                                  Name = $"%{request.Name}%",
+                                                                                                                  Hotline = $"%{request.Hotline}%",
                                                                                                                   request.ProvinceId,
                                                                                                                   request.DistrictId,
                                                                                                                   request.WardId,
@@ -209,6 +209,7 @@ namespace Pelo.Api.Services.MasterServices
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Id,
+                                                                                                                  request.Name,
                                                                                                                   request.ProvinceId,
                                                                                                                   request.DistrictId,
                                                                                                                   request.Hotline,

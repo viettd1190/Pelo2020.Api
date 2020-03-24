@@ -9,6 +9,8 @@ using Pelo.Api.Services.MasterServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.Invoice;
 using Pelo.Common.Dtos.User;
+using Pelo.Common.Events.Invoice;
+using Pelo.Common.Kafka;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
@@ -26,6 +28,9 @@ namespace Pelo.Api.Services.InvoiceServices
 
         Task<TResponse<bool>> Insert(int userId,
                                      InsertInvoiceRequest request);
+
+        Task<TResponse<GetInvoiceByIdResponse>> GetById(int userId,
+                                                        int id);
     }
 
     public class InvoiceService : BaseService,
@@ -33,11 +38,13 @@ namespace Pelo.Api.Services.InvoiceServices
     {
         private readonly IAppConfigService _appConfigService;
 
+        private readonly IBusPublisher _busPublisher;
+
+        private readonly IProductService _productService;
+
         private readonly IRoleService _roleService;
 
         private readonly IUserService _userService;
-
-        private IProductService _productService;
 
         public InvoiceService(IDapperReadOnlyRepository readOnlyRepository,
                               IDapperWriteRepository writeRepository,
@@ -45,14 +52,16 @@ namespace Pelo.Api.Services.InvoiceServices
                               IRoleService roleService,
                               IUserService userService,
                               IProductService productService,
-                              IAppConfigService appConfigService) : base(readOnlyRepository,
-                                                                         writeRepository,
-                                                                         context)
+                              IAppConfigService appConfigService,
+                              IBusPublisher busPublisher) : base(readOnlyRepository,
+                                                                 writeRepository,
+                                                                 context)
         {
             _roleService = roleService;
             _appConfigService = appConfigService;
             _userService = userService;
             _productService = productService;
+            _busPublisher = busPublisher;
         }
 
         #region IInvoiceService Members
@@ -151,6 +160,8 @@ namespace Pelo.Api.Services.InvoiceServices
         {
             try
             {
+                userId = 1;
+
                 var canGetPaging = await CanGetPaging(userId);
                 if(canGetPaging.IsSuccess)
                 {
@@ -239,7 +250,7 @@ namespace Pelo.Api.Services.InvoiceServices
                     var invoiceCode = await BuildInvoiceCode(DateTime.Now);
                     var invoiceStatusId = await GetDefaultInvoiceStatus();
                     int totalAmount = 0;
-                    if(request.Products!=null)
+                    if(request.Products != null)
                     {
                         totalAmount = request.Products.Sum(c => c.Price * c.Quantity);
                     }
@@ -254,7 +265,7 @@ namespace Pelo.Api.Services.InvoiceServices
                                                                                        request.PayMethodId,
                                                                                        Total = totalAmount,
                                                                                        request.Deposit,
-                                                                                       DeliveryCode = 0,
+                                                                                       DeliveryCost = 0,
                                                                                        request.Discount,
                                                                                        request.UserSellId,
                                                                                        request.DeliveryDate,
@@ -269,26 +280,26 @@ namespace Pelo.Api.Services.InvoiceServices
 
                         #region 1. Thêm sản phẩm
 
-                        if(request.Products!=null)
+                        if(request.Products != null)
                         {
                             foreach (var productInInvoiceRequest in request.Products)
                             {
                                 var product = await _productService.GetSimpleById(productInInvoiceRequest.Id);
-                                if (product != null)
+                                if(product != null)
                                 {
-                                    await WriteRepository.ExecuteAsync(SqlQuery.PRODUCT_IN_INVOICE_INSERT,
-                                                                       new
-                                                                       {
-                                                                               ProductId = productInInvoiceRequest.Id,
-                                                                               InvoiceId = invoiceId,
-                                                                               Price = productInInvoiceRequest.Price,
-                                                                               Quantity = productInInvoiceRequest.Quantity,
-                                                                               ImportPrice = product.ImportPrice,
-                                                                               ProductName = product.Name,
-                                                                               Description = productInInvoiceRequest.Description,
-                                                                               UserCreated = userId,
-                                                                               UserUpdated = userId
-                                                                       });
+                                    var resultAddProduct = await WriteRepository.ExecuteAsync(SqlQuery.PRODUCT_IN_INVOICE_INSERT,
+                                                                                              new
+                                                                                              {
+                                                                                                      ProductId = productInInvoiceRequest.Id,
+                                                                                                      InvoiceId = invoiceId,
+                                                                                                      productInInvoiceRequest.Price,
+                                                                                                      productInInvoiceRequest.Quantity,
+                                                                                                      product.ImportPrice,
+                                                                                                      ProductName = product.Name,
+                                                                                                      productInInvoiceRequest.Description,
+                                                                                                      UserCreated = userId,
+                                                                                                      UserUpdated = userId
+                                                                                              });
                                 }
                             }
                         }
@@ -297,75 +308,16 @@ namespace Pelo.Api.Services.InvoiceServices
 
                         #region 2. Thêm thông báo
 
-                        List<int> receiveNotificationUserIds=new List<int>();
-
-                        #region 2.1. Kiểm tra xem user admin có trong danh sách người nhận thông báo không, nếu  không có thì thêm vào
-
-                        var adminUserId = await _userService.GetByUsername("admin");
-                        if (adminUserId.IsSuccess)
-                        {
-                            receiveNotificationUserIds.Add(adminUserId.Data.Id);
-                        }
-
-                        #endregion
-
-                        #region 4.2. Thêm danh sách tài khoản mặc định nhận thông báo Crm
-
-                        var notificationUserInvoicesResponse = await _appConfigService.GetByName("NotificationInvoiceUsers");
-                        if (notificationUserInvoicesResponse != null)
-                        {
-                            if (!string.IsNullOrEmpty(notificationUserInvoicesResponse.Data))
-                            {
-                                var notificationUSerCrms = notificationUserInvoicesResponse.Data.Split(' ');
-                                if (notificationUSerCrms.Any())
-                                {
-                                    foreach (var notificationUSerCrm in notificationUSerCrms)
-                                    {
-                                        var notificationUser = await _userService.GetByUsername(notificationUSerCrm);
-                                        if (notificationUser.IsSuccess)
-                                        {
-                                            if (!receiveNotificationUserIds.Contains(notificationUser.Data.Id))
-                                            {
-                                                receiveNotificationUserIds.Add(notificationUser.Data.Id);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        await _busPublisher.SendEventAsync(new InvoiceInsertSuccessEvent
+                                                           {
+                                                                   Id = invoiceId,
+                                                                   Code = invoiceCode,
+                                                                   InvoiceStatusId = invoiceStatusId,
+                                                                   UserId = userId,
+                                                                   CustomerId = request.CustomerId
+                                                           });
 
                         #endregion
-
-                        var resultNotification = await Notify(userId,
-                                                              receiveNotificationUserIds,
-                                                              "đã thêm đơn hàng mới",
-                                                              string.Empty,
-                                                              invoiceCode,
-                                                              invoiceId);
-                        //if (!resultNotification.IsSuccess)
-                        //{
-                        //    Log(resultNotification.Message);
-                        //}
-
-                        #endregion
-
-                        //#region 5. Thêm lịch sử chỉnh sửa Crm
-
-                        //KafkaHelper.PublishMessage(Constants.KAFKA_URL_SERVER,
-                        //                           Constants.TOPIC_AUDIT_TABLE,
-                        //                           new AuditTableKafkaMessage<AuditCrm>
-                        //                           {
-                        //                               Table = AuditTableTypeEnum.CRM,
-                        //                               LogType = LogTypeEnum.INSERT,
-                        //                               Id = crmId,
-                        //                               OldValue = null,
-                        //                               Value = null,
-                        //                               Comment = string.Empty,
-                        //                               UserId = userId,
-                        //                               Attachments = new Dictionary<string, string>()
-                        //                           });
-
-                        //#endregion
 
                         return await Ok(true);
                     }
@@ -378,6 +330,71 @@ namespace Pelo.Api.Services.InvoiceServices
             catch (Exception exception)
             {
                 return await Fail<bool>(exception);
+            }
+        }
+
+        public async Task<TResponse<GetInvoiceByIdResponse>> GetById(int userId,
+                                                                     int id)
+        {
+            try
+            {
+                var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetInvoiceByIdResponse>(SqlQuery.INVOICE_GET_BY_ID, new
+                                                                                                                                   {
+                                                                                                                                           Id = id
+                                                                                                                                   });
+                if(result.IsSuccess)
+                {
+                    if(result.Data != null)
+                    {
+                        var invoice = result.Data;
+
+                        invoice.Products = new List<ProductInInvoice>();
+                        invoice.UserCares = new List<UserDisplaySimpleModel>();
+                        invoice.UserDeliveries = new List<UserDisplaySimpleModel>();
+
+                        var products = await ReadOnlyRepository.QueryAsync<ProductInInvoice>(SqlQuery.GET_PRODUCTS_IN_INVOICE, new
+                                                                                                                               {
+                                                                                                                                       InvoiceId = id
+                                                                                                                               });
+                        if(products.IsSuccess
+                           && products.Data != null)
+                        {
+                            invoice.Products.AddRange(products.Data);
+                        }
+
+                        var userCares = await ReadOnlyRepository.QueryAsync<UserDisplaySimpleModel>(SqlQuery.GET_USERS_IN_INVOICE, new
+                                                                                                                                   {
+                                                                                                                                           InvoiceId = id,
+                                                                                                                                           Type = 1
+                                                                                                                                   });
+                        if(userCares.IsSuccess
+                           && userCares.Data != null)
+                        {
+                            invoice.UserCares.AddRange(userCares.Data);
+                        }
+
+                        var userDeliveries = await ReadOnlyRepository.QueryAsync<UserDisplaySimpleModel>(SqlQuery.GET_USERS_IN_INVOICE, new
+                                                                                                                                        {
+                                                                                                                                                InvoiceId = id,
+                                                                                                                                                Type = 0
+                                                                                                                                        });
+                        if(userDeliveries.IsSuccess
+                           && userDeliveries.Data != null)
+                        {
+                            invoice.UserDeliveries.AddRange(userDeliveries.Data);
+                        }
+
+                        return await Ok(invoice);
+                    }
+
+                    return await Fail<GetInvoiceByIdResponse>("Not found");
+                }
+
+                return await Fail<GetInvoiceByIdResponse>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<GetInvoiceByIdResponse>(exception);
             }
         }
 
@@ -406,7 +423,7 @@ namespace Pelo.Api.Services.InvoiceServices
             try
             {
                 var checkPermission = await _roleService.CheckPermission(userId);
-                if (checkPermission.IsSuccess)
+                if(checkPermission.IsSuccess)
                 {
                     return await Ok(true);
                 }
@@ -435,72 +452,72 @@ namespace Pelo.Api.Services.InvoiceServices
             {
                 whereBuilder.AppendFormat("{0}ISNULL(c.Code, '') LIKE @CustomerCode ",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(!string.IsNullOrEmpty(request.CustomerName))
             {
                 whereBuilder.AppendFormat("{0}ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(!string.IsNullOrEmpty(request.CustomerPhone))
             {
                 whereBuilder.AppendFormat("{0}(ISNULL(c.Phone, '') LIKE @CustomerPhone OR ISNULL(c.Phone2, '') LIKE @CustomerPhone OR ISNULL(c.Phone3, '') LIKE @CustomerPhone)",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(!string.IsNullOrEmpty(request.Code))
             {
                 whereBuilder.AppendFormat("{0}i.Code LIKE @Code",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(request.BranchId > 0)
             {
                 whereBuilder.AppendFormat("{0}ISNULL(i.BranchId, 0) = @BranchId",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(request.InvoiceStatusId > 0)
             {
                 whereBuilder.AppendFormat("{0}ISNULL(i.InvoiceStatusId, 0) = @InvoiceStatusId",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             var isDefaultInvoiceRoles = await _userService.IsBelongDefaultInvoiceRole(userId);
             if(!isDefaultInvoiceRoles.IsSuccess)
             {
-                whereBuilder.AppendFormat("{0}(i.UserCreatedId = @UserCreatedId OR i.UserSellId = @UserSellId OR uii.UserId = @UserDeliveryId)",
+                whereBuilder.AppendFormat("{0}(i.UserCreated = @UserCreatedId OR i.UserSellId = @UserSellId OR uii.UserId = @UserDeliveryId)",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
             else
             {
                 if(request.UserCreatedId > 0)
                 {
-                    whereBuilder.AppendFormat("{0}i.UserCreatedId = @UserCreatedId",
+                    whereBuilder.AppendFormat("{0}i.UserCreated = @UserCreatedId",
                                               whereCondition);
-                    whereCondition = "AND ";
+                    whereCondition = " AND ";
                 }
 
                 if(request.UserSellId > 0)
                 {
                     whereBuilder.AppendFormat("{0}i.UserSellId = @UserSellId",
                                               whereCondition);
-                    whereCondition = "AND ";
+                    whereCondition = " AND ";
                 }
 
                 if(request.UserDeliveryId > 0)
                 {
                     whereBuilder.AppendFormat("{0}uii.UserId = @UserDeliveryId AND uii.Type = 0",
                                               whereCondition);
-                    whereCondition = "AND ";
+                    whereCondition = " AND ";
                 }
             }
 
@@ -508,14 +525,14 @@ namespace Pelo.Api.Services.InvoiceServices
             {
                 whereBuilder.AppendFormat("{0}i.DateCreated >= @FromDate",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             if(request.ToDate != null)
             {
                 whereBuilder.AppendFormat("{0}i.DateCreated <= @ToDate",
                                           whereCondition);
-                whereCondition = "AND ";
+                whereCondition = " AND ";
             }
 
             whereBuilder.AppendFormat("{0}i.IsDeleted = 0 AND c.IsDeleted = 0 AND uii.IsDeleted = 0",
@@ -581,9 +598,14 @@ namespace Pelo.Api.Services.InvoiceServices
             {
                 var invoicePrefixResponse = await _appConfigService.GetByName("InvoicePrefix");
                 string invoicePrefix = "HD";
-                if (invoicePrefixResponse.IsSuccess)
+                if(invoicePrefixResponse.IsSuccess)
                 {
                     invoicePrefix = invoicePrefixResponse.Data;
+                }
+
+                if(string.IsNullOrEmpty(invoicePrefix))
+                {
+                    invoicePrefix = "HD";
                 }
 
                 var code = $"{invoicePrefix}{(date.Year % 100):00}{date.Month:00}{date.Day:00}";
@@ -592,7 +614,7 @@ namespace Pelo.Api.Services.InvoiceServices
                                                                                             {
                                                                                                     Code = $"{code}%"
                                                                                             });
-                if (countResponses.IsSuccess)
+                if(countResponses.IsSuccess)
                 {
                     return $"{code}{(countResponses.Data + 1):000}";
                 }
@@ -615,7 +637,7 @@ namespace Pelo.Api.Services.InvoiceServices
                 int invoiceStatusId = 0;
                 if(defaultInvoiceStatus.IsSuccess)
                 {
-                    if(int.TryParse(defaultInvoiceStatus.Data,out invoiceStatusId))
+                    if(int.TryParse(defaultInvoiceStatus.Data, out invoiceStatusId))
                     {
                         return invoiceStatusId;
                     }

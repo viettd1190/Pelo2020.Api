@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pelo.Api.Services.MasterServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.AppConfig;
+using Pelo.Common.Models;
 
 namespace Pelo.Api.Controllers
 {
@@ -82,6 +83,18 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _appConfigService.Delete(await GetUserId(),
                                                      id));
+        }
+
+        /// <summary>
+        ///     Get value of app config by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/app_config/get_by_name")]
+        public async Task<ActionResult<TResponse<string>>> GetByName(string name)
+        {
+            return Ok(await _appConfigService.GetByName(name));
         }
     }
 }

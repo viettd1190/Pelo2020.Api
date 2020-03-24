@@ -14,7 +14,8 @@ namespace Pelo.Api.Controllers
     {
         private readonly IRoleService _roleService;
 
-        public RoleController(IAccountService accountService, IRoleService roleService) : base(accountService)
+        public RoleController(IAccountService accountService,
+                              IRoleService roleService) : base(accountService)
         {
             _roleService = roleService;
         }
@@ -32,7 +33,7 @@ namespace Pelo.Api.Controllers
         }
 
         /// <summary>
-        ///     Lấy tất cả phường xã
+        ///     Lấy tất cả role có phân trang
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -41,8 +42,9 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _roleService.GetPaging(await GetUserId(), request));
         }
+
         /// <summary>
-        ///     Lấy phường xã
+        ///     Lấy role by id
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -51,8 +53,9 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _roleService.GetById(await GetUserId(), id));
         }
+
         /// <summary>
-        ///     insert phường xã
+        ///     insert role
         /// </summary>
         /// <returns></returns>
         [HttpPost]
@@ -63,7 +66,7 @@ namespace Pelo.Api.Controllers
         }
 
         /// <summary>
-        ///     update phường xã
+        ///     update role
         /// </summary>
         /// <returns></returns>
         [HttpPut]
@@ -72,8 +75,9 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _roleService.Update(await GetUserId(), request));
         }
+
         /// <summary>
-        ///     delete phường xã
+        ///     delete role
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
@@ -81,6 +85,17 @@ namespace Pelo.Api.Controllers
         public async Task<ActionResult<bool>> Delete(int id)
         {
             return Ok(await _roleService.Delete(await GetUserId(), id));
+        }
+
+        /// <summary>
+        ///     Lấy role name của user đăng nhập
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/role/get_current_role")]
+        public async Task<ActionResult<TResponse<string>>> GetCurrentRole()
+        {
+            return Ok(await _roleService.GetNameByUserId(await GetUserId()));
         }
     }
 }

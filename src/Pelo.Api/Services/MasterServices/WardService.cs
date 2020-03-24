@@ -134,7 +134,9 @@ namespace Pelo.Api.Services.MasterServices
                     var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWardPagingResponse, int>(SqlQuery.WARD_PAGING,
                                                                                                               new
                                                                                                               {
-                                                                                                                  request.Name,
+                                                                                                                  Name = $"%{request.Name}%",
+                                                                                                                  request.ProvinceId,
+                                                                                                                  request.DistrictId,
                                                                                                                   Skip = (request.Page - 1) * request.PageSize,
                                                                                                                   Take = request.PageSize
                                                                                                               });
@@ -166,6 +168,7 @@ namespace Pelo.Api.Services.MasterServices
                                                                                                               {
                                                                                                                   request.Type,
                                                                                                                   request.Name,
+                                                                                                                  request.ProvinceId,
                                                                                                                   request.DistrictId,
                                                                                                                   request.ProvinceId,
                                                                                                                   request.SortOrder,

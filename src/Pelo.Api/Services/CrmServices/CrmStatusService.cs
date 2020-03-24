@@ -134,13 +134,15 @@ namespace Pelo.Api.Services.CrmServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmStatusPagingResponse, int>(SqlQuery.CRM_STATUS_GET_BY_PAGING,
-                                                                                                              new
-                                                                                                              {
-                                                                                                                  request.Name,
-                                                                                                                  Skip = (request.Page - 1) * request.PageSize,
-                                                                                                                  Take = request.PageSize
-                                                                                                              });
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCrmStatusPagingResponse, int>(string.Format(SqlQuery.CRM_STATUS_GET_BY_PAGING,
+                                                                                                                              request.ColumnOrder,
+                                                                                                                              request.SortDir),
+                                                                                                                new
+                                                                                                                {
+                                                                                                                        Name = $"%{request.Name}%",
+                                                                                                                        Skip = (request.Page - 1) * request.PageSize,
+                                                                                                                        Take = request.PageSize
+                                                                                                                });
                     if (result.IsSuccess)
                     {
                         return await Ok(new PageResult<GetCrmStatusPagingResponse>(request.Page,
@@ -172,6 +174,8 @@ namespace Pelo.Api.Services.CrmServices
                                                                                                               {
                                                                                                                   request.Name,
                                                                                                                   request.Color,
+                                                                                                                  request.IsSendSms,
+                                                                                                                  request.SmsContent,
                                                                                                                   UserCreated = userId,
                                                                                                                   DateCreated = DateTime.Now,
                                                                                                                   UserUpdated = userId,
@@ -207,6 +211,8 @@ namespace Pelo.Api.Services.CrmServices
                                                                                                                   request.Id,
                                                                                                                   request.Name,
                                                                                                                   request.Color,
+                                                                                                                  request.IsSendSms,
+                                                                                                                  request.SmsContent,
                                                                                                                   UserUpdated = userId,
                                                                                                                   DateUpdated = DateTime.Now
                                                                                                               });

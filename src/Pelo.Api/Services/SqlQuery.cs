@@ -54,65 +54,66 @@
                                                   WHERE Id = @Id";
 
         public const string BRANCH_PAGING= @"SELECT c.Id,
-                                                              c.Name,
-                                                              c.Hotline,
-                                                              p.Name AS Province,
-                                                              d.Name AS District,
-                                                              w.Name AS Ward,
-                                                              c.Address,
-                                                              c.DateUpdated
-                                                       FROM dbo.Branch c
-                                                           LEFT JOIN dbo.Province p
-                                                               ON p.Id = c.ProvinceId
-                                                           LEFT JOIN dbo.District d
-                                                               ON d.Id = c.DistrictId
-                                                           LEFT JOIN dbo.Ward w
-                                                               ON w.Id = c.WardId
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND ISNULL(c.Hotline, '') LIKE @Hotline
-                                                             AND
-                                                             (
-                                                                 ISNULL(@ProvinceId, 0) = 0
-                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
-                                                             )
-                                                             AND
-                                                             (
-                                                                 ISNULL(@DistrictId, 0) = 0
-                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
-                                                             )
-                                                             AND
-                                                             (
-                                                                 ISNULL(@WardId, 0) = 0
-                                                                 OR ISNULL(c.WardId, 0) = @WardId
-                                                             )
-                                                             AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
-                                                SELECT COUNT(*)
-                                                   FROM dbo.Branch c
-                                                           LEFT JOIN dbo.Province p
-                                                               ON p.Id = c.ProvinceId
-                                                           LEFT JOIN dbo.District d
-                                                               ON d.Id = c.DistrictId
-                                                           LEFT JOIN dbo.Ward w
-                                                               ON w.Id = c.WardId
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND ISNULL(c.Hotline, '') LIKE @Hotline
-                                                             AND
-                                                             (
-                                                                 ISNULL(@ProvinceId, 0) = 0
-                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
-                                                             )
-                                                             AND
-                                                             (
-                                                                 ISNULL(@DistrictId, 0) = 0
-                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
-                                                             )
-                                                             AND
-                                                             (
-                                                                 ISNULL(@WardId, 0) = 0
-                                                                 OR ISNULL(c.WardId, 0) = @WardId
-                                                             )
-                                                             AND c.IsDeleted = 0";
+                                                    c.Name,
+                                                    c.Hotline,
+                                                    p.Type+' '+p.Name AS Province,
+                                                    d.Type+' '+d.Name AS District,
+                                                    w.Type+' '+w.Name AS Ward,
+                                                    c.Address,
+                                                    c.DateUpdated
+                                             FROM dbo.Branch c
+                                                 LEFT JOIN dbo.Province p
+                                                     ON p.Id = c.ProvinceId
+                                                 LEFT JOIN dbo.District d
+                                                     ON d.Id = c.DistrictId
+                                                 LEFT JOIN dbo.Ward w
+                                                     ON w.Id = c.WardId
+                                             WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                   AND ISNULL(c.Hotline, '') LIKE @Hotline
+                                                   AND
+                                                   (
+                                                       ISNULL(@ProvinceId, 0) = 0
+                                                       OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                   )
+                                                   AND
+                                                   (
+                                                       ISNULL(@DistrictId, 0) = 0
+                                                       OR ISNULL(c.DistrictId, 0) = @DistrictId
+                                                   )
+                                                   AND
+                                                   (
+                                                       ISNULL(@WardId, 0) = 0
+                                                       OR ISNULL(c.WardId, 0) = @WardId
+                                                   )
+                                                   AND c.IsDeleted = 0
+                                             ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                     
+                                             SELECT COUNT(*)
+                                             FROM dbo.Branch c
+                                                 LEFT JOIN dbo.Province p
+                                                     ON p.Id = c.ProvinceId
+                                                 LEFT JOIN dbo.District d
+                                                     ON d.Id = c.DistrictId
+                                                 LEFT JOIN dbo.Ward w
+                                                     ON w.Id = c.WardId
+                                             WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                   AND ISNULL(c.Hotline, '') LIKE @Hotline
+                                                   AND
+                                                   (
+                                                       ISNULL(@ProvinceId, 0) = 0
+                                                       OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                   )
+                                                   AND
+                                                   (
+                                                       ISNULL(@DistrictId, 0) = 0
+                                                       OR ISNULL(c.DistrictId, 0) = @DistrictId
+                                                   )
+                                                   AND
+                                                   (
+                                                       ISNULL(@WardId, 0) = 0
+                                                       OR ISNULL(c.WardId, 0) = @WardId
+                                                   )
+                                                   AND c.IsDeleted = 0;";
 
 
         #endregion
@@ -154,16 +155,65 @@
                                                   WHERE Id = @Id";
 
         public const string DEPARTMENT_PAGING = @"SELECT c.Id,
+                                                         c.Name
+                                                 FROM dbo.Department c
+                                                 WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                       AND c.IsDeleted = 0
+                                                 ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                 SELECT COUNT(*)
+                                                 FROM dbo.Department c
+                                                 WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                       AND c.IsDeleted = 0;";
+
+        #endregion
+
+        #region Manufacturer
+
+        public const string MANUFACTURER_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.Manufacturer
+                                                   WHERE IsDeleted = 0;";
+
+        public const string MANUFACTURER_GET_BY_ID = @"SELECT * FROM dbo.Manufacturer WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string MANUFACTURER_INSERT = @"INSERT dbo.Manufacturer
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string MANUFACTURER_UPDATE = @"  UPDATE dbo.Manufacturer
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string MANUFACTURER_DELETE = @"  UPDATE dbo.Manufacturer
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string MANUFACTURER_PAGING = @"SELECT c.Id,
                                                               c.Name,
                                                               c.DateUpdated
-                                                       FROM dbo.Department c
+                                                       FROM dbo.Manufacturer c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
                                                              AND c.IsDeleted = 0
                                                        ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
                                                        SELECT COUNT(*)
-                                                       FROM dbo.Department c
+                                                       FROM dbo.Manufacturer c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND c.IsDeleted = 0";
+                                                             AND c.IsDeleted = 0;";
 
         #endregion
 
@@ -223,7 +273,7 @@
                                                     SELECT COUNT(*) 
                                                     FROM dbo.Province c
                                                        WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND c.IsDeleted = 0";
+                                                             AND c.IsDeleted = 0;";
 
         #endregion
 
@@ -276,33 +326,34 @@
                                                   WHERE Id = @Id";
 
         public const string DISTRICT_PAGING = @"SELECT c.Id,
-                                                              c.Name,
-                                                              c.Type,
-                                                              c.SortOrder,
-                                                              p.Name AS Province,
-                                                              c.DateUpdated
-                                                       FROM dbo.District c
-                                                           LEFT JOIN dbo.ProvinceId p
-                                                               ON p.Id = c.ProvinceId
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND
-                                                             (
-                                                                 @ProvinceId = 0
-                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
-                                                             )
-                                                             AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
- SELECT COUNT(*) 
-FROM dbo.District c
-                                                           LEFT JOIN dbo.ProvinceId p
-                                                               ON p.Id = c.ProvinceId
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND
-                                                             (
-                                                                 @ProvinceId = 0
-                                                                 OR ISNULL(c.ProvinceId, 0) = @ProvinceId
-                                                             )
-                                                             AND c.IsDeleted = 0";
+                                                       c.Name,
+                                                       c.Type,
+                                                       c.SortOrder,
+                                                       p.Type+' '+p.Name AS Province,
+                                                       c.DateUpdated
+                                                FROM dbo.District c
+                                                    LEFT JOIN dbo.Province p
+                                                        ON p.Id = c.ProvinceId
+                                                WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                      AND
+                                                      (
+                                                          @ProvinceId = 0
+                                                          OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                      )
+                                                      AND c.IsDeleted = 0
+                                                ORDER BY p.SortOrder, c.SortOrder OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                SELECT COUNT(*)
+                                                FROM dbo.District c
+                                                    LEFT JOIN dbo.Province p
+                                                        ON p.Id = c.ProvinceId
+                                                WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                      AND
+                                                      (
+                                                          @ProvinceId = 0
+                                                          OR ISNULL(c.ProvinceId, 0) = @ProvinceId
+                                                      )
+                                                      AND c.IsDeleted = 0;";
 
         #endregion
 
@@ -320,7 +371,8 @@ FROM dbo.District c
 
         public const string WARD_INSERT = @"INSERT dbo.Ward
                                                         (Type,
-                                                         Name,
+                                                         Name,                                                                                                                  
+                                                         ProvinceId,                                                         
                                                          DistrictId,                                                         
                                                          ProvinceId,                                                         
                                                          SortOrder,                                                         
@@ -331,6 +383,7 @@ FROM dbo.District c
                                                          IsDeleted)
                                                  VALUES (@Type,
                                                          @Name,
+                                                         @ProvinceId,                                                                                                                                                                           
                                                          @DistrictId,
                                                          @ProvinceId,                                                         
                                                          @SortOrder,                                                         
@@ -358,32 +411,62 @@ FROM dbo.District c
                                                   WHERE Id = @Id";
 
         public const string WARD_PAGING = @"SELECT c.Id,
-                                                              c.Name,
-                                                              c.Type,
-                                                              c.SortOrder,
-                                                              d.Name AS District,
-                                                              c.DateUpdated
-                                                       FROM dbo.Ward c
-                                                           LEFT JOIN dbo.District d
-                                                               ON d.Id = c.DistrictId
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND
-                                                             (
-                                                                 @DistrictId = 0
-                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
-                                                             )
-                                                             AND c.IsDeleted = 0
-                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
-SELECT COUNT(*) FROM dbo.Ward c
-                                                           LEFT JOIN dbo.District d
-                                                               ON d.Id = c.DistrictId
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND
-                                                             (
-                                                                 @DistrictId = 0
-                                                                 OR ISNULL(c.DistrictId, 0) = @DistrictId
-                                                             )
-                                                             AND c.IsDeleted = 0";
+                                                   c.Name,
+                                                   c.Type,
+                                                   c.SortOrder,
+                                                   d.Type + ' ' + d.Name AS District,
+                                                   p.Type + ' ' + p.Name AS Province,
+                                                   c.DateUpdated
+                                            FROM dbo.Ward c
+                                                LEFT JOIN dbo.District d
+                                                    ON d.Id = c.DistrictId
+                                                LEFT JOIN dbo.Province p
+                                                    ON p.Id = c.ProvinceId
+                                            WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                  AND
+                                                  (
+                                                      @ProvinceId = 0
+                                                      OR
+                                                      (
+                                                          @ProvinceId > 0
+                                                          AND @DistrictId = 0
+                                                          AND c.ProvinceId = @ProvinceId
+                                                      )
+                                                      OR
+                                                      (
+                                                          @ProvinceId > 0
+                                                          AND @DistrictId > 0
+                                                          AND c.DistrictId = @DistrictId
+                                                      )
+                                                  )
+                                                  AND c.IsDeleted = 0
+                                            ORDER BY p.SortOrder,
+                                                     d.SortOrder,
+                                                     c.SortOrder OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                            SELECT COUNT(*)
+                                            FROM dbo.Ward c
+                                                LEFT JOIN dbo.District d
+                                                    ON d.Id = c.DistrictId
+                                                LEFT JOIN dbo.Province p
+                                                    ON p.Id = c.ProvinceId
+                                            WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                  AND
+                                                  (
+                                                      @ProvinceId = 0
+                                                      OR
+                                                      (
+                                                          @ProvinceId > 0
+                                                          AND @DistrictId = 0
+                                                          AND c.ProvinceId = @ProvinceId
+                                                      )
+                                                      OR
+                                                      (
+                                                          @ProvinceId > 0
+                                                          AND @DistrictId > 0
+                                                          AND c.DistrictId = @DistrictId
+                                                      )
+                                                  )
+                                                  AND c.IsDeleted = 0;";
 
         #endregion
 
@@ -655,6 +738,56 @@ SELECT COUNT(*) FROM dbo.ProductUnit c
 
         #endregion
 
+        #region ProductStatus
+
+        public const string PRODUCT_STATUS_GET_ALL = @"SELECT Id,
+                                                            Name
+                                                     FROM dbo.ProductStatus
+                                                     WHERE IsDeleted = 0
+                                                     ORDER BY Id;";
+
+        public const string PRODUCT_STATUS_GET_BY_ID = @"SELECT * FROM dbo.ProductStatus WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string PRODUCT_STATUS_INSERT = @"INSERT dbo.ProductStatus
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string PRODUCT_STATUS_UPDATE = @"  UPDATE dbo.ProductStatus
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string PRODUCT_STATUS_DELETE = @"  UPDATE dbo.ProductStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string PRODUCT_STATUS_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.DateUpdated
+                                                       FROM dbo.ProductStatus c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+SELECT COUNT(*) FROM dbo.ProductStatus c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0";
+
+        #endregion
+        
         #region CrmPriority
 
         public const string CRM_PRIORITY_GET_ALL = @"SELECT Id,
@@ -706,7 +839,7 @@ SELECT COUNT(*) FROM dbo.ProductUnit c
                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                             AND IsDeleted = 0;";
 
-        public const string CRM_PRIORITY_GET_BY_ID = @"SELECT * FROM dbo.InvoiceStatus WHERE Id = @Id AND IsDeleted = 0";
+        public const string CRM_PRIORITY_GET_BY_ID = @"SELECT * FROM dbo.CrmPriority WHERE Id = @Id AND IsDeleted = 0";
 
         #endregion
 
@@ -902,7 +1035,8 @@ SELECT COUNT(*) FROM dbo.ProductUnit c
                                                        AND IsDeleted = 0";
 
         public const string USER_GET_ALL = @"SELECT Id,
-                                                    DisplayName
+                                                    DisplayName,
+                                                    PhoneNumber
                                              FROM   dbo.[User]
                                              WHERE  IsDeleted = 0;";
 
@@ -1191,12 +1325,12 @@ SELECT COUNT(*) FROM dbo.Role c
 
         public const string CUSTOMER_VIP_CHECK_PROFIT_INVALID = @"SELECT Id
                                                                   FROM dbo.CustomerVip
-                                                                  WHERE Profit = @Profit
+                                                                  WHERE Id!=@Id AND Profit = @Profit
                                                                         AND IsDeleted = 0;";
 
         public const string CUSTOMER_VIP_CHJECK_NAME_INVALID = @"SELECT Id
                                                                  FROM dbo.CustomerVip
-                                                                 WHERE Name = @Name
+                                                                 WHERE Id!=@Id AND Name = @Name
                                                                        AND IsDeleted = 0;";
 
         public const string CUSTOMER_VIP_CHECK_PROFIT_INVALID_2 = @"SELECT Id
@@ -1216,6 +1350,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         Name,
                                                         Color,
                                                         Profit,
+                                                        SortOrder,
                                                         UserCreated,
                                                         DateCreated,
                                                         UserUpdated,
@@ -1226,6 +1361,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                     (   @Name,       -- Name - nvarchar(200)
                                                         @Color,       -- Color - nvarchar(10)
                                                         @Profit,         -- Profit - int
+                                                        @SortOrder,
                                                         @UserCreated,         -- UserCreated - int
                                                         GETDATE(), -- DateCreated - datetime
                                                         @UserUpdated,         -- UserUpdated - int
@@ -1237,6 +1373,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                     SET Name = @Name,
                                                         Color = @Color,
                                                         Profit = @Profit,
+                                                        SortOrder = @SortOrder,
                                                         UserUpdated = @UserUpdated,
                                                         DateUpdated = GETDATE()
                                                     WHERE Id = @Id
@@ -1279,9 +1416,9 @@ SELECT COUNT(*) FROM dbo.Role c
                                                               c.Phone2,
                                                               c.Phone3,
                                                               c.Email,
-                                                              p.Name AS Province,
-                                                              d.Name AS District,
-                                                              w.Name AS Ward,
+                                                              p.Type+' '+p.Name AS Province,
+                                                              d.Type+' '+d.Name AS District,
+                                                              w.Type+' '+w.Name AS Ward,
                                                               c.Address,
                                                               c.Description,
                                                               cg.Name AS CustomerGroup,
@@ -1497,6 +1634,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              c.Code,
                                                              c.Name,
                                                              c.Address,
+                                                             c.Email,
                                                              p.Type AS ProvinceType,
                                                              p.Name AS Province,
                                                              d.Type AS DistrictType,
@@ -1510,6 +1648,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              c.Phone2,
                                                              c.Phone3,
                                                              u.DisplayName AS UserCreated,
+                                                             u.PhoneNumber AS UserCreatedPhone,
                                                              c.DateCreated
                                                       FROM dbo.Customer c
                                                           LEFT JOIN dbo.Province p
@@ -1539,12 +1678,9 @@ SELECT COUNT(*) FROM dbo.Role c
                                                            c.Phone3,
                                                            c.Email,
                                                            c.Address,
-                                                           p.Type AS ProvinceType,
-                                                           p.Name AS Province,
-                                                           d.Type AS DistrictType,
-                                                           d.Name AS District,
-                                                           w.Type AS WardType,
-                                                           w.Name AS Ward,
+                                                           p.Type+' '+p.Name AS Province,
+                                                           d.Type+' '+d.Name AS District,
+                                                           w.Type+' '+w.Name AS Ward,
                                                            cg.Name AS CustomerGroup,
                                                            cv.Name AS CustomerVip,
                                                            c.Profit,
@@ -1728,9 +1864,9 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          cu.Phone2 AS CustomerPhone2,
                                                          cu.Phone3 AS CustomerPhone3,
                                                          cu.Address AS CustomerAddress,
-                                                         p.Name AS Province,
-                                                         d.Name AS District,
-                                                         w.Name AS Ward,
+                                                         p.Type+' '+p.Name AS Province,
+                                                         d.Type+' '+d.Name AS District,
+                                                         w.Type+' '+w.Name AS Ward,
                                                          cg.Name AS CustomerGroup,
                                                          cv.Name AS CustomerVip,
                                                          c.Need,
@@ -1891,9 +2027,9 @@ SELECT COUNT(*) FROM dbo.Role c
                                                            cu.Phone2 AS CustomerPhone2,
                                                            cu.Phone3 AS CustomerPhone3,
                                                            cu.Address AS CustomerAddress,
-                                                           p.Name AS Province,
-                                                           d.Name AS District,
-                                                           w.Name AS Ward,
+                                                           p.Type+' '+p.Name AS Province,
+                                                           d.Type+' '+d.Name AS District,
+                                                           w.Type+' '+w.Name AS Ward,
                                                            cg.Name AS CustomerGroup,
                                                            cv.Name AS CustomerVip,
                                                            c.Need,
@@ -1940,6 +2076,266 @@ SELECT COUNT(*) FROM dbo.Role c
                                                     FROM #tmpCrm;
       
                                                     DROP TABLE #tmpCrm;";
+
+        public const string CRM_KHACH_CHUA_XU_LY = @"DROP TABLE IF EXISTS #tmpCrm;
+
+                                                     SELECT c.Id
+                                                     INTO #tmpCrm
+                                                     FROM dbo.Crm c
+                                                         LEFT JOIN dbo.Customer cu
+                                                             ON cu.Id = c.CustomerId
+                                                         INNER JOIN dbo.CrmUser cru
+                                                             ON cru.CrmId = c.Id
+                                                     WHERE c.CrmStatusId = @CrmStatusId
+                                                           AND
+                                                           (
+                                                               @FromDate IS NULL
+                                                               OR c.ContactDate >= @FromDate
+                                                           )
+                                                           AND
+                                                           (
+                                                               @ToDate IS NULL
+                                                               OR c.ContactDate <= @ToDate
+                                                           )
+                                                           AND cru.UserId = @UserCareId
+                                                           AND cru.IsDeleted = 0
+                                                           AND c.IsDeleted = 0;
+  
+                                                     SELECT c.Id,
+                                                            c.Code,
+                                                            c.CustomerId,
+                                                            cs.Name AS CrmStatus,
+                                                            cs.Color AS CrmStatusColor,
+                                                            cu.Name AS CustomerName,
+                                                            cu.Phone AS CustomerPhone,
+                                                            cu.Phone2 AS CustomerPhone2,
+                                                            cu.Phone3 AS CustomerPhone3,
+                                                            cu.Address AS CustomerAddress,
+                                                            p.Type + ' ' + p.Name AS Province,
+                                                            d.Type + ' ' + d.Name AS District,
+                                                            w.Type + ' ' + w.Name AS Ward,
+                                                            cg.Name AS CustomerGroup,
+                                                            cv.Name AS CustomerVip,
+                                                            c.Need,
+                                                            c.Description,
+                                                            pg.Name AS ProductGroup,
+                                                            cp.Name AS CrmPriority,
+                                                            cus.Name AS CustomerSource,
+                                                            ct.Name AS CrmType,
+                                                            c.Visit,
+                                                            u.DisplayName AS UserCreated,
+                                                            u.PhoneNumber AS UserCreatedPhone,
+                                                            c.ContactDate,
+                                                            c.DateCreated
+                                                     FROM #tmpCrm t
+                                                         INNER JOIN dbo.Crm c
+                                                             ON c.Id = t.Id
+                                                         LEFT JOIN dbo.CrmStatus cs
+                                                             ON cs.Id = c.CrmStatusId
+                                                         LEFT JOIN dbo.CrmPriority cp
+                                                             ON cp.Id = c.CrmPriorityId
+                                                         LEFT JOIN dbo.CrmType ct
+                                                             ON ct.Id = c.CrmTypeId
+                                                         LEFT JOIN dbo.Customer cu
+                                                             ON cu.Id = c.CustomerId
+                                                         LEFT JOIN dbo.Province p
+                                                             ON p.Id = cu.ProvinceId
+                                                         LEFT JOIN dbo.District d
+                                                             ON d.Id = cu.DistrictId
+                                                         LEFT JOIN dbo.Ward w
+                                                             ON w.Id = cu.WardId
+                                                         LEFT JOIN dbo.CustomerGroup cg
+                                                             ON cg.Id = cu.CustomerGroupId
+                                                         LEFT JOIN dbo.CustomerSource cus
+                                                             ON cus.Id = c.CustomerSourceId
+                                                         LEFT JOIN dbo.CustomerVip cv
+                                                             ON cv.Id = cu.CustomerVipId
+                                                         LEFT JOIN dbo.ProductGroup pg
+                                                             ON pg.Id = c.ProductGroupId
+                                                         LEFT JOIN dbo.[User] u
+                                                             ON u.Id = c.UserCreated
+                                                     ORDER BY c.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+  
+                                                     SELECT COUNT(*)
+                                                     FROM #tmpCrm;
+  
+                                                     DROP TABLE #tmpCrm;";
+
+        public const string CRM_KHACH_TOI_HEN_CAN_CHAM_SOC = @"DROP TABLE IF EXISTS #tmpCrm;
+
+                                                               SELECT c.Id
+                                                               INTO #tmpCrm
+                                                               FROM dbo.Crm c
+                                                                   LEFT JOIN dbo.Customer cu
+                                                                       ON cu.Id = c.CustomerId
+                                                                   INNER JOIN dbo.CrmUser cru
+                                                                       ON cru.CrmId = c.Id
+                                                               WHERE c.CrmStatusId <> 1
+                                                                     AND c.CrmStatusId <> 2
+                                                                     AND c.CrmStatusId <> 5
+                                                                     AND c.CrmStatusId <> 7
+                                                                     AND c.CrmStatusId <> 8
+                                                                     AND c.CrmStatusId <> 9
+                                                                     AND
+                                                                     (
+                                                                         @FromDate IS NULL
+                                                                         OR c.ContactDate >= @FromDate
+                                                                     )
+                                                                     AND
+                                                                     (
+                                                                         @ToDate IS NULL
+                                                                         OR c.ContactDate <= @ToDate
+                                                                     )
+                                                                     AND cru.UserId = @UserCareId
+                                                                     AND cru.IsDeleted = 0
+                                                                     AND c.IsDeleted = 0;
+
+                                                               SELECT c.Id,
+                                                                      c.Code,
+                                                                      c.CustomerId,
+                                                                      cs.Name AS CrmStatus,
+                                                                      cs.Color AS CrmStatusColor,
+                                                                      cu.Name AS CustomerName,
+                                                                      cu.Phone AS CustomerPhone,
+                                                                      cu.Phone2 AS CustomerPhone2,
+                                                                      cu.Phone3 AS CustomerPhone3,
+                                                                      cu.Address AS CustomerAddress,
+                                                                      p.Type + ' ' + p.Name AS Province,
+                                                                      d.Type + ' ' + d.Name AS District,
+                                                                      w.Type + ' ' + w.Name AS Ward,
+                                                                      cg.Name AS CustomerGroup,
+                                                                      cv.Name AS CustomerVip,
+                                                                      c.Need,
+                                                                      c.Description,
+                                                                      pg.Name AS ProductGroup,
+                                                                      cp.Name AS CrmPriority,
+                                                                      cus.Name AS CustomerSource,
+                                                                      ct.Name AS CrmType,
+                                                                      c.Visit,
+                                                                      u.DisplayName AS UserCreated,
+                                                                      u.PhoneNumber AS UserCreatedPhone,
+                                                                      c.ContactDate,
+                                                                      c.DateCreated
+                                                               FROM #tmpCrm t
+                                                                   INNER JOIN dbo.Crm c
+                                                                       ON c.Id = t.Id
+                                                                   LEFT JOIN dbo.CrmStatus cs
+                                                                       ON cs.Id = c.CrmStatusId
+                                                                   LEFT JOIN dbo.CrmPriority cp
+                                                                       ON cp.Id = c.CrmPriorityId
+                                                                   LEFT JOIN dbo.CrmType ct
+                                                                       ON ct.Id = c.CrmTypeId
+                                                                   LEFT JOIN dbo.Customer cu
+                                                                       ON cu.Id = c.CustomerId
+                                                                   LEFT JOIN dbo.Province p
+                                                                       ON p.Id = cu.ProvinceId
+                                                                   LEFT JOIN dbo.District d
+                                                                       ON d.Id = cu.DistrictId
+                                                                   LEFT JOIN dbo.Ward w
+                                                                       ON w.Id = cu.WardId
+                                                                   LEFT JOIN dbo.CustomerGroup cg
+                                                                       ON cg.Id = cu.CustomerGroupId
+                                                                   LEFT JOIN dbo.CustomerSource cus
+                                                                       ON cus.Id = c.CustomerSourceId
+                                                                   LEFT JOIN dbo.CustomerVip cv
+                                                                       ON cv.Id = cu.CustomerVipId
+                                                                   LEFT JOIN dbo.ProductGroup pg
+                                                                       ON pg.Id = c.ProductGroupId
+                                                                   LEFT JOIN dbo.[User] u
+                                                                       ON u.Id = c.UserCreated
+                                                               ORDER BY c.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                               SELECT COUNT(*)
+                                                               FROM #tmpCrm;
+
+                                                               DROP TABLE #tmpCrm;";
+
+        public const string CRM_KHACH_QUA_HEN_CHAM_SOC = @"DROP TABLE IF EXISTS #tmpCrm;
+
+                                                           SELECT c.Id
+                                                           INTO #tmpCrm
+                                                           FROM dbo.Crm c
+                                                               LEFT JOIN dbo.Customer cu
+                                                                   ON cu.Id = c.CustomerId
+                                                               INNER JOIN dbo.CrmUser cru
+                                                                   ON cru.CrmId = c.Id
+                                                           WHERE c.CrmStatusId <> 5
+                                                                 AND c.CrmStatusId <> 7
+                                                                 AND c.CrmStatusId <> 8
+                                                                 AND c.CrmStatusId <> 9
+                                                                 AND
+                                                                 (
+                                                                     @FromDate IS NULL
+                                                                     OR c.ContactDate >= @ToDate
+                                                                 )
+                                                                 AND
+                                                                 (
+                                                                     @ToDate IS NULL
+                                                                     OR c.ContactDate <= @ToDate
+                                                                 )
+                                                                 AND cru.UserId = @UserCareId
+                                                                 AND cru.IsDeleted = 0
+                                                                 AND c.IsDeleted = 0;
+                               
+                                                           SELECT c.Id,
+                                                                  c.Code,
+                                                                  c.CustomerId,
+                                                                  cs.Name AS CrmStatus,
+                                                                  cs.Color AS CrmStatusColor,
+                                                                  cu.Name AS CustomerName,
+                                                                  cu.Phone AS CustomerPhone,
+                                                                  cu.Phone2 AS CustomerPhone2,
+                                                                  cu.Phone3 AS CustomerPhone3,
+                                                                  cu.Address AS CustomerAddress,
+                                                                  p.Type + ' ' + p.Name AS Province,
+                                                                  d.Type + ' ' + d.Name AS District,
+                                                                  w.Type + ' ' + w.Name AS Ward,
+                                                                  cg.Name AS CustomerGroup,
+                                                                  cv.Name AS CustomerVip,
+                                                                  c.Need,
+                                                                  c.Description,
+                                                                  pg.Name AS ProductGroup,
+                                                                  cp.Name AS CrmPriority,
+                                                                  cus.Name AS CustomerSource,
+                                                                  ct.Name AS CrmType,
+                                                                  c.Visit,
+                                                                  u.DisplayName AS UserCreated,
+                                                                  u.PhoneNumber AS UserCreatedPhone,
+                                                                  c.ContactDate,
+                                                                  c.DateCreated
+                                                           FROM #tmpCrm t
+                                                               INNER JOIN dbo.Crm c
+                                                                   ON c.Id = t.Id
+                                                               LEFT JOIN dbo.CrmStatus cs
+                                                                   ON cs.Id = c.CrmStatusId
+                                                               LEFT JOIN dbo.CrmPriority cp
+                                                                   ON cp.Id = c.CrmPriorityId
+                                                               LEFT JOIN dbo.CrmType ct
+                                                                   ON ct.Id = c.CrmTypeId
+                                                               LEFT JOIN dbo.Customer cu
+                                                                   ON cu.Id = c.CustomerId
+                                                               LEFT JOIN dbo.Province p
+                                                                   ON p.Id = cu.ProvinceId
+                                                               LEFT JOIN dbo.District d
+                                                                   ON d.Id = cu.DistrictId
+                                                               LEFT JOIN dbo.Ward w
+                                                                   ON w.Id = cu.WardId
+                                                               LEFT JOIN dbo.CustomerGroup cg
+                                                                   ON cg.Id = cu.CustomerGroupId
+                                                               LEFT JOIN dbo.CustomerSource cus
+                                                                   ON cus.Id = c.CustomerSourceId
+                                                               LEFT JOIN dbo.CustomerVip cv
+                                                                   ON cv.Id = cu.CustomerVipId
+                                                               LEFT JOIN dbo.ProductGroup pg
+                                                                   ON pg.Id = c.ProductGroupId
+                                                               LEFT JOIN dbo.[User] u
+                                                                   ON u.Id = c.UserCreated
+                                                           ORDER BY c.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                               
+                                                           SELECT COUNT(*)
+                                                           FROM #tmpCrm;
+                               
+                                                           DROP TABLE #tmpCrm;";
 
         public const string CRM_USER_CARE_GET_BY_CRM_ID = @"SELECT u.DisplayName,
                                                                    u.PhoneNumber,
@@ -1996,6 +2392,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                 ProductGroupId = @ProductGroupId,
                                                 CrmPriorityId = @CrmPriorityId,
                                                 CrmTypeId = @CrmTypeId,
+                                                CrmStatusId = @CrmStatusId,
                                                 Need = @Need,
                                                 Description = @Description,
                                                 CustomerSourceId = @CustomerSourceId,
@@ -2003,6 +2400,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                 UserUpdated = @UserUpdated,
                                                 DateUpdated = @DateUpdated
                                                WHERE Id = @Id";
+
         public const string STATUS_CRM_UPDATE = @"UPDATE dbo.Crm
                                             SET ContactDate = @ContactDate,
                                                 ProductGroupId = @ProductGroupId,
@@ -2038,6 +2436,83 @@ SELECT COUNT(*) FROM dbo.Role c
                                                             @DateCreated,
                                                             @UserUpdated;
                                                         SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string CRM_INSERT_COMMENT= @"INSERT dbo.CrmLog
+                                                  (
+                                                      CrmId,
+                                                      Comment,
+                                                      LogDate,
+                                                      UserId,
+                                                      Attachment,
+                                                      OldCrmStatusId,
+                                                      CrmStatusId,
+                                                      AttachmentName
+                                                  )
+                                                  VALUES
+                                                  (   @CrmId,         -- CrmId - int
+                                                      @Comment,       -- Comment - nvarchar(1500)
+                                                      GETDATE(), -- LogDate - datetime
+                                                      @UserId,         -- UserId - int
+                                                      N'',       -- Attachment - nvarchar(50)
+                                                      @CrmStatusId,         -- OldCrmStatusId - int
+                                                      @CrmStatusId,         -- CrmStatusId - int
+                                                      N''        -- AttachmentName - nvarchar(300)
+                                                      );
+
+                                                  SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string CRM_LOG_ATTACHMENT_INSERT = @"INSERT dbo.CrmLogAttachment
+                                                          (
+                                                              CrmLogId,
+                                                              Attachment,
+                                                              AttachmentName,
+                                                              UserCreated,
+                                                              DateCreated,
+                                                              UserUpdated,
+                                                              DateUpdated,
+                                                              IsDeleted
+                                                          )
+                                                          VALUES
+                                                          (   @CrmLogId,         -- CrmLogId - int
+                                                              @Attachment,       -- Attachment - nvarchar(max)
+                                                              @AttachmentName,       -- AttachmentName - nvarchar(max)
+                                                              @UserCreated,         -- UserCreated - int
+                                                              GETDATE(), -- DateCreated - datetime
+                                                              @UserUpdated,         -- UserUpdated - int
+                                                              GETDATE(), -- DateUpdated - datetime
+                                                              0       -- IsDeleted - bit
+                                                              )";
+
+        public const string CRM_GET_LOGS = @"SELECT Id,
+                                                    CrmId,
+                                                    UserId,
+                                                    Comment,
+                                                    LogDate,
+                                                    OldCrmStatusId,
+                                                    CrmStatusId
+                                             FROM dbo.CrmLog
+                                             WHERE CrmId = @CrmId
+                                             ORDER BY LogDate DESC;";
+
+        public const string GET_USER_IN_LOG = @"SELECT Id,
+                                                       DisplayName AS Name,
+                                                       PhoneNumber,
+                                                       Avatar
+                                                FROM dbo.[User]
+                                                WHERE Id = @Id
+                                                      AND IsDeleted = 0;";
+
+        public const string GET_CRM_STATUS_IN_LOG = @"SELECT Id,
+                                                             Name
+                                                      FROM dbo.CrmStatus
+                                                      WHERE Id = @Id
+                                                            AND IsDeleted = 0;";
+
+        public const string GET_CRM_ATTACHMENT_IN_LOG = @"SELECT Attachment,
+                                                                 AttachmentName
+                                                          FROM dbo.CrmLogAttachment
+                                                          WHERE CrmLogId = @CrmLogId;";
+
         public const string GET_CRM_BY_ID = @"SELECT c.Id,
 		                                        c.Code,
 		                                        c.CustomerId,
@@ -2759,6 +3234,48 @@ SELECT COUNT(*) FROM dbo.Role c
                                                               0       -- IsDeleted - bit
                                                               )";
 
+        public const string INVOICE_GET_BY_ID = @"SELECT i.Id,
+                                                         i.Code,
+                                                         i.DateCreated,
+                                                         i.CustomerId,
+                                                         i.DeliveryCost,
+                                                         i.DeliveryDate,
+                                                         i.Discount,
+                                                         i.Deposit,
+                                                         i.InvoiceStatusId,
+                                                         i.Description,
+                                                         u1.DisplayName AS UserCreated,
+                                                         u1.PhoneNumber AS UserCreatedPhone,
+                                                         u2.DisplayName AS UserSell,
+                                                         u2.PhoneNumber AS UserSellPhone,
+                                                         p.Name AS PayMethod
+                                                  FROM dbo.Invoice i
+                                                      INNER JOIN dbo.[User] u1
+                                                          ON u1.Id = i.UserCreated
+                                                      INNER JOIN dbo.[User] u2
+                                                          ON u2.Id = i.UserSellId
+                                                      INNER JOIN dbo.PayMethod p
+                                                          ON p.Id = i.PayMethodId
+                                                  WHERE i.Id = @Id AND i.IsDeleted = 0;";
+
+        public const string GET_PRODUCTS_IN_INVOICE = @"SELECT ProductId AS Id,
+                                                               ProductName AS Name,
+                                                               ImportPrice,
+                                                               Price,
+                                                               Quantity,
+                                                               Description
+                                                        FROM dbo.ProductInInvoice
+                                                        WHERE InvoiceId = @InvoiceId
+                                                              AND IsDeleted = 0;";
+
+        public const string GET_USERS_IN_INVOICE = @"SELECT u.DisplayName,
+                                                            u.PhoneNumber
+                                                     FROM dbo.UserInInvoice i
+                                                         INNER JOIN dbo.[User] u
+                                                             ON i.UserId = u.Id
+                                                                AND i.IsDeleted = 0
+                                                                AND i.Type = @Type
+                                                                AND i.InvoiceId = @InvoiceId;";
 
         #endregion
 
@@ -2840,7 +3357,6 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          FROM dbo.WarrantyStatus 
                                                          WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                              AND IsDeleted = 0
-                                                        ORDER BY {0} {1}
                                                         OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
 
                                                         SELECT COUNT(*)
@@ -2887,6 +3403,926 @@ SELECT COUNT(*) FROM dbo.Role c
                                                   WHERE Id = @Id";
 
         public const string WARRANTY_STATUS_DELETE = @"  UPDATE dbo.WarrantyStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
+
+        #region CandidateStatus
+
+        public const string CANDIDATE_STATUS_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.CandidateStatus
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        public const string CANDIDATE_STATUS_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.CandidateStatus 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.CandidateStatus 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string CANDIDATE_STATUS_GET_BY_ID = @"SELECT * FROM dbo.CandidateStatus WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string CANDIDATE_STATUS_INSERT = @"INSERT dbo.CandidateStatus
+                                                        (Name,
+                                                         Color,
+                                                         IsSendSms,
+                                                         SmsContent,
+                                                         SortOrder,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @IsSendSms,
+                                                         @SmsContent,
+                                                         @SortOrder,                                                                                                                  
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string CANDIDATE_STATUS_UPDATE = @"  UPDATE dbo.CandidateStatus
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                      IsSendSms = @IsSendSms,
+                                                      SmsContent = @SmsContent,
+                                                      SortOrder=@SortOrder, 
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string CANDIDATE_STATUS_DELETE = @"  UPDATE dbo.CandidateStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
+
+        #region ReceiptStatus
+
+        public const string RECEIPT_STATUS_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.ReceiptStatus
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        public const string RECEIPT_STATUS_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.ReceiptStatus 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.ReceiptStatus 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string RECEIPT_STATUS_GET_BY_ID = @"SELECT * FROM dbo.CrmStatus WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string RECEIPT_STATUS_INSERT = @"INSERT dbo.ReceiptStatus
+                                                        (Name,
+                                                         Color,
+                                                         IsSendSms,
+                                                         SmsContent,
+                                                         SortOrder,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @IsSendSms,
+                                                         @SmsContent,
+                                                         @SortOrder,                                                                                                                  
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string RECEIPT_STATUS_UPDATE = @"  UPDATE dbo.ReceiptStatus
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                      IsSendSms = @IsSendSms,
+                                                      SmsContent = @SmsContent,
+                                                      SortOrder=@SortOrder, 
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string RECEIPT_STATUS_DELETE = @"  UPDATE dbo.ReceiptStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
+
+        #region ReceiptDescription
+
+        public const string RECEIPT_DESCRIPTION_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.ReceiptDescription
+                                                   WHERE IsDeleted = 0;";
+
+        public const string RECEIPT_DESCRIPTION_GET_BY_ID = @"SELECT * FROM dbo.ReceiptDescription WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string RECEIPT_DESCRIPTION_INSERT = @"INSERT dbo.ReceiptDescription
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string RECEIPT_DESCRIPTION_UPDATE = @"  UPDATE dbo.ReceiptDescription
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string RECEIPT_DESCRIPTION_DELETE = @"  UPDATE dbo.ReceiptDescription
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string RECEIPT_DESCRIPTION_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.DateUpdated
+                                                       FROM dbo.ReceiptDescription c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY Name
+                                                       OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                       SELECT COUNT(*)
+                                                       FROM dbo.ReceiptDescription c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0;";
+
+        #endregion
+
+        #region WarrantyDescription
+
+        public const string WARRANTY_DESCRIPTION_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.WarrantyDescription
+                                                   WHERE IsDeleted = 0;";
+
+        public const string WARRANTY_DESCRIPTION_GET_BY_ID = @"SELECT * FROM dbo.WarrantyDescription WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string WARRANTY_DESCRIPTION_INSERT = @"INSERT dbo.WarrantyDescription
+                                                        (Name,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string WARRANTY_DESCRIPTION_UPDATE = @"  UPDATE dbo.WarrantyDescription
+                                                  SET Name = @Name,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string WARRANTY_DESCRIPTION_DELETE = @"  UPDATE dbo.WarrantyDescription
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string WARRANTY_DESCRIPTION_PAGING = @"SELECT c.Id,
+                                                              c.Name,
+                                                              c.DateUpdated
+                                                       FROM dbo.WarrantyDescription c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0
+                                                       ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                       SELECT COUNT(*)
+                                                       FROM dbo.WarrantyDescription c
+                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND c.IsDeleted = 0;";
+
+        #endregion
+
+        #region TaskPriority
+
+        public const string TASK_PRIORITY_GET_ALL = @"SELECT Id,
+                                                            Name
+                                                     FROM dbo.TaskPriority
+                                                     WHERE IsDeleted = 0
+                                                     ORDER BY Id;";
+
+        public const string TASK_PRIORITY_INSERT = @"INSERT dbo.TaskPriority
+                                                        (Name,
+                                                         Color,
+                                                         SortOrder,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @SortOrder,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string TASK_PRIORITY_UPDATE = @"  UPDATE dbo.TaskPriority
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                      SortOrder = @SortOrder,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string TASK_PRIORITY_DELETE = @"  UPDATE dbo.TaskPriority
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string TASK_PRIORITY_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.TaskPriority 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.TaskPriority 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string TASK_PRIORITY_GET_BY_ID = @"SELECT * FROM dbo.TaskPriority WHERE Id = @Id AND IsDeleted = 0";
+
+        #endregion
+
+        #region TaskStatus
+
+        public const string TASK_STATUS_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.TaskStatus
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        public const string TASK_STATUS_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.TaskStatus 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.TaskStatus 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string TASK_STATUS_GET_BY_ID = @"SELECT * FROM dbo.TaskStatus WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string TASK_STATUS_INSERT = @"INSERT dbo.TaskStatus
+                                                        (Name,
+                                                         Color,
+                                                         SortOrder,
+                                                         IsSendSms,
+                                                         SmsContent,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @SortOrder,
+                                                         @IsSendSms,
+                                                         @SmsContent,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string TASK_STATUS_UPDATE = @"  UPDATE dbo.TaskStatus
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                      SortOrder = @SortOrder,
+                                                      IsSendSms = @IsSendSms,
+                                                      SmsContent = @SmsContent,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string TASK_STATUS_DELETE = @"  UPDATE dbo.TaskStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
+
+        #region Task Type
+
+        public const string TASK_TYPE_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.TaskType
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        public const string TASK_TYPE_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.TaskType 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.TaskType 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string TASK_TYPE_GET_BY_ID = @"SELECT * FROM dbo.TaskType WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string TASK_TYPE_INSERT = @"INSERT dbo.TaskType
+                                                        (Name,
+                                                         SortOrder,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @SortOrder,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string TASK_TYPE_UPDATE = @"  UPDATE dbo.TaskType
+                                                  SET Name = @Name,
+                                                      SortOrder = @SortOrder,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string TASK_TYPE_DELETE = @"  UPDATE dbo.TaskType
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
+
+        #region Task Loop
+
+        public const string TASK_LOOP_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.TaskLoop
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        public const string TASK_LOOP_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.TaskLoop 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.TaskLoop 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string TASK_LOOP_GET_BY_ID = @"SELECT * FROM dbo.TaskLoop WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string TASK_LOOP_INSERT = @"INSERT dbo.TaskLoop
+                                                        (Name,
+                                                         DayCount,
+                                                         SortOrder,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @DayCount,
+                                                         @SortOrder,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string TASK_LOOP_UPDATE = @"  UPDATE dbo.TaskLoop
+                                                  SET Name = @Name,
+                                                      SortOrder = @SortOrder,
+                                                      DayCount = @DayCount,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string TASK_LOOP_DELETE = @"  UPDATE dbo.TaskLoop
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
+
+        #region Task
+
+        public const string TASK_GET_ALL_BY_CUSTOMERID = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.Task
+                                                   WHERE IsDeleted = 0 AND CustomerId = @CustomerId
+                                                   ORDER BY Id;";
+
+        public const string TASK_GET_BY_PAGING = @"DROP TABLE IF EXISTS #tmpTask;
+                                                        SELECT t.Id,
+                                                         t.TaskStatusId,
+                                                         t.TaskPriorityId,
+                                                         t.TaskLoopId,
+                                                         t.TaskTypeId,
+                                                         t.UserCreated, 
+                                                         t.Code,
+                                                         t.Name,
+                                                         t.Content,
+                                                         t.Description,
+                                                         t.FromDateTime,
+                                                         t.ToDateTime,                                                       
+                                                         tl.Name AS TaskLoopName,
+                                                         tp.Name AS TaskPriorityName,
+                                                         tp.Color AS TaskPriorityColor,
+                                                         ts.Color AS TaskStatusColor,
+                                                         ts.Name AS TaskStatusName,
+                                                         u.FullName AS UserNameCreated,
+                                                         cs.Phone AS CustomerPhone,
+                                                         cs.Name AS CustomerName,
+                                                         cs.Address AS CustomerAddress
+                                                       INTO #tmpTask
+                                                         FROM dbo.Task as t
+                                                         LEFT JOIN dbo.[User] AS u
+                                                               ON u.Id = t.UserCreated                                                         
+                                                         LEFT JOIN dbo.TaskLoop AS tl
+                                                               ON tl.Id = t.TaskLoopId
+                                                         LEFT JOIN dbo.TaskPriority AS tp
+                                                               ON tp.Id = t.TaskPriorityId
+                                                         LEFT JOIN dbo.TaskStatus AS ts
+                                                               ON ts.Id = t.TaskStatusId
+                                                         LEFT JOIN dbo.Customer AS cs
+                                                               ON cs.Id = t.CustomerId
+                                                         WHERE ISNULL(t.Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND ISNULL(t.Code,'') COLLATE Latin1_general_CI_AI LIKE @Code COLLATE Latin1_general_CI_AI
+                                                             AND ISNULL(CustomerPhone,'') COLLATE Latin1_general_CI_AI LIKE @Phone COLLATE Latin1_general_CI_AI
+                                                             AND ISNULL(CustomerName,'') COLLATE Latin1_general_CI_AI LIKE @CustomerName COLLATE Latin1_general_CI_AI
+                                                             AND
+                                                             (
+                                                                 @TaskStatusId = 0
+                                                                 OR ISNULL(t.TaskStatusId, 0) = @TaskStatusId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @TaskPriorityId = 0
+                                                                 OR ISNULL(t.TaskPriorityId, 0) = @TaskPriorityId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @TaskLoopId = 0
+                                                                 OR ISNULL(t.TaskLoopId, 0) = @TaskLoopId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @TaskTypeId = 0
+                                                                 OR ISNULL(t.TaskTypeId, 0) = @TaskTypeId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @UserCreatedId = 0
+                                                                 OR ISNULL(t.UserCreated, 0) = @UserCreatedId
+                                                             )
+                                                             AND
+                                                             (
+                                                                 @UserCaredId = 0
+                                                                 OR ISNULL(ut.UserCaredId, 0) = @UserCaredId
+                                                             )                                                             
+                                                             AND
+                                                             (
+                                                                (@FromTime ='' OR DATEDIFF(DAY,t.FromDateTime,convert(datetime, @FromDate, 0)) <= 0 OR DATEDIFF(DAY,t.ToDateTime,convert(datetime, @FromDate, 0)) <= 0) AND (@ToTime ='' OR DATEDIFF(DAY,t.ToDateTime,convert(datetime, @ToDate, 0)) >= 0)
+                                                             )           
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM #tmpTask";
+
+        public const string TASK_GET_BY_ID = @"SELECT * FROM dbo.TaskLoop WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string TASK_INSERT = @"INSERT dbo.Task
+                                                        (Name,
+                                                         Code,
+                                                         CustomerId,
+                                                         Content,
+                                                         Description,
+                                                         TaskStatusId,
+                                                         TaskPriorityId,
+                                                         TaskLoopId,
+                                                         TaskTypeId,
+                                                         FromDateTime,
+                                                         ToDateTime,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Code,
+                                                         @CustomerId,
+                                                         @Content,
+                                                         @Description,
+                                                         @TaskStatusId,
+                                                         @TaskPriorityId,
+                                                         @TaskLoopId,
+                                                         @TaskTypeId,
+                                                         @FromDateTime,
+                                                         @ToDateTime,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string TASK_UPDATE = @"UPDATE dbo.Task
+                                                  SET Name = @Name,
+                                                         Code=@Code,
+                                                         Content=@Content,
+                                                         Description=@Description,
+                                                         TaskStatusId=@TaskStatusId,
+                                                         TaskPriorityId=@TaskPriorityId,
+                                                         TaskLoopId=@TaskLoopId,
+                                                         TaskTypeId=@TaskTypeId,
+                                                         FromDateTime=@FromDateTime,
+                                                         ToDateTime=@ToDateTime,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string TASK_DELETE = @"  UPDATE dbo.Task
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string TASK_CURRENT_COUNT = @"SELECT COUNT(*) FROM dbo.Task
+                                                         WHERE @CurrentDate ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @CurrentDate, 0)) = 0                                                                                                                       
+                                                                AND IsDeleted = 0;";
+
+        #endregion
+
+        #region RecruitmentStatus
+
+        public const string RECRUITMENT_STATUS_GET_ALL = @"SELECT Id,
+                                                          Name
+                                                   FROM dbo.RecruitmentStatus
+                                                   WHERE IsDeleted = 0
+                                                   ORDER BY Id;";
+
+        public const string RECRUITMENT_STATUS_GET_BY_PAGING = @"  SELECT *
+                                                         FROM dbo.RecruitmentStatus 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.RecruitmentStatus 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string RECRUITMENT_STATUS_GET_BY_ID = @"SELECT * FROM dbo.RecruitmentStatus WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string RECRUITMENT_STATUS_INSERT = @"INSERT dbo.RecruitmentStatus
+                                                        (Name,
+                                                         Color,
+                                                         SortOrder,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @SortOrder,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string RECRUITMENT_STATUS_UPDATE = @"  UPDATE dbo.RecruitmentStatus
+                                                  SET Name = @Name,
+                                                      Color = @Color,
+                                                      SortOrder = @SortOrder,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string RECRUITMENT_STATUS_DELETE = @"  UPDATE dbo.RecruitmentStatus
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        #endregion
+
+        #region Candidate
+
+        public const string CANDIDATE_GET_BY_ID = @"SELECT * FROM dbo.Candidate WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string CANDIDATE_INSERT = @"INSERT dbo.Candidate
+                                                        (Name,
+                                                         Code,
+                                                         Address,
+                                                         Email,Description,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Code,
+                                                         @Address,
+                                                         @Email,@Description,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string CANDIDATE_UPDATE = @"  UPDATE dbo.Candidate
+                                                  SET Name = @Name,
+                                                         Code=@Code,
+                                                         Address=@Address,
+                                                         Email=@Email,Description=@Description,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string CANDIDATE_DELETE = @"  UPDATE dbo.Candidate
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string CANDIDATE_GET_BY_PAGING = @"SELECT c.Id,
+                                                             c.Code,
+                                                             c.Name,
+                                                             c.Phone,
+                                                             c.Address,
+                                                             c.Email,
+                                                             c.Description
+                                                             cs.Color
+                                                             cs.Name AS CandidateStatusName
+                                                             u.FullName AS UserNameCreated,
+                                                             u.Phone AS UserPhoneCreated
+                                                         FROM dbo.Candidate AS c
+                                                            LEFT JOIN dbo.CandidateStatus AS cs
+                                                               ON cs.Id = c.CandidateStatusId
+                                                         LEFT JOIN dbo.[User] As u
+                                                               ON u.Id = c.UserCreated
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND ISNULL(c.Phone, '') COLLATE Latin1_General_CI_AI LIKE @Phone COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @CandidateStatusId = 0
+                                                                 OR ISNULL(c.CandidateStatusId, 0) = @CandidateStatusId
+                                                             )
+                                                             AND
+                                                             (
+                                                                (@FromDate = '' OR c.DateCreated >= @FromDate) AND (@ToDate ='' OR c.DateCreated <= @ToDate)
+                                                             )
+                                                             
+                                                                AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*) FROM dbo.Candidate
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND ISNULL(c.Phone, '') COLLATE Latin1_General_CI_AI LIKE @Phone COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @CandidateStatusId = 0
+                                                                 OR ISNULL(c.CandidateStatusId, 0) = @CandidateStatusId
+                                                             )
+                                                             AND
+                                                             (
+                                                                (@FromTime ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @FromTime, 0)) <= 0) AND (@ToTime ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @ToTime, 0)) >= 0)
+                                                             )
+                                                                AND IsDeleted = 0;";
+
+        public const string CANDIDATE_CURRENT_COUNT = @"SELECT COUNT(*) FROM dbo.Candidate
+                                                         WHERE @CurrentDate ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @CurrentDate, 0)) = 0                                                                                                                       
+                                                                AND IsDeleted = 0;";
+
+        #endregion
+
+        #region Recruitment
+
+        public const string RECRUITMENT_GET_BY_ID = @"SELECT * FROM dbo.Recruitment WHERE Id = @Id AND IsDeleted = 0";
+
+        public const string RECRUITMENT_INSERT = @"INSERT dbo.Recruitment
+                                                        (Name,
+                                                         Code,
+                                                         Description,
+                                                         Content,
+                                                         RecruitmentStatusId,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Color,
+                                                         @Code,
+                                                         @Description,
+                                                         @Content,
+                                                         @RecruitmentStatusId,
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string RECRUITMENT_UPDATE = @"  UPDATE dbo.Recruitment
+                                                  SET RecruitmentStatusId = @RecruitmentStatusId,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string RECRUITMENT_DELETE = @"  UPDATE dbo.Recruitment
+                                                  SET UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated,
+                                                      IsDeleted = 1
+                                                  WHERE Id = @Id";
+
+        public const string RECRUITMENT_GET_BY_PAGING = @"SELECT c.Id,
+                                                             c.Code,
+                                                             c.Name,
+                                                             c.Description
+                                                             cs.Color
+                                                             cs.Name AS RecruitmentStatusName
+                                                             u.FullName AS UserNameCreated,
+                                                             u.Phone AS UserPhoneCreated
+                                                         FROM dbo.Recruitment AS c
+                                                            LEFT JOIN dbo.RecruitmentStatus AS cs
+                                                               ON cs.Id = c.RecruitmentStatusId
+                                                         LEFT JOIN dbo.[User] As u
+                                                               ON u.Id = c.UserCreated
+                                                         WHERE ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @RecruitmentStatusId = 0
+                                                                 OR ISNULL(c.RecruitmentStatusId, 0) = @RecruitmentStatusId
+                                                             )
+                                                             AND
+                                                             (
+                                                                (@FromDate = '' OR c.DateCreated >= @FromDate) AND (@ToDate ='' OR c.DateCreated <= @ToDate)
+                                                             )                                                             
+                                                                AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*) FROM dbo.Recruitment
+                                                         WHERE ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
+                                                             AND
+                                                             (
+                                                                 @RecruitmentStatusId = 0
+                                                                 OR ISNULL(c.RecruitmentStatusId, 0) = @RecruitmentStatusId
+                                                             )
+                                                             AND
+                                                             (
+                                                                (@FromTime ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @FromTime, 0)) <= 0) AND (@ToTime ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @ToTime, 0)) >= 0)
+                                                             )                                                             
+                                                                AND IsDeleted = 0;";
+
+        public const string RECRUITMENT_CURRENT_COUNT = @"SELECT COUNT(*) FROM dbo.Recruitment 
+                                                         WHERE @CurrentDate ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @CurrentDate, 0)) = 0                                                                                                                       
+                                                                AND IsDeleted = 0;";
+
+        #endregion
+
+        #region Country
+
+        public const string COUNTRY_GET_ALL = @"SELECT *
+                                                 FROM [dbo].[Country]
+                                                 WHERE IsDeleted = 0;";
+
+        public const string COUNTRY_GET_BY_PAGING = @"  SELECT *
+                                                         FROM [dbo].[Country] 
+                                                         WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                             AND IsDeleted = 0
+                                                        ORDER BY {0} {1}
+                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                        SELECT COUNT(*)
+                                                        FROM dbo.Country 
+                                                        WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
+                                                            AND IsDeleted = 0;";
+
+        public const string COUNTRY_GET_BY_ID = @"SELECT * FROM [dbo].[Country] WHERE Id = @Id AND IsDeleted = 0";
+
+
+        public const string COUNTRY_INSERT = @"INSERT [dbo].[Country]
+                                                        (Name,
+                                                         Code,
+                                                         Region,
+                                                         UserCreated,
+                                                         DateCreated,
+                                                         UserUpdated,
+                                                         DateUpdated,
+                                                         IsDeleted)
+                                                 VALUES (@Name,
+                                                         @Code,
+                                                         @Region,                                                         
+                                                         @UserCreated,
+                                                         @DateCreated,
+                                                         @UserUpdated,
+                                                         @DateUpdated,
+                                                         0);
+
+                                                 SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string COUNTRY_UPDATE = @"  UPDATE [dbo].[Country]
+                                                  SET Name = @Name,
+                                                      Code = @Code,
+                                                      Region = @Region,
+                                                      UserUpdated = @UserUpdated,
+                                                      DateUpdated = @DateUpdated
+                                                  WHERE Id = @Id";
+
+        public const string COUNTRY_DELETE = @"  UPDATE [dbo].[Country]
                                                   SET UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated,
                                                       IsDeleted = 1

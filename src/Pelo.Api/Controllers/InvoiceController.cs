@@ -44,5 +44,29 @@ namespace Pelo.Api.Controllers
             return Ok(await _invoiceService.GetPaging(await GetUserId(),
                                                       request));
         }
+
+        /// <summary>
+        ///     Thêm mới đơn hàng
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/invoice")]
+        public async Task<ActionResult<TResponse<bool>>> Insert(InsertInvoiceRequest request)
+        {
+            return Ok(await _invoiceService.Insert(await GetUserId(), request));
+        }
+
+        /// <summary>
+        /// Lấy chi tiết đơn hàng
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/invoice/{id}")]
+        public async Task<ActionResult<TResponse<GetInvoiceByIdResponse>>> GetById(int id)
+        {
+            return Ok(await _invoiceService.GetById(await GetUserId(), id));
+        }
     }
 }
