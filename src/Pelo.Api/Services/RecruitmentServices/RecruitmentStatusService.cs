@@ -15,7 +15,7 @@ namespace Pelo.Api.Services.TaskServices
         Task<TResponse<IEnumerable<RecruitmentStatusSimpleModel>>> GetAll(int userId);
         Task<TResponse<PageResult<GetRecruitmentStatusPagingResponse>>> GetPaging(int v, GetRecruitmentStatusPagingRequest request);
 
-        Task<TResponse<RecruitmentStatusSimpleModel>> GetById(int userId, int id);
+        Task<TResponse<RecruitmentStatusResponse>> GetById(int userId, int id);
 
         Task<TResponse<bool>> Insert(int userId, InsertRecruitmentStatus request);
 
@@ -98,14 +98,14 @@ namespace Pelo.Api.Services.TaskServices
             }
         }
 
-        public async Task<TResponse<RecruitmentStatusSimpleModel>> GetById(int userId, int id)
+        public async Task<TResponse<RecruitmentStatusResponse>> GetById(int userId, int id)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<RecruitmentStatusSimpleModel>(SqlQuery.RECRUITMENT_STATUS_GET_BY_ID,
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<RecruitmentStatusResponse>(SqlQuery.RECRUITMENT_STATUS_GET_BY_ID,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -115,14 +115,14 @@ namespace Pelo.Api.Services.TaskServices
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<RecruitmentStatusSimpleModel>(result.Message);
+                    return await Fail<RecruitmentStatusResponse>(result.Message);
                 }
 
-                return await Fail<RecruitmentStatusSimpleModel>(canGetAll.Message);
+                return await Fail<RecruitmentStatusResponse>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<RecruitmentStatusSimpleModel>(exception);
+                return await Fail<RecruitmentStatusResponse>(exception);
             }
         }
 

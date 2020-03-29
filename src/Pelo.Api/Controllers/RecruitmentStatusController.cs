@@ -46,7 +46,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/recruitment_status/{id}")]
-        public async Task<ActionResult<RecruitmentStatusSimpleModel>> GetById(int id)
+        public async Task<ActionResult<RecruitmentStatusResponse>> GetById(int id)
         {
             return Ok(await _RecruitmentStatusService.GetById(await GetUserId(), id));
         }

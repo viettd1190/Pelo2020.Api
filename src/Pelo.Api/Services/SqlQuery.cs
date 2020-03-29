@@ -3434,8 +3434,6 @@ SELECT COUNT(*) FROM dbo.Role c
         public const string CANDIDATE_STATUS_INSERT = @"INSERT dbo.CandidateStatus
                                                         (Name,
                                                          Color,
-                                                         IsSendSms,
-                                                         SmsContent,
                                                          SortOrder,
                                                          UserCreated,
                                                          DateCreated,
@@ -3444,9 +3442,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          IsDeleted)
                                                  VALUES (@Name,
                                                          @Color,
-                                                         @IsSendSms,
-                                                         @SmsContent,
-                                                         @SortOrder,                                                                                                                  
+                                                         @SortOrder,
                                                          @UserCreated,
                                                          @DateCreated,
                                                          @UserUpdated,
@@ -3458,9 +3454,7 @@ SELECT COUNT(*) FROM dbo.Role c
         public const string CANDIDATE_STATUS_UPDATE = @"  UPDATE dbo.CandidateStatus
                                                   SET Name = @Name,
                                                       Color = @Color,
-                                                      IsSendSms = @IsSendSms,
-                                                      SmsContent = @SmsContent,
-                                                      SortOrder=@SortOrder, 
+                                                      SortOrder = @SortOrder,
                                                       UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated
                                                   WHERE Id = @Id";
@@ -4117,7 +4111,6 @@ SELECT COUNT(*) FROM dbo.Role c
 
         public const string CANDIDATE_UPDATE = @"  UPDATE dbo.Candidate
                                                   SET Name = @Name,
-                                                         Code=@Code,
                                                          Address=@Address,
                                                          Email=@Email,Description=@Description,
                                                       UserUpdated = @UserUpdated,

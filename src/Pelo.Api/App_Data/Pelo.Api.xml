@@ -594,6 +594,13 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.InvoiceController.GetById(System.Int32)">
+            <summary>
+            Lấy chi tiết đơn hàng
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.InvoiceStatusController.GetAll">
             <summary>
                 Lấy tất cả trạng thái đơn hàng

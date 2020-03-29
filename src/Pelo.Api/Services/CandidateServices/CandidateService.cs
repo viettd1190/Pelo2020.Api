@@ -191,7 +191,6 @@ namespace Pelo.Api.Services.CandidateServices
                                                                                                               {
                                                                                                                   request.Id,
                                                                                                                   request.Name,
-                                                                                                                  request.Color,
                                                                                                                   request.Address,
                                                                                                                   request.Email,
                                                                                                                   request.Description,
