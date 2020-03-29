@@ -4046,7 +4046,6 @@ SELECT COUNT(*) FROM dbo.Role c
 
         public const string RECRUITMENT_STATUS_GET_BY_ID = @"SELECT * FROM dbo.RecruitmentStatus WHERE Id = @Id AND IsDeleted = 0";
 
-
         public const string RECRUITMENT_STATUS_INSERT = @"INSERT dbo.RecruitmentStatus
                                                         (Name,
                                                          Color,
@@ -4075,7 +4074,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                       DateUpdated = @DateUpdated
                                                   WHERE Id = @Id";
 
-        public const string RECRUITMENT_STATUS_DELETE = @"  UPDATE dbo.RecruitmentStatus
+        public const string RECRUITMENT_STATUS_DELETE = @"UPDATE dbo.RecruitmentStatus
                                                   SET UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated,
                                                       IsDeleted = 1
