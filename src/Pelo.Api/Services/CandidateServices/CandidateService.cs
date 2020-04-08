@@ -116,8 +116,8 @@ namespace Pelo.Api.Services.CandidateServices
                                                                                                                   Phone = $"%{request.Phone}%",
                                                                                                                   Code = $"%{request.Code}%",
                                                                                                                   CandidateStatusId = request.CandidateStatusId,
-                                                                                                                  FromDate = $"{request.FromDate}",
-                                                                                                                  ToDate = $"{request.ToDate}",
+                                                                                                                  FromDate = request.FromDate,
+                                                                                                                  ToDate = request.FromDate,
                                                                                                                   Skip = (request.Page - 1) * request.PageSize,
                                                                                                                   Take = request.PageSize
                                                                                                               });
