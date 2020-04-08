@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Pelo.Api.Services.BaseServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.Candidate;
+using Pelo.Common.Dtos.CandidateStatus;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
 
@@ -149,6 +150,12 @@ namespace Pelo.Api.Services.CandidateServices
                     {
                         code = $"TD{DateTime.Today.ToString("yyMMdd")}{(rs.Data + 1).ToString("D3")}";
                     }
+                    int candidateStatusId = 0;
+                    var candidateStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCandidateStatusResponse>(SqlQuery.CANDIDATE_STATUS_FIRST_SORT_ORDER, null);
+                    if (candidateStatus.IsSuccess)
+                    {
+                        candidateStatusId = candidateStatus.Data.Id;
+                    }
                     var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CANDIDATE_INSERT,
                                                                                                               new
                                                                                                               {
@@ -157,6 +164,7 @@ namespace Pelo.Api.Services.CandidateServices
                                                                                                                   request.Address,
                                                                                                                   request.Email,
                                                                                                                   request.Description,
+                                                                                                                  CandidateStatusId = candidateStatusId,
                                                                                                                   UserCreated = userId,
                                                                                                                   DateCreated = DateTime.Now,
                                                                                                                   UserUpdated = userId,
@@ -193,6 +201,7 @@ namespace Pelo.Api.Services.CandidateServices
                                                                                                                   request.Name,
                                                                                                                   request.Address,
                                                                                                                   request.Email,
+                                                                                                                  request.CandidateStatusId,
                                                                                                                   request.Description,
                                                                                                                   UserUpdated = userId,
                                                                                                                   DateUpdated = DateTime.Now

@@ -3415,7 +3415,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                    FROM dbo.CandidateStatus
                                                    WHERE IsDeleted = 0
                                                    ORDER BY Id;";
-
+        public const string CANDIDATE_STATUS_FIRST_SORT_ORDER= @"SELECT TOP 1 Id,[Name],SortOrder FROM dbo.CandidateStatus WHERE IsDeleted = 0 ORDER BY SortOrder asc";
         public const string CANDIDATE_STATUS_GET_BY_PAGING = @"  SELECT *
                                                          FROM dbo.CandidateStatus 
                                                          WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
@@ -3429,7 +3429,6 @@ SELECT COUNT(*) FROM dbo.Role c
                                                             AND IsDeleted = 0;";
 
         public const string CANDIDATE_STATUS_GET_BY_ID = @"SELECT * FROM dbo.CandidateStatus WHERE Id = @Id AND IsDeleted = 0";
-
 
         public const string CANDIDATE_STATUS_INSERT = @"INSERT dbo.CandidateStatus
                                                         (Name,
@@ -4090,7 +4089,9 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         (Name,
                                                          Code,
                                                          Address,
-                                                         Email,Description,
+                                                         Email,
+                                                         Description,
+                                                         CandidateStatusId,
                                                          UserCreated,
                                                          DateCreated,
                                                          UserUpdated,
@@ -4099,7 +4100,9 @@ SELECT COUNT(*) FROM dbo.Role c
                                                  VALUES (@Name,
                                                          @Code,
                                                          @Address,
-                                                         @Email,@Description,
+                                                         @Email,
+                                                         @Description,
+                                                         @CandidateStatusId,
                                                          @UserCreated,
                                                          @DateCreated,
                                                          @UserUpdated,
@@ -4111,7 +4114,9 @@ SELECT COUNT(*) FROM dbo.Role c
         public const string CANDIDATE_UPDATE = @"  UPDATE dbo.Candidate
                                                   SET Name = @Name,
                                                          Address=@Address,
-                                                         Email=@Email,Description=@Description,
+                                                         Email=@Email,
+                                                         CandidateStatusId=@CandidateStatusId,
+                                                         Description=@Description,
                                                       UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated
                                                   WHERE Id = @Id";
@@ -4123,23 +4128,23 @@ SELECT COUNT(*) FROM dbo.Role c
                                                   WHERE Id = @Id";
 
         public const string CANDIDATE_GET_BY_PAGING = @"SELECT c.Id,
-                                                             c.Code,
-                                                             c.Name,
-                                                             c.Phone,
-                                                             c.Address,
+                                                             c.[Code],
+                                                             c.[Name],
+                                                             c.[Phone],
+                                                             c.[Address],
                                                              c.Email,
-                                                             c.Description
-                                                             cs.Color
-                                                             cs.Name AS CandidateStatusName
+                                                             c.[Description],
+                                                             cs.Color,
+                                                             cs.[Name] AS CandidateStatusName,
                                                              u.FullName AS UserNameCreated,
-                                                             u.Phone AS UserPhoneCreated
+                                                             u.[PhoneNumber] AS UserPhoneCreated
                                                          FROM dbo.Candidate AS c
                                                             LEFT JOIN dbo.CandidateStatus AS cs
                                                                ON cs.Id = c.CandidateStatusId
                                                          LEFT JOIN dbo.[User] As u
                                                                ON u.Id = c.UserCreated
                                                          WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
-                                                             AND ISNULL(c.Phone, '') COLLATE Latin1_General_CI_AI LIKE @Phone COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(c.[Phone], '') COLLATE Latin1_General_CI_AI LIKE @Phone COLLATE Latin1_General_CI_AI
                                                              AND ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
                                                              AND
                                                              (
@@ -4148,7 +4153,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              )
                                                              AND
                                                              (
-                                                                (@FromDate = '' OR c.DateCreated >= @FromDate) AND (@ToDate ='' OR c.DateCreated <= @ToDate)
+                                                                ((@FromDate = '' AND @ToDate ='')||(@FromDate = '' OR c.DateCreated >= @FromDate) AND (@ToDate ='' OR c.DateCreated <= @ToDate))
                                                              )
                                                              
                                                                 AND IsDeleted = 0
@@ -4157,8 +4162,8 @@ SELECT COUNT(*) FROM dbo.Role c
 
                                                         SELECT COUNT(*) FROM dbo.Candidate
                                                          WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
-                                                             AND ISNULL(c.Phone, '') COLLATE Latin1_General_CI_AI LIKE @Phone COLLATE Latin1_General_CI_AI
-                                                             AND ISNULL(c.Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL([Phone], '') COLLATE Latin1_General_CI_AI LIKE @Phone COLLATE Latin1_General_CI_AI
+                                                             AND ISNULL(Code, '') COLLATE Latin1_General_CI_AI LIKE @Code COLLATE Latin1_General_CI_AI
                                                              AND
                                                              (
                                                                  @CandidateStatusId = 0
@@ -4166,7 +4171,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                              )
                                                              AND
                                                              (
-                                                                (@FromTime ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @FromTime, 0)) <= 0) AND (@ToTime ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @ToTime, 0)) >= 0)
+                                                                ((@FromDate = '' AND @ToDate ='')||(@FromDate = '' OR c.DateCreated >= @FromDate) AND (@ToDate ='' OR c.DateCreated <= @ToDate))
                                                              )
                                                                 AND IsDeleted = 0;";
 
