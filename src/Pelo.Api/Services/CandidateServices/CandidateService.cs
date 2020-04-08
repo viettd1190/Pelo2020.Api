@@ -161,6 +161,7 @@ namespace Pelo.Api.Services.CandidateServices
                                                                                                               {
                                                                                                                   request.Name,
                                                                                                                   Code = code,
+                                                                                                                  request.Phone,
                                                                                                                   request.Address,
                                                                                                                   request.Email,
                                                                                                                   request.Description,
@@ -199,6 +200,7 @@ namespace Pelo.Api.Services.CandidateServices
                                                                                                               {
                                                                                                                   request.Id,
                                                                                                                   request.Name,
+                                                                                                                  request.Phone,
                                                                                                                   request.Address,
                                                                                                                   request.Email,
                                                                                                                   request.CandidateStatusId,

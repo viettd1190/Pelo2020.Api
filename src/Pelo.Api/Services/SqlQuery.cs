@@ -4088,6 +4088,7 @@ SELECT COUNT(*) FROM dbo.Role c
         public const string CANDIDATE_INSERT = @"INSERT dbo.Candidate
                                                         (Name,
                                                          Code,
+                                                         Phone,
                                                          Address,
                                                          Email,
                                                          Description,
@@ -4099,6 +4100,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          IsDeleted)
                                                  VALUES (@Name,
                                                          @Code,
+                                                         @Phone,
                                                          @Address,
                                                          @Email,
                                                          @Description,
@@ -4113,6 +4115,7 @@ SELECT COUNT(*) FROM dbo.Role c
 
         public const string CANDIDATE_UPDATE = @"  UPDATE dbo.Candidate
                                                   SET Name = @Name,
+                                                         Phone = @Phone,
                                                          Address=@Address,
                                                          Email=@Email,
                                                          CandidateStatusId=@CandidateStatusId,
