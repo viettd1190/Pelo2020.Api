@@ -109,6 +109,15 @@ namespace Pelo.Api.Services.CandidateServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
+                    string fromDate = string.Empty; string toDate = string.Empty;
+                    if (!string.IsNullOrEmpty(request.FromDate))
+                    {
+                        fromDate = string.Format("{0:yyyy-MM-dd} 00:00:00", DateTime.Parse(request.FromDate));
+                    }
+                    if (!string.IsNullOrEmpty(request.ToDate))
+                    {
+                        toDate = string.Format("{0:yyyy-MM-dd} 23:59:00", DateTime.Parse(request.ToDate));
+                    }
                     var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetCandidatePagingResponse, int>(string.Format(SqlQuery.CANDIDATE_GET_BY_PAGING, request.ColumnOrder, request.SortDir.ToUpper()),
                                                                                                               new
                                                                                                               {
@@ -116,8 +125,8 @@ namespace Pelo.Api.Services.CandidateServices
                                                                                                                   Phone = $"%{request.Phone}%",
                                                                                                                   Code = $"%{request.Code}%",
                                                                                                                   CandidateStatusId = request.CandidateStatusId,
-                                                                                                                  FromDate = request.FromDate,
-                                                                                                                  ToDate = request.FromDate,
+                                                                                                                  FromDate = fromDate,
+                                                                                                                  ToDate = toDate,
                                                                                                                   Skip = (request.Page - 1) * request.PageSize,
                                                                                                                   Take = request.PageSize
                                                                                                               });
