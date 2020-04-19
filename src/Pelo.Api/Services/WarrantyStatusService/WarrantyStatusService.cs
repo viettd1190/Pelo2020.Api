@@ -175,8 +175,6 @@ namespace Pelo.Api.Services.WarrantyServices
                                                                                                                   request.Name,
                                                                                                                   request.Color,
                                                                                                                   request.SortOrder,
-                                                                                                                  request.IsSendSms,
-                                                                                                                  request.SmsContent,
                                                                                                                   UserCreated = userId,
                                                                                                                   DateCreated = DateTime.Now,
                                                                                                                   UserUpdated = userId,

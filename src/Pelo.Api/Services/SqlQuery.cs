@@ -3370,8 +3370,6 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         (Name,
                                                          Color,
                                                          SortOrder,
-                                                         IsSendSms,
-                                                         SmsContent,
                                                          UserCreated,
                                                          DateCreated,
                                                          UserUpdated,
@@ -3380,8 +3378,6 @@ SELECT COUNT(*) FROM dbo.Role c
                                                  VALUES (@Name,
                                                          @Color,
                                                          @SortOrder,
-                                                         @IsSendSms,
-                                                         @SmsContent,
                                                          @UserCreated,
                                                          @DateCreated,
                                                          @UserUpdated,
@@ -3393,9 +3389,7 @@ SELECT COUNT(*) FROM dbo.Role c
         public const string WARRANTY_STATUS_UPDATE = @"  UPDATE dbo.WarrantyStatus
                                                   SET Name = @Name,
                                                       Color = @Color,
-                                                      IsSendSms = @IsSendSms,
                                                       SortOrder = @SortOrder,
-                                                      SmsContent = @SmsContent,
                                                       UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated
                                                   WHERE Id = @Id";
