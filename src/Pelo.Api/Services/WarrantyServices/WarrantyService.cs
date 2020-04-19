@@ -107,7 +107,12 @@ namespace Pelo.Api.Services.WarrantyServices
                                               whereCondition);
                     whereCondition = " AND ";
                 }
-
+                if (request.UserCareId > 0)
+                {
+                    whereBuilder.AppendFormat("{0}uiw.UserId = @UserCareId",
+                                              whereCondition);
+                    whereCondition = " AND ";
+                }
             }
 
             if (request.FromDate != null)
@@ -146,8 +151,8 @@ namespace Pelo.Api.Services.WarrantyServices
                                        b.Name AS Branch,
                                        u1.DisplayName AS UserCreated,
                                        u1.PhoneNumber AS UserCreatedPhone,
-                                       i.DeliveryDate,
-                                       i.DateCreated
+                                       w.DeliveryDate,
+                                       w.DateCreated
                                 FROM #tmpWarranty tmp
                                     INNER JOIN dbo.Warranty w
                                         ON tmp.Id = w.Id
@@ -204,8 +209,8 @@ namespace Pelo.Api.Services.WarrantyServices
                     {
                         foreach (var warranty in result.Data.Item1)
                         {
-                            warranty.Products = new List<ProductInWarrantySimpleModel>();
-                            var products = await ReadOnlyRepository.QueryAsync<ProductInWarrantySimpleModel>(SqlQuery.PRODUCTS_IN_INVOICE_GET_BY_INVOICE_ID,
+                            warranty.Products = new List<ProductInWarrantySimple>();
+                            var products = await ReadOnlyRepository.QueryAsync<ProductInWarrantySimple>(SqlQuery.PRODUCTS_IN_INVOICE_GET_BY_INVOICE_ID,
                                                                                                             new
                                                                                                             {
                                                                                                                 WarrantyId = warranty.Id
@@ -250,9 +255,78 @@ namespace Pelo.Api.Services.WarrantyServices
             }
         }
 
-        public Task<TResponse<PageResult<GetWarrantyPagingResponse>>> GetByCustomerId(int userId, int customerId, int page, int pageSize)
+        public async Task<TResponse<PageResult<GetWarrantyPagingResponse>>> GetByCustomerId(int userId, int customerId, int page, int pageSize)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = new TResponse<(IEnumerable<GetWarrantyPagingResponse>, int)>();
+
+                bool canGetAll = false;
+
+                var canGetAllCrm = await _appConfigService.GetByName("DefaultWarrantyAcceptRoles");
+                if (canGetAllCrm.IsSuccess)
+                {
+                    var defaultRoles = canGetAllCrm.Data.Split(" ");
+                    var currentRole = await _roleService.GetNameByUserId(userId);
+                    if (currentRole.IsSuccess
+                       && !string.IsNullOrEmpty(currentRole.Data)
+                       && defaultRoles.Contains(currentRole.Data))
+                    {
+                        canGetAll = true;
+                    }
+                }
+
+                if (canGetAll)
+                {
+                    result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyPagingResponse, int>(SqlQuery.WARRANTY_GET_BY_CUSTOMER_ID,
+                                                                                                          new
+                                                                                                          {
+                                                                                                              CustomerId = customerId,
+                                                                                                              Skip = (page - 1) * pageSize,
+                                                                                                              Take = pageSize
+                                                                                                          });
+                }
+                else
+                {
+                    result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyPagingResponse, int>(SqlQuery.WARRANTY_GET_BY_CUSTOMER_ID_2,
+                                                                                                          new
+                                                                                                          {
+                                                                                                              CustomerId = customerId,
+                                                                                                              UserId = userId,
+                                                                                                              Skip = (page - 1) * pageSize,
+                                                                                                              Take = pageSize
+                                                                                                          });
+                }
+
+                if (result.IsSuccess)
+                {
+                    foreach (var warranty in result.Data.Item1)
+                    {
+                        warranty.Products = new List<ProductInWarrantySimple>();
+                        var products = await ReadOnlyRepository.QueryAsync<ProductInWarrantySimple>(SqlQuery.PRODUCTS_IN_WARRANTY_GET_BY_WARRANTY_ID,
+                                                                                                        new
+                                                                                                        {
+                                                                                                            WarrantyId = warranty.Id
+                                                                                                        });
+                        if (products.IsSuccess
+                           && products.Data != null)
+                        {
+                            warranty.Products.AddRange(products.Data);
+                        }
+                    }
+
+                    return await Ok(new PageResult<GetWarrantyPagingResponse>(page,
+                                                                             pageSize,
+                                                                             result.Data.Item2,
+                                                                             result.Data.Item1));
+                }
+
+                return await Fail<PageResult<GetWarrantyPagingResponse>>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<PageResult<GetWarrantyPagingResponse>>(exception);
+            }
         }
 
         public async Task<TResponse<bool>> Insert(int userId, InsertWarrantyRequest request)
@@ -271,7 +345,7 @@ namespace Pelo.Api.Services.WarrantyServices
                                                                                    WarrantyStatusId = warrantyStatusId,
                                                                                    request.BranchId,
                                                                                    request.CustomerId,
-                                                                                   Total = request.Total,
+                                                                                   request.Total,
                                                                                    request.Deposit,
                                                                                    request.DeliveryDate,
                                                                                    request.Description,
@@ -337,9 +411,68 @@ namespace Pelo.Api.Services.WarrantyServices
             }
         }
 
-        public Task<TResponse<GetWarrantyByIdResponse>> GetById(int userId, int id)
+        public async Task<TResponse<GetWarrantyByIdResponse>> GetById(int userId, int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyByIdResponse>(SqlQuery.WARRANTY_GET_BY_ID, new
+                {
+                    Id = id
+                });
+                if (result.IsSuccess)
+                {
+                    if (result.Data != null)
+                    {
+                        var warranty = result.Data;
+
+                        warranty.Products = new List<ProductInWarranty>();
+                        warranty.UsersCare = new List<UserDisplaySimpleModel>();
+                        warranty.UsersInCharge = new List<UserDisplaySimpleModel>();
+
+                        var products = await ReadOnlyRepository.QueryAsync<ProductInWarranty>(SqlQuery.GET_PRODUCTS_IN_WARRANTY, new
+                        {
+                            WarrantyId = id
+                        });
+                        if (products.IsSuccess
+                           && products.Data != null)
+                        {
+                            warranty.Products.AddRange(products.Data);
+                        }
+
+                        var userCares = await ReadOnlyRepository.QueryAsync<UserDisplaySimpleModel>(SqlQuery.GET_USERS_IN_WARRANTY, new
+                        {
+                            WarrantyId = id,
+                            Type = 1
+                        });
+                        if (userCares.IsSuccess
+                           && userCares.Data != null)
+                        {
+                            warranty.UsersCare.AddRange(userCares.Data);
+                        }
+
+                        var userIncharge = await ReadOnlyRepository.QueryAsync<UserDisplaySimpleModel>(SqlQuery.GET_USERS_IN_WARRANTY, new
+                        {
+                            WarrantyId = id,
+                            Type = 0
+                        });
+                        if (userIncharge.IsSuccess
+                           && userIncharge.Data != null)
+                        {
+                            warranty.UsersInCharge.AddRange(userIncharge.Data);
+                        }
+
+                        return await Ok(warranty);
+                    }
+
+                    return await Fail<GetWarrantyByIdResponse>("Not found");
+                }
+
+                return await Fail<GetWarrantyByIdResponse>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<GetWarrantyByIdResponse>(exception);
+            }
         }
 
         private async Task<TResponse<bool>> CanInsert(int userId)

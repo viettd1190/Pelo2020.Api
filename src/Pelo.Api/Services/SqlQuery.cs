@@ -4566,6 +4566,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                           (
                                                               ProductId,
                                                               WarrantyId,
+                                                              ProductName,
                                                               Description,
                                                               WarrantyDescriptionId,
                                                               SerialNumber,
@@ -4578,6 +4579,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                           VALUES
                                                           (   @ProductId,         -- ProductId - int
                                                               @WarrantyId,         -- WarrantyId - int
+                                                              @ProductName,        --- ProductName nvarchar(250)
                                                               @Description,         -- Description - int
                                                               @WarrantyDescriptionId,         -- WarrantyDescriptionId - int
                                                               @SerialNumber,       -- SerialNumber - nvarchar(2000)
@@ -4603,6 +4605,94 @@ SELECT COUNT(*) FROM dbo.Role c
                                                       INNER JOIN dbo.[User] u1
                                                           ON u1.Id = w.UserCreated
                                                   WHERE i.Id = @Id AND i.IsDeleted = 0;";
+
+        public const string WARRANTY_GET_BY_CUSTOMER_ID = @"SELECT i.Id,
+                                                                  ws.Name AS WarrantyStatus,
+                                                                  ws.Color AS WarrantyStatusColor,
+                                                                  w.Code,
+                                                                  c.Name AS CustomerName,
+                                                                  c.Phone AS CustomerPhone1,
+                                                                  c.Phone2 AS CustomerPhone2,
+                                                                  c.Phone3 AS CustomerPhone3,
+                                                                  c.Address AS CustomerAddress,
+                                                                  c.Code AS CustomerCode,
+                                                                  b.Name AS Branch,
+                                                                  u2.DisplayName AS UserCreated,
+                                                                  u2.PhoneNumber AS UserCreatedPhone,
+                                                                  w.DeliveryDate,
+                                                                  w.DateCreated
+                                                           FROM dbo.Warranty w
+                                                               INNER JOIN dbo.Customer c
+                                                                   ON c.Id = w.CustomerId
+                                                               INNER JOIN dbo.Branch b
+                                                                   ON b.Id = w.BranchId
+                                                               INNER JOIN dbo.InvoiceStatus ins
+                                                                   ON ins.Id = w.InvoiceStatusId
+                                                               INNER JOIN dbo.[User] u2
+                                                                   ON u2.Id = w.UserCreated
+                                                           WHERE w.CustomerId = @CustomerId
+                                                                 AND w.IsDeleted = 0
+                                                                 AND c.IsDeleted = 0
+                                                           ORDER BY i.Id DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                    
+                                                           SELECT COUNT(*)
+                                                           FROM dbo.Warranty w
+                                                               INNER JOIN dbo.Customer c
+                                                                   ON c.Id = w.CustomerId
+                                                           WHERE w.CustomerId = @CustomerId
+                                                                 AND w.IsDeleted = 0
+                                                                 AND c.IsDeleted = 0;";
+
+        public const string WARRANTY_GET_BY_CUSTOMER_ID_2 = @"SELECT w.Id,
+                                                                    ws.Name AS WarrantyStatus,
+                                                                    ws.Color AS WarrantyStatusColor,
+                                                                    w.Code,
+                                                                    c.Name AS CustomerName,
+                                                                    c.Phone AS CustomerPhone,
+                                                                    c.Phone2 AS CustomerPhone2,
+                                                                    c.Phone3 AS CustomerPhone3,
+                                                                    c.Address AS CustomerAddress,
+                                                                    c.Code AS CustomerCode,
+                                                                    b.Name AS Branch,
+                                                                    u2.DisplayName AS UserCreated,
+                                                                    u2.PhoneNumber AS UserCreatedPhone,
+                                                                    w.DeliveryDate,
+                                                                    w.DateCreated
+                                                             FROM dbo.Warranty w
+                                                                 INNER JOIN dbo.Customer c
+                                                                     ON c.Id = w.CustomerId
+                                                                 INNER JOIN dbo.Branch b
+                                                                     ON b.Id = w.BranchId
+                                                                 INNER JOIN dbo.InvoiceStatus ins
+                                                                     ON ins.Id = w.InvoiceStatusId
+                                                                 INNER JOIN dbo.[User] u2
+                                                                     ON u2.Id = w.UserCreated
+                                                                 LEFT JOIN dbo.UserInWarranty uiw
+                                                                     ON c.Id = uiw.InvoiceId
+                                                             WHERE w.CustomerId = @CustomerId
+                                                                   AND
+                                                                   (
+                                                                       w.UserCreated = @UserId
+                                                                       OR uiw.UserId = @UserId
+                                                                   )
+                                                                   AND w.IsDeleted = 0
+                                                                   AND c.IsDeleted = 0
+                                                             ORDER BY w.Id DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                        
+                                                             SELECT COUNT(*)
+                                                             FROM dbo.Warranty w
+                                                                 INNER JOIN dbo.Customer c
+                                                                     ON c.Id = w.CustomerId
+                                                                 LEFT JOIN dbo.UserInWarranty uiw
+                                                                     ON c.Id = uiw.InvoiceId
+                                                             WHERE w.CustomerId = @CustomerId
+                                                                   AND
+                                                                   (
+                                                                       w.UserCreated = @UserId
+                                                                       OR uiw.UserId = @UserId
+                                                                   )
+                                                                   AND w.IsDeleted = 0
+                                                                   AND c.IsDeleted = 0;";
         #endregion
     }
 }
