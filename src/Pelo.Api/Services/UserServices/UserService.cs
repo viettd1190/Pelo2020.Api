@@ -39,6 +39,8 @@ namespace Pelo.Api.Services.UserServices
         Task<TResponse<bool>> IsBelongDefaultInvoiceRole(int userId);
 
         Task<TResponse<UserDisplaySimpleModel>> GetByUsername(string name);
+
+        Task<TResponse<bool>> IsBelongDefaultWarrantyRole(int userId);
     }
 
     public class UserService : BaseService,
@@ -359,7 +361,30 @@ namespace Pelo.Api.Services.UserServices
                 return await Fail<bool>(exception);
             }
         }
+        public async Task<TResponse<bool>> IsBelongDefaultWarrantyRole(int userId)
+        {
+            try
+            {
+                var canGetAllInvoice = await _appConfigService.GetByName("DefaultWarrantyAcceptRoles");
+                if (canGetAllInvoice.IsSuccess)
+                {
+                    var defaultRoles = canGetAllInvoice.Data.Split(" ");
+                    var currentRole = await _roleService.GetNameByUserId(userId);
+                    if (currentRole.IsSuccess
+                       && !string.IsNullOrEmpty(currentRole.Data)
+                       && defaultRoles.Contains(currentRole.Data))
+                    {
+                        return await Ok(true);
+                    }
+                }
 
+                return await Fail<bool>(string.Empty);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
         public async Task<TResponse<UserDisplaySimpleModel>> GetByUsername(string username)
         {
             try

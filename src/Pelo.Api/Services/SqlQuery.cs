@@ -4335,5 +4335,274 @@ SELECT COUNT(*) FROM dbo.Role c
                                                   WHERE Id = @Id";
 
         #endregion
+
+        #region Warranty
+        /// <summary>
+        ///     Lấy danh sách Warranty ko có điều kiện UserCareId
+        /// </summary>
+
+        public const string WARRANTY_GET_BY_PAGING = @"DROP TABLE IF EXISTS #tmpWarranty;
+
+                                                      SELECT w.Id
+                                                      INTO #tmpWarranty
+                                                      FROM dbo.Warranty w
+                                                          LEFT JOIN Customer c
+                                                              ON c.Id = w.CustomerId
+                                                      WHERE ISNULL(c.Code, '') LIKE @CustomerCode
+                                                            AND ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI
+                                                            AND
+                                                            (
+                                                                ISNULL(c.Phone, '') LIKE @CustomerPhone
+                                                                OR ISNULL(c.Phone2, '') LIKE @CustomerPhone
+                                                                OR ISNULL(c.Phone3, '') LIKE @CustomerPhone
+                                                            )
+                                                            AND w.Code LIKE @Code
+                                                            AND
+                                                            (
+                                                                @WarrantyStatusId = 0
+                                                                OR ISNULL(w.WarrantyStatusId, 0) = @WarrantyStatusId
+                                                            )
+                                                            AND
+                                                            (
+                                                                @UserCreatedId = 0
+                                                                OR w.UserCreated = @UserCreatedId
+                                                            )
+                                                            AND
+                                                            (
+                                                                @UserCreatedId = 0
+                                                                OR w.UserCreatedId = @UserCreatedId
+                                                            )
+                                                            AND
+                                                            (
+                                                                @FromDate IS NULL
+                                                                OR w.DateCreated >= @FromDate
+                                                            )
+                                                            AND
+                                                            (
+                                                                @ToDate IS NULL
+                                                                OR w.DateCreated <= @ToDate
+                                                            )
+                                                            AND w.IsDeleted = 0
+                                                            AND c.IsDeleted = 0;
+
+
+                                                      SELECT w.Id,
+                                                             w.Code,
+                                                             ws.Name AS WarrantyStatus,
+                                                             ws.Color AS WarrantyStatusColor,
+                                                             c.Name AS CustomerName,
+                                                             c.Phone AS CustomerPhone1,
+                                                             c.Phone2 AS CustomerPhone2,
+                                                             c.Phone3 AS CustomerPhone3,
+                                                             c.CustomerAddress,
+                                                             c.Code AS CustomerCode,
+                                                             b.Name AS Branch,
+                                                             u1.DisplayName AS UserCreated,
+                                                             u1.PhoneNumber AS UserCreatedPhone,
+                                                             w.DeliveryDate,
+                                                             w.DateCreated
+                                                      FROM #tmpWarranty tmp
+                                                          INNER JOIN dbo.Warranty w
+                                                              ON tmp.Id = w.Id
+                                                          LEFT JOIN dbo.Customer c
+                                                              ON c.Id = w.CustomerId
+                                                          LEFT JOIN dbo.Branch b
+                                                              ON b.Id = w.BranchId
+                                                          LEFT JOIN dbo.WarrantyStatus ws
+                                                              ON ws.Id = w.WarrantyStatusId
+                                                          LEFT JOIN dbo.[User] u1
+                                                              ON u1.Id = w.UserCreated
+                                                      ORDER BY w.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                      SELECT COUNT(*)
+                                                      FROM #tmpWarranty;
+                                                      DROP TABLE #tmpWarranty;";
+
+        /// <summary>
+        ///     Lấy danh sách Warranty có điều kiện UserCareId
+        /// </summary>
+
+        public const string WARRANTY_GET_BY_PAGING_2 = @"DROP TABLE IF EXISTS #tmpWarranty;
+
+                                                        SELECT w.Id
+                                                        INTO #tmpWarranty
+                                                        FROM dbo.Warranty w
+                                                            LEFT JOIN Customer c
+                                                                ON c.Id = w.CustomerId
+                                                        WHERE ISNULL(c.Code, '') LIKE @CustomerCode
+                                                              AND ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI
+                                                              AND
+                                                              (
+                                                                  ISNULL(c.Phone, '') LIKE @CustomerPhone
+                                                                  OR ISNULL(c.Phone2, '') LIKE @CustomerPhone
+                                                                  OR ISNULL(c.Phone3, '') LIKE @CustomerPhone
+                                                              )
+                                                              AND w.Code LIKE @Code
+                                                              AND
+                                                              (
+                                                                  @WarrantyStatusId = 0
+                                                                  OR ISNULL(w.WarrantyStatusId, 0) = @WarrantyStatusId
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @UserCreatedId = 0
+                                                                  OR w.UserCreated = @UserCreatedId
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @FromDate IS NULL
+                                                                  OR w.DateCreated >= @FromDate
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @ToDate IS NULL
+                                                                  OR w.DateCreated <= @ToDate
+                                                              )
+                                                              AND w.IsDeleted = 0
+                                                              AND c.IsDeleted = 0;
+                         
+                         
+                                                        SELECT w.Id,
+                                                               w.Code,
+                                                               ws.Name AS WarrantyStatus,
+                                                               ws.Color AS WarrantyStatusColor,
+                                                               c.Name AS CustomerName,
+                                                               c.Phone AS CustomerPhone1,
+                                                               c.Phone2 AS CustomerPhone2,
+                                                               c.Phone3 AS CustomerPhone3,
+                                                               c.CustomerAddress,
+                                                               c.Code AS CustomerCode,
+                                                               b.Name AS Branch,
+                                                               u1.DisplayName AS UserCreated,
+                                                               u1.PhoneNumber AS UserCreatedPhone,
+                                                               w.DeliveryDate,
+                                                               w.DateCreated                                                                                    FROM #tmpWarranty tmp
+                                                            INNER JOIN dbo.Warranty w
+                                                                ON tmp.Id = w.Id
+                                                            LEFT JOIN dbo.Customer c
+                                                                ON c.Id = w.CustomerId
+                                                            LEFT JOIN dbo.Province p
+                                                                ON p.Id = c.ProvinceId
+                                                            LEFT JOIN dbo.District d
+                                                                ON d.Id = c.DistrictId
+                                                            LEFT JOIN dbo.Ward w
+                                                                ON w.Id = c.WardId
+                                                            LEFT JOIN dbo.Branch b
+                                                                ON b.Id = w.BranchId
+                                                            LEFT JOIN dbo.WarrantyStatus ws
+                                                                ON ws.Id = w.WarrantyStatusId
+                                                            LEFT JOIN dbo.[User] u1
+                                                                ON u1.Id = w.UserCreated
+                                                        ORDER BY w.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                         
+                                                        SELECT COUNT(*)
+                                                        FROM #tmpWarranty;
+                                                        DROP TABLE #tmpWarranty;";
+
+        public const string GET_PRODUCTS_IN_WARRANTY= @"SELECT piw.ProductId AS Id,
+                                                               piw.ProductName AS Name,
+                                                               piw.Description,
+                                                               piw.SerialNumber,
+                                                               wd.Name AS WarrantyDescription
+                                                        FROM dbo.ProductInWarranty AS piw
+                                                            LEFT JOIN dbo.WarrantyDescription wd
+                                                                ON wd.Id = piw.WarrantyStatusId
+                                                        WHERE WarrantyId = @WarrantyId
+                                                              AND IsDeleted = 0;";
+
+        public const string PRODUCTS_IN_WARRANTY_GET_BY_WARRANTY_ID = @"SELECT Id,
+                                                                             ProductName AS Name,
+                                                                             Description
+                                                                      FROM dbo.ProductInWarranty
+                                                                      WHERE WarrantyId = @WarrantyId
+                                                                            AND IsDeleted = 0;";
+
+        public const string GET_USERS_IN_WARRANTY = @"SELECT u.DisplayName,
+                                                            u.PhoneNumber
+                                                     FROM dbo.UserInWarranty i
+                                                         INNER JOIN dbo.[User] u
+                                                             ON i.UserId = u.Id
+                                                                AND i.IsDeleted = 0
+                                                                AND i.Type = @Type
+                                                                AND i.WarrantyId = @WarrantyId;";
+
+        public const string WARRANTY_INSERT = @"INSERT dbo.Warranty
+                                               (
+                                                   Code,
+                                                   WarrantyStatusId,
+                                                   BranchId,
+                                                   CustomerId,
+                                                   Total,
+                                                   Deposit,
+                                                   DeliveryDate,
+                                                   Description,
+                                                   UserCreated,
+                                                   DateCreated,
+                                                   UserUpdated,
+                                                   DateUpdated,
+                                                   IsDeleted
+                                               )
+                                               VALUES
+                                               (   @Code,       -- Code - nvarchar(50)
+                                                   @WarrantyStatusId,         -- WarrantyStatusId - int
+                                                   @BranchId,         -- BranchId - int
+                                                   @CustomerId,         -- CustomerId - int
+                                                   @Total,         -- Total - bigint
+                                                   @Deposit,         -- Deposit - bigint
+                                                   @DeliveryDate, -- DeliveryDate - datetime
+                                                   @Description,       -- Description - nvarchar(max)
+                                                   @UserCreated,         -- UserCreated - int
+                                                   GETDATE(), -- DateCreated - datetime
+                                                   @UserUpdated,         -- UserUpdated - int
+                                                   GETDATE(), -- DateUpdated - datetime
+                                                   0       -- IsDeleted - bit
+                                                   );
+
+                                               SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string WARRANTY_COUNT_BY_DATE = @"SELECT COUNT(*) FROM dbo.Warranty WHERE Code LIKE @Code";
+
+        public const string PRODUCT_IN_WARRANTY_INSERT = @"INSERT dbo.ProductInWarranty
+                                                          (
+                                                              ProductId,
+                                                              WarrantyId,
+                                                              Description,
+                                                              WarrantyDescriptionId,
+                                                              SerialNumber,
+                                                              UserCreated,
+                                                              DateCreated,
+                                                              UserUpdated,
+                                                              DateUpdated,
+                                                              IsDeleted
+                                                          )
+                                                          VALUES
+                                                          (   @ProductId,         -- ProductId - int
+                                                              @WarrantyId,         -- WarrantyId - int
+                                                              @Description,         -- Description - int
+                                                              @WarrantyDescriptionId,         -- WarrantyDescriptionId - int
+                                                              @SerialNumber,       -- SerialNumber - nvarchar(2000)
+                                                              @UserCreated,         -- UserCreated - int
+                                                              GETDATE(), -- DateCreated - datetime
+                                                              @UserUpdated,         -- UserUpdated - int
+                                                              GETDATE(), -- DateUpdated - datetime
+                                                              0       -- IsDeleted - bit
+                                                              )";
+
+        public const string WARRANTY_GET_BY_ID = @"SELECT w.Id,
+                                                         w.Code,
+                                                         w.DateCreated,
+                                                         w.CustomerId,
+                                                         w.DeliveryDate,
+                                                         w.Total,
+                                                         w.Deposit,
+                                                         w.WarrantyStatusId,
+                                                         w.Description,
+                                                         u1.DisplayName AS UserCreated,
+                                                         u1.PhoneNumber AS UserCreatedPhone,
+                                                  FROM dbo.Warranty w
+                                                      INNER JOIN dbo.[User] u1
+                                                          ON u1.Id = w.UserCreated
+                                                  WHERE i.Id = @Id AND i.IsDeleted = 0;";
+        #endregion
     }
 }

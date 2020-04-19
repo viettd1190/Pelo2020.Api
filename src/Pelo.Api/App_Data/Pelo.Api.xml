@@ -1334,6 +1334,27 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyController.GetByPaging(Pelo.Common.Dtos.Warranty.GetWarrantyPagingRequest)">
+            <summary>
+                Lấy danh sách  bao hanh có phân trang
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyController.Insert(Pelo.Common.Dtos.Warranty.InsertWarrantyRequest)">
+            <summary>
+                Thêm mới bao hanh
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyController.GetById(System.Int32)">
+            <summary>
+            Lấy chi tiết bao hanh
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.WarrantyDescriptionController.GetAll">
             <summary>
                 Lấy tất cả trạng thái bảo hành
@@ -1518,6 +1539,16 @@
         <member name="F:Pelo.Api.Services.SqlQuery.INVOICE_GET_BY_PAGING_2">
             <summary>
                 Danh sách đơn hàng có thêm điều kiện người giao hàng
+            </summary>
+        </member>
+        <member name="F:Pelo.Api.Services.SqlQuery.WARRANTY_GET_BY_PAGING">
+            <summary>
+                Lấy danh sách Warranty ko có điều kiện UserCareId
+            </summary>
+        </member>
+        <member name="F:Pelo.Api.Services.SqlQuery.WARRANTY_GET_BY_PAGING_2">
+            <summary>
+                Lấy danh sách Warranty có điều kiện UserCareId
             </summary>
         </member>
         <member name="M:Pelo.Api.Services.UserServices.UserService.Insert(System.Int32,Pelo.Common.Dtos.User.InsertUserRequest)">
