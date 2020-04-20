@@ -50,7 +50,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/warranty_description/{id}")]
-        public async Task<ActionResult<WarrantyDescriptionSimpleModel>> GetById(int id)
+        public async Task<ActionResult<GetWarrantyDescriptionPagingResponse>> GetById(int id)
         {
             return Ok(await _warrantyService.GetById(await GetUserId(), id));
         }

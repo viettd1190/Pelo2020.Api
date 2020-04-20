@@ -3618,17 +3618,15 @@ SELECT COUNT(*) FROM dbo.Role c
                                                       IsDeleted = 1
                                                   WHERE Id = @Id";
 
-        public const string WARRANTY_DESCRIPTION_PAGING = @"SELECT c.Id,
-                                                              c.Name,
-                                                              c.DateUpdated
-                                                       FROM dbo.WarrantyDescription c
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND c.IsDeleted = 0
+        public const string WARRANTY_DESCRIPTION_PAGING = @"SELECT *
+                                                       FROM dbo.WarrantyDescription
+                                                       WHERE ISNULL(Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND IsDeleted = 0
                                                        ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
                                                        SELECT COUNT(*)
-                                                       FROM dbo.WarrantyDescription c
-                                                       WHERE ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
-                                                             AND c.IsDeleted = 0;";
+                                                       FROM dbo.WarrantyDescription
+                                                       WHERE ISNULL(Name, '') COLLATE Latin1_General_CI_AI LIKE @Name COLLATE Latin1_General_CI_AI
+                                                             AND IsDeleted = 0;";
 
         #endregion
 

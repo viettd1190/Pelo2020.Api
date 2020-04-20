@@ -15,7 +15,7 @@ namespace Pelo.Api.Services.WarrantyServices
         Task<TResponse<IEnumerable<WarrantyDescriptionSimpleModel>>> GetAll(int userId);
         Task<TResponse<PageResult<GetWarrantyDescriptionPagingResponse>>> GetPaging(int v, GetWarrantyDescriptionPagingRequest request);
 
-        Task<TResponse<WarrantyDescriptionSimpleModel>> GetById(int userId, int id);
+        Task<TResponse<GetWarrantyDescriptionPagingResponse>> GetById(int userId, int id);
 
         Task<TResponse<bool>> Insert(int userId, InsertWarrantyDescription request);
 
@@ -49,7 +49,7 @@ namespace Pelo.Api.Services.WarrantyServices
                     var data = await GetById(userId, id);
                     if (data.IsSuccess)
                     {
-                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.WARRANTY_DESCRIPTION_GET_ALL,
+                        var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.WARRANTY_DESCRIPTION_DELETE,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -98,14 +98,14 @@ namespace Pelo.Api.Services.WarrantyServices
             }
         }
 
-        public async Task<TResponse<WarrantyDescriptionSimpleModel>> GetById(int userId, int id)
+        public async Task<TResponse<GetWarrantyDescriptionPagingResponse>> GetById(int userId, int id)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<WarrantyDescriptionSimpleModel>(SqlQuery.WARRANTY_DESCRIPTION_GET_BY_ID,
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyDescriptionPagingResponse>(SqlQuery.WARRANTY_DESCRIPTION_GET_BY_ID,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -115,14 +115,14 @@ namespace Pelo.Api.Services.WarrantyServices
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<WarrantyDescriptionSimpleModel>(result.Message);
+                    return await Fail<GetWarrantyDescriptionPagingResponse>(result.Message);
                 }
 
-                return await Fail<WarrantyDescriptionSimpleModel>(canGetAll.Message);
+                return await Fail<GetWarrantyDescriptionPagingResponse>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<WarrantyDescriptionSimpleModel>(exception);
+                return await Fail<GetWarrantyDescriptionPagingResponse>(exception);
             }
         }
 
