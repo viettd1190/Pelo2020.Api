@@ -19,7 +19,7 @@ namespace Pelo.Api.Services.WarrantyServices
 
         Task<TResponse<PageResult<GetWarrantyStatusPagingResponse>>> GetPaging(int userId, GetWarrantyStatusPagingRequest request);
 
-        Task<TResponse<GetWarrantyStatusPagingResponse>> GetById(int userId, int id);
+        Task<TResponse<GetWarrantyStatusResponse>> GetById(int userId, int id);
 
         Task<TResponse<bool>> Insert(int userId, InsertWarrantyStatus request);
 
@@ -104,14 +104,14 @@ namespace Pelo.Api.Services.WarrantyServices
             }
         }
 
-        public async Task<TResponse<GetWarrantyStatusPagingResponse>> GetById(int userId, int id)
+        public async Task<TResponse<GetWarrantyStatusResponse>> GetById(int userId, int id)
         {
             try
             {
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyStatusPagingResponse>(SqlQuery.INVOICE_STATUS_GET_BY_ID,
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyStatusResponse>(SqlQuery.INVOICE_STATUS_GET_BY_ID,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -121,14 +121,14 @@ namespace Pelo.Api.Services.WarrantyServices
                         return await Ok(result.Data);
                     }
 
-                    return await Fail<GetWarrantyStatusPagingResponse>(result.Message);
+                    return await Fail<GetWarrantyStatusResponse>(result.Message);
                 }
 
-                return await Fail<GetWarrantyStatusPagingResponse>(canGetAll.Message);
+                return await Fail<GetWarrantyStatusResponse>(canGetAll.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<GetWarrantyStatusPagingResponse>(exception);
+                return await Fail<GetWarrantyStatusResponse>(exception);
             }
         }
 
