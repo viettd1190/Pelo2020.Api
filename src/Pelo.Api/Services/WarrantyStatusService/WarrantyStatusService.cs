@@ -111,7 +111,7 @@ namespace Pelo.Api.Services.WarrantyServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyStatusResponse>(SqlQuery.INVOICE_STATUS_GET_BY_ID,
+                    var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyStatusResponse>(SqlQuery.WARRANTY_STATUS_GET_BY_ID,
                                                                                                               new
                                                                                                               {
                                                                                                                   Id = id,
@@ -212,6 +212,7 @@ namespace Pelo.Api.Services.WarrantyServices
                                                                                                                   request.Id,
                                                                                                                   request.Name,
                                                                                                                   request.Color,
+                                                                                                                  request.SortOrder,
                                                                                                                   request.IsSendSms,
                                                                                                                   request.SmsContent,
                                                                                                                   UserUpdated = userId,
