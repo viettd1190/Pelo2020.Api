@@ -3351,11 +3351,11 @@ SELECT COUNT(*) FROM dbo.Role c
         #endregion
 
         #region WarrantStatus
-        public const string WARRANTY_STATUS_GET_BY_PAGING = @"  SELECT *
+        public const string WARRANTY_STATUS_GET_BY_PAGING = @"SELECT *
                                                          FROM dbo.WarrantyStatus 
                                                          WHERE ISNULL(Name,'') COLLATE Latin1_general_CI_AI LIKE @Name COLLATE Latin1_general_CI_AI
                                                              AND IsDeleted = 0
-                                                        OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                                                        ORDER BY {0} {1} OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
 
                                                         SELECT COUNT(*)
                                                         FROM dbo.WarrantyStatus 

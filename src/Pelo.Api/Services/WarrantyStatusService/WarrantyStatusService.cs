@@ -139,7 +139,7 @@ namespace Pelo.Api.Services.WarrantyServices
                 var canGetAll = await CanGetAll(userId);
                 if (canGetAll.IsSuccess)
                 {
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyStatusPagingResponse, int>(SqlQuery.WARRANTY_STATUS_GET_BY_PAGING,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyStatusPagingResponse, int>(string.Format(SqlQuery.WARRANTY_STATUS_GET_BY_PAGING, request.ColumnOrder, request.SortDir.ToUpper()),
                                                                                                               new
                                                                                                               {
                                                                                                                   request.Name,
