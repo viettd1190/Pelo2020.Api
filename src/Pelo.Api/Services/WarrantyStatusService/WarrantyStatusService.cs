@@ -142,7 +142,7 @@ namespace Pelo.Api.Services.WarrantyServices
                     var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyStatusPagingResponse, int>(string.Format(SqlQuery.WARRANTY_STATUS_GET_BY_PAGING, request.ColumnOrder, request.SortDir.ToUpper()),
                                                                                                               new
                                                                                                               {
-                                                                                                                  request.Name,
+                                                                                                                  Name =$"%{request.Name}%",
                                                                                                                   Skip = (request.Page - 1) * request.PageSize,
                                                                                                                   Take = request.PageSize
                                                                                                               });
@@ -175,6 +175,8 @@ namespace Pelo.Api.Services.WarrantyServices
                                                                                                                   request.Name,
                                                                                                                   request.Color,
                                                                                                                   request.SortOrder,
+                                                                                                                  request.IsSendSms,
+                                                                                                                  request.SmsContent,
                                                                                                                   UserCreated = userId,
                                                                                                                   DateCreated = DateTime.Now,
                                                                                                                   UserUpdated = userId,

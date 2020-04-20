@@ -3370,6 +3370,8 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         (Name,
                                                          Color,
                                                          SortOrder,
+                                                         IsSendSms,
+                                                         SmsContent,
                                                          UserCreated,
                                                          DateCreated,
                                                          UserUpdated,
@@ -3378,6 +3380,8 @@ SELECT COUNT(*) FROM dbo.Role c
                                                  VALUES (@Name,
                                                          @Color,
                                                          @SortOrder,
+                                                         @IsSendSms,
+                                                         @SmsContent,
                                                          @UserCreated,
                                                          @DateCreated,
                                                          @UserUpdated,
@@ -3390,6 +3394,8 @@ SELECT COUNT(*) FROM dbo.Role c
                                                   SET Name = @Name,
                                                       Color = @Color,
                                                       SortOrder = @SortOrder,
+                                                      IsSendSms = @IsSendSms,
+                                                      SmsContent = @SmsContent,
                                                       UserUpdated = @UserUpdated,
                                                       DateUpdated = @DateUpdated
                                                   WHERE Id = @Id";
@@ -4139,7 +4145,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                       IsDeleted = 1
                                                   WHERE Id = @Id";
 
-    public const string CANDIDATE_GET_BY_PAGING = @"SELECT c.Id,
+        public const string CANDIDATE_GET_BY_PAGING = @"SELECT c.Id,
                                                              c.Code,
                                                              c.Name,
                                                              c.Phone,
@@ -4190,6 +4196,71 @@ SELECT COUNT(*) FROM dbo.Role c
                                                          WHERE @CurrentDate ='' OR DATEDIFF(DAY,DateCreated,convert(datetime, @CurrentDate, 0)) = 0                                                                                                                       
                                                                 AND IsDeleted = 0;";
 
+        public const string CANDIDATE_INSERT_COMMENT = @"INSERT dbo.CandidateLog
+                                                  (
+                                                      CandidateId,
+                                                      Comment,
+                                                      LogDate,
+                                                      UserId,
+                                                      Attachment,
+                                                      OldCandidateStatusId,
+                                                      CandidateStatusId,
+                                                      AttachmentName
+                                                  )
+                                                  VALUES
+                                                  (   @CandidateId,         -- CandidateId - int
+                                                      @Comment,       -- Comment - nvarchar(1500)
+                                                      GETDATE(), -- LogDate - datetime
+                                                      @UserId,         -- UserId - int
+                                                      N'',       -- Attachment - nvarchar(50)
+                                                      @OldCandidateStatusId,         -- OldCandidateStatusId - int
+                                                      @CandidateStatusId,         -- CandidateStatusId - int
+                                                      N''        -- AttachmentName - nvarchar(300)
+                                                      );
+
+                                                  SELECT CAST(SCOPE_IDENTITY() as int);";
+        public const string CANDIDATE_LOG_ATTACHMENT_INSERT = @"INSERT dbo.CandidateLogAttachment
+                                                          (
+                                                              CandidateLogId,
+                                                              Attachment,
+                                                              AttachmentName,
+                                                              UserCreated,
+                                                              DateCreated,
+                                                              UserUpdated,
+                                                              DateUpdated,
+                                                              IsDeleted
+                                                          )
+                                                          VALUES
+                                                          (   @CandidateLogId,         -- CandidateLogId - int
+                                                              @Attachment,       -- Attachment - nvarchar(max)
+                                                              @AttachmentName,       -- AttachmentName - nvarchar(max)
+                                                              @UserCreated,         -- UserCreated - int
+                                                              GETDATE(), -- DateCreated - datetime
+                                                              @UserUpdated,         -- UserUpdated - int
+                                                              GETDATE(), -- DateUpdated - datetime
+                                                              0       -- IsDeleted - bit
+                                                              )";
+
+        public const string CANDIDATE_GET_LOGS = @"SELECT Id,
+                                                    CandidateId,
+                                                    UserId,
+                                                    Comment,
+                                                    LogDate,
+                                                    OldCandidateStatusId,
+                                                    CandidateStatusId
+                                             FROM dbo.CandidateLog
+                                             WHERE CandidateId = @CandidateId
+                                             ORDER BY LogDate DESC;";
+        public const string GET_CANDIDATE_STATUS_IN_LOG = @"SELECT Id,
+                                                             Name
+                                                      FROM dbo.CandidateStatus
+                                                      WHERE Id = @Id
+                                                            AND IsDeleted = 0;";
+
+        public const string GET_CANDIDATE_ATTACHMENT_IN_LOG = @"SELECT Attachment,
+                                                                 AttachmentName
+                                                          FROM dbo.CandidateLogAttachment
+                                                          WHERE CandidateLogId = @CandidateLogId;";
         #endregion
 
         #region Recruitment

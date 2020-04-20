@@ -1,13 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Pelo.Api.Services.BaseServices;
+using Pelo.Api.Services.MasterServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.Candidate;
 using Pelo.Common.Dtos.CandidateStatus;
+using Pelo.Common.Kafka;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
+using Pelo.Common.Events.Candidate;
+using Pelo.Common.Enums;
+using Pelo.Common.Extensions;
+using Pelo.Common.Dtos;
 
 namespace Pelo.Api.Services.CandidateServices
 {
@@ -22,6 +32,8 @@ namespace Pelo.Api.Services.CandidateServices
         Task<TResponse<bool>> Update(int userId, UpdateCandidate request);
 
         Task<TResponse<bool>> Delete(int userId, int id);
+        Task<TResponse<bool>> Comment(int userId, CandidateComment request);
+        Task<TResponse<IEnumerable<CandidateLogResponse>>> GetLogs(int userId, int id);
     }
 
     public class CandidateService : BaseService,
@@ -29,14 +41,109 @@ namespace Pelo.Api.Services.CandidateServices
     {
         readonly IRoleService _roleService;
 
+        private readonly IAppConfigService _appConfigService;
+
+        private readonly IBusPublisher _busPublisher;
+
+        private readonly IConfiguration _configuration;
+
         public CandidateService(IDapperReadOnlyRepository readOnlyRepository,
                                 IDapperWriteRepository writeRepository,
                                 IHttpContextAccessor context,
-                                IRoleService roleService) : base(readOnlyRepository,
+                                IRoleService roleService, IAppConfigService appConfigService,
+                          IConfiguration configuration,
+                          IBusPublisher busPublisher) : base(readOnlyRepository,
                                                                  writeRepository,
                                                                  context)
         {
             _roleService = roleService;
+            _appConfigService = appConfigService;
+            _busPublisher = busPublisher;
+            _configuration = configuration;
+        }
+
+        public async Task<TResponse<bool>> Comment(int userId, CandidateComment request)
+        {
+            try
+            {
+                var candidate = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetCandidateResponse>(SqlQuery.CANDIDATE_GET_BY_ID,
+                                                                                                new
+                                                                                                {
+                                                                                                    request.Id
+                                                                                                });
+                if (candidate.IsSuccess)
+                {
+                    if (candidate.Data != null)
+                    {
+                        var rs = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.CANDIDATE_INSERT_COMMENT,
+                                                                               new
+                                                                               {
+                                                                                   CandidateId = request.Id,
+                                                                                   Comment = string.IsNullOrEmpty(request.Comment)
+                                                                                                         ? "đã đính kèm file"
+                                                                                                         : request.Comment,
+                                                                                   UserId = userId,
+                                                                                   candidate.Data.CandidateStatusId
+                                                                               });
+                        if (rs.IsSuccess)
+                        {
+                            if (request.Files != null
+                               && request.Files.Any())
+                            {
+                                var candidateLogId = rs.Data;
+
+                                var path = _configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "\\wwwroot\\Attachments";
+
+                                if (!Directory.Exists(path))
+                                {
+                                    Directory.CreateDirectory(path);
+                                }
+
+                                foreach (var file in request.Files)
+                                {
+                                    var newFileName = RenameFile(file.FileName);
+
+                                    using (FileStream fileStream = File.Create(Path.Combine(path,
+                                                                                            newFileName) + Path.GetExtension(file.FileName)))
+                                    {
+                                        file.CopyTo(fileStream);
+                                        fileStream.Flush();
+
+                                        var result = await WriteRepository.ExecuteAsync(SqlQuery.CANDIDATE_LOG_ATTACHMENT_INSERT,
+                                                                                        new
+                                                                                        {
+                                                                                            CandidateLogId = candidateLogId,
+                                                                                            Attachment = $"{newFileName}{Path.GetExtension(file.FileName)}",
+                                                                                            AttachmentName = file.FileName,
+                                                                                            UserCreated = userId,
+                                                                                            UserUpdated = userId
+                                                                                        });
+                                    }
+                                }
+
+                                await _busPublisher.SendEventAsync(new CandidateCommentSuccessEvent
+                                {
+                                    Id = request.Id,
+                                    Code = candidate.Data.Code,
+                                    Comment = request.Comment,
+                                    HasAttachmentFile = request.Files != null && request.Files.Any(),
+                                    UserId = userId
+                                });
+
+                                return await Ok(true);
+                            }
+
+                            return await Ok(true);
+                        }
+                    }
+                }
+
+                return await Fail<bool>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+            }
+            catch (Exception)
+            {
+                return await Fail<bool>(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue());
+            }
         }
 
         public async Task<TResponse<bool>> Delete(int userId, int id)
@@ -99,6 +206,74 @@ namespace Pelo.Api.Services.CandidateServices
             catch (Exception exception)
             {
                 return await Fail<GetCandidateResponse>(exception);
+            }
+        }
+
+        public async Task<TResponse<IEnumerable<CandidateLogResponse>>> GetLogs(int userId, int id)
+        {
+            try
+            {
+                var result = await ReadOnlyRepository.QueryAsync<CandidateLogResponse>(SqlQuery.CANDIDATE_GET_LOGS,
+                                                                                 new
+                                                                                 {
+                                                                                     CandidateId = id
+                                                                                 });
+                if (result.IsSuccess)
+                {
+                    foreach (var log in result.Data)
+                    {
+                        var user = await ReadOnlyRepository.QueryFirstOrDefaultAsync<UserInLog>(SqlQuery.GET_USER_IN_LOG,
+                                                                                                new
+                                                                                                {
+                                                                                                    Id = log.UserId
+                                                                                                });
+                        if (user.IsSuccess
+                           && user.Data != null)
+                        {
+                            log.User = user.Data;
+                        }
+
+                        var oldCandidateStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<StatusInLog>(SqlQuery.GET_CANDIDATE_STATUS_IN_LOG,
+                                                                                                             new
+                                                                                                             {
+                                                                                                                 Id = log.OldCandidateStatusId
+                                                                                                             });
+                        if (oldCandidateStatus.IsSuccess)
+                        {
+                            log.OldCandidateStatus = oldCandidateStatus.Data;
+                        }
+
+                        var crmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<StatusInLog>(SqlQuery.GET_CANDIDATE_STATUS_IN_LOG,
+                                                                                                          new
+                                                                                                          {
+                                                                                                              Id = log.CandidateStatusId
+                                                                                                          });
+                        if (crmStatus.IsSuccess)
+                        {
+                            log.CandidateStatus = crmStatus.Data;
+                        }
+
+                        var attachments = await ReadOnlyRepository.QueryAsync<LogAttachment>(SqlQuery.GET_CANDIDATE_ATTACHMENT_IN_LOG,
+                                                                                                new
+                                                                                                {
+                                                                                                    CandidateLogId = log.Id
+                                                                                                });
+
+                        if (attachments.IsSuccess)
+                        {
+                            log.Attachments = attachments.Data.ToList();
+                        }
+                    }
+
+                    return await Ok(result.Data);
+                }
+
+                return await Fail<IEnumerable<CandidateLogResponse>>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<IEnumerable<CandidateLogResponse>>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(),
+                                                                             "GetCandidateLog"));
             }
         }
 
@@ -254,6 +429,15 @@ namespace Pelo.Api.Services.CandidateServices
             {
                 return await Fail<bool>(exception);
             }
+        }
+
+        private string RenameFile(string fileName)
+        {
+            var newName = Guid.NewGuid()
+                              .ToString()
+                              .Replace("-",
+                                       string.Empty);
+            return newName;
         }
     }
 }

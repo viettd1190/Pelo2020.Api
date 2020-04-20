@@ -75,5 +75,26 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _CandidateService.Delete(await GetUserId(), id));
         }
+        /// <summary>
+        ///     get Candidate log
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("api/candidate/log/{id}")]
+        public async Task<ActionResult<bool>> GetLog(int id)
+        {
+            return Ok(await _CandidateService.GetLogs(await GetUserId(), id));
+        }
+
+        /// <summary>
+        ///     Post Candidate comment
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("api/candidate/comment")]
+        public async Task<ActionResult<bool>> Comment(CandidateComment request)
+        {
+            return Ok(await _CandidateService.Comment(await GetUserId(), request));
+        }
     }
 }

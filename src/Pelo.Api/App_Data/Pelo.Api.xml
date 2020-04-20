@@ -119,6 +119,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.CandidateController.GetLog(System.Int32)">
+            <summary>
+                get Candidate log
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.CandidateController.Comment(Pelo.Common.Dtos.Candidate.CandidateComment)">
+            <summary>
+                Post Candidate comment
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.CandidateStatusController.GetAll">
             <summary>
                 Lấy tất cả trạng thái Candidate
