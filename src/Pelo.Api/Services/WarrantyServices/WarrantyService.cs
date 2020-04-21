@@ -9,6 +9,8 @@ using Pelo.Api.Services.MasterServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.User;
 using Pelo.Common.Dtos.Warranty;
+using Pelo.Common.Enums;
+using Pelo.Common.Extensions;
 using Pelo.Common.Events.Warranty;
 using Pelo.Common.Kafka;
 using Pelo.Common.Models;
@@ -30,6 +32,9 @@ namespace Pelo.Api.Services.WarrantyServices
 
         Task<TResponse<GetWarrantyByIdResponse>> GetById(int userId,
                                                         int id);
+        Task<TResponse<IEnumerable<WarrantyLogResponse>>> GetLogs(int v, int id);
+        Task<TResponse<bool>> UpdateCrm(int v, UpdateWarrantyRequest request);
+        Task<TResponse<bool>> Comment(int v, CommentWarrantyRequest commentWarrantyRequest);
     }
     public class WarrantyService : BaseService, IWarrantyService
     {
@@ -529,7 +534,7 @@ namespace Pelo.Api.Services.WarrantyServices
 
             return string.Empty;
         }
-        
+
         private async Task<int> GetDefaultWarrantyStatus()
         {
             try
@@ -550,6 +555,312 @@ namespace Pelo.Api.Services.WarrantyServices
             }
 
             return 0;
+        }
+
+        public Task<TResponse<IEnumerable<WarrantyLogResponse>>> GetLogs(int v, int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateWarrantyRequest request)
+        {
+            try
+            {
+                var oldInformation = await CanUpdate(userId,
+                                                     request);
+                if (oldInformation.IsSuccess)
+                {
+                    var result = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_UPDATE,
+                                                                    new
+                                                                    {
+                                                                        request.Id,
+                                                                        request.DeliveryDate,
+                                                                        request.Total,
+                                                                        request.Deposit,
+                                                                        request.BranchId,
+                                                                        request.Description,
+                                                                        UserUpdated = userId,
+                                                                        DateUpdated = DateTime.Now
+                                                                    });
+                    if (result.IsSuccess)
+                    {
+                        if (result.Data > 0)
+                        {
+                            var warrantyId = request.Id;
+                            var warrantyCareUser = await ReadOnlyRepository.QueryAsync<WarrantyUserResponse>(SqlQuery.GET_WARRANTY_USER_BY_WARRANTYID,
+                                                                                               new
+                                                                                               {
+                                                                                                   WarrantyId = warrantyId,
+                                                                                                   Type = 0
+                                                                                               });
+                            var warrantyRelativeUser = await ReadOnlyRepository.QueryAsync<WarrantyUserResponse>(SqlQuery.GET_WARRANTY_USER_BY_WARRANTYID,
+                                                                                               new
+                                                                                               {
+                                                                                                   WarrantyId = warrantyId,
+                                                                                                   Type = 1
+                                                                                               });
+                            if (request.UserCareIds == null)
+                            {
+                                request.UserCareIds = new List<int>();
+                            }
+
+                            if (warrantyCareUser.Data.Any()
+                               || request.UserCareIds.Any())
+                            {
+                                if (warrantyCareUser.Data.Any()
+                                   && (request.UserCareIds == null || !request.UserCareIds.Any()))
+                                {
+                                }
+                                else if (request.UserCareIds.Any()
+                                        && (warrantyCareUser.Data == null || !warrantyCareUser.Data.Any()))
+                                {
+                                }
+                            }
+                            if (request.UserRelativeIds == null)
+                            {
+                                request.UserRelativeIds = new List<int>();
+                            }
+
+                            if (warrantyRelativeUser.Data.Any()
+                               || request.UserRelativeIds.Any())
+                            {
+                                if (warrantyRelativeUser.Data.Any()
+                                   && (request.UserRelativeIds == null || !request.UserRelativeIds.Any()))
+                                {
+                                }
+                                else if (request.UserRelativeIds.Any()
+                                        && (warrantyRelativeUser.Data == null || !warrantyRelativeUser.Data.Any()))
+                                {
+                                }
+                            }
+
+                            List<int> userCareIds = new List<int>();
+                            List<int> userRelativeIds = new List<int>();
+                            if (warrantyCareUser != null)
+                            {
+                                if (request.UserCareIds.Any())
+                                {
+                                    WarrantyUserResponse[] warrantyUserResponse = warrantyCareUser.Data.Where(c => c.WarrantyId == request.Id && !request.UserCareIds.Contains(c.UserId))
+                                                                               .ToArray();
+                                    userCareIds.AddRange(warrantyUserResponse.Select(c => c.UserId));
+                                    foreach (var item in warrantyUserResponse)
+                                    {
+                                        await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_DELETE,
+                                                                           new
+                                                                           {
+                                                                               WarrantyId = request.Id,
+                                                                               UserId = item.UserId,
+                                                                               Type = 0
+                                                                           });
+                                    }
+
+                                    foreach (var user in request.UserCareIds)
+                                    {
+                                        var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_INSERT,
+                                                                                    new
+                                                                                    {
+                                                                                        WarrantyId = request.Id,
+                                                                                        UserId = user,
+                                                                                        Type = 0,
+                                                                                        UserUpdated = userId,
+                                                                                        UserCreated = userId,
+                                                                                        DateUpdated = DateTime.Now,
+                                                                                        DateCreated = DateTime.Now
+                                                                                    });
+                                    }
+                                }
+                                else
+                                {
+                                    if (warrantyCareUser.IsSuccess)
+                                    {
+                                        foreach (var item in warrantyCareUser.Data)
+                                        {
+                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_DELETE,
+                                                                                        new
+                                                                                        {
+                                                                                            WarrantyId = request.Id,
+                                                                                            UserId = item.Id,
+                                                                                            Type = 0
+                                                                                        });
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (var user in request.UserCareIds)
+                                {
+                                    var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_INSERT,
+                                                                                new
+                                                                                {
+                                                                                    WarrantyId = request.Id,
+                                                                                    UserId = user,
+                                                                                    Type = 0,
+                                                                                    UserUpdated = userId,
+                                                                                    UserCreated = userId,
+                                                                                    DateUpdated = DateTime.Now,
+                                                                                    DateCreated = DateTime.Now
+                                                                                });
+                                }
+                            }
+                            if (warrantyRelativeUser != null)
+                            {
+                                if (request.UserRelativeIds.Any())
+                                {
+                                    WarrantyUserResponse[] warrantyUserResponse = warrantyRelativeUser.Data.Where(c => c.WarrantyId == request.Id && !request.UserRelativeIds.Contains(c.UserId))
+                                                                               .ToArray();
+                                    userRelativeIds.AddRange(warrantyUserResponse.Select(c => c.UserId));
+                                    foreach (var item in warrantyUserResponse)
+                                    {
+                                        await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_DELETE,
+                                                                           new
+                                                                           {
+                                                                               WarrantyId = request.Id,
+                                                                               UserId = item.UserId,
+                                                                               Type = 1
+                                                                           });
+                                    }
+
+                                    foreach (var user in request.UserRelativeIds)
+                                    {
+                                        var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_INSERT,
+                                                                                    new
+                                                                                    {
+                                                                                        WarrantyId = request.Id,
+                                                                                        UserId = user,
+                                                                                        Type = 1,
+                                                                                        UserUpdated = userId,
+                                                                                        UserCreated = userId,
+                                                                                        DateUpdated = DateTime.Now,
+                                                                                        DateCreated = DateTime.Now
+                                                                                    });
+                                    }
+                                }
+                                else
+                                {
+                                    if (warrantyRelativeUser.IsSuccess)
+                                    {
+                                        foreach (var item in warrantyRelativeUser.Data)
+                                        {
+                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_DELETE,
+                                                                                        new
+                                                                                        {
+                                                                                            WarrantyId = request.Id,
+                                                                                            UserId = item.Id,
+                                                                                            Type = 1
+                                                                                        });
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (var user in request.UserCareIds)
+                                {
+                                    var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_INSERT,
+                                                                                new
+                                                                                {
+                                                                                    WarrantyId = request.Id,
+                                                                                    UserId = user,
+                                                                                    Type = 0,
+                                                                                    UserUpdated = userId,
+                                                                                    UserCreated = userId,
+                                                                                    DateUpdated = DateTime.Now,
+                                                                                    DateCreated = DateTime.Now
+                                                                                });
+                                }
+                            }
+                            await _busPublisher.SendEventAsync(new WarrantyUpdateSuccessEvent
+                            {
+                                Id = oldInformation.Data.Id,
+                                Code = oldInformation.Data.Code,
+                                BeforeUpdated = new WarrantyUpdateSuccessModel
+                                {
+                                    WarrantyStatusId = oldInformation.Data.WarrantyStatusId,
+                                    DeliveryDate = oldInformation.Data.DeliveryDate,
+                                    Description = oldInformation.Data.Description,
+                                    UserCareIds = userCareIds,
+                                    UserRelativeIds = userRelativeIds
+                                },
+                                AfterUpdated = new WarrantyUpdateSuccessModel
+                                {
+                                    WarrantyStatusId = oldInformation.Data.WarrantyStatusId,
+                                    DeliveryDate = request.DeliveryDate,
+                                    Description = request.Description,
+                                    UserRelativeIds = request.UserRelativeIds,
+                                    UserCareIds = request.UserRelativeIds
+                                },
+                                UserId = userId
+                            });
+
+                            return await Ok(true);
+                        }
+
+                        return await Fail<bool>("Can not execute CRM_UPDATE");
+                    }
+
+                    return await Fail<bool>(result.Message);
+                }
+
+                return await Fail<bool>(oldInformation.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        private async Task<TResponse<GetWarrantyByIdResponse>> CanUpdate(int userId,
+                                                                    UpdateWarrantyRequest request)
+        {
+            try
+            {
+                var checkPermission = await _roleService.CheckPermission(userId);
+                if (checkPermission.IsSuccess)
+                {
+                    if (request.Id == 0)
+                    {
+                        return await Fail<GetWarrantyByIdResponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+                    }
+
+                    var checkIdInvalid = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyByIdResponse>(SqlQuery.WARRANTY_GET_BY_ID,
+                                                                                                               new
+                                                                                                               {
+                                                                                                                   request.Id
+                                                                                                               });
+                    if (checkIdInvalid.IsSuccess)
+                    {
+                        if (checkIdInvalid.Data != null)
+                        {
+                            return await Ok(checkIdInvalid.Data);
+                        }
+
+                        return await Fail<GetWarrantyByIdResponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+                    }
+
+                    return await Fail<GetWarrantyByIdResponse>(checkIdInvalid.Message);
+                }
+
+                return await Fail<GetWarrantyByIdResponse>(checkPermission.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<GetWarrantyByIdResponse>(exception);
+            }
+        }
+        //TODO
+        public Task<TResponse<bool>> Comment(int v, CommentWarrantyRequest commentWarrantyRequest)
+        {
+            throw new NotImplementedException();
+        }
+
+        private string RenameFile(string fileName)
+        {
+            var newName = Guid.NewGuid()
+                              .ToString()
+                              .Replace("-",
+                                       string.Empty);
+            return newName;
         }
     }
 }

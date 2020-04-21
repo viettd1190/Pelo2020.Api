@@ -4762,6 +4762,139 @@ SELECT COUNT(*) FROM dbo.Role c
                                                                    )
                                                                    AND w.IsDeleted = 0
                                                                    AND c.IsDeleted = 0;";
+
+        public const string WARRANTY_UPDATE = @"UPDATE dbo.Warranty
+                                            SET DeleveryDate = @DeleveryDate,
+                                                Total = @Total,
+                                                Deposit = @Deposit,
+                                                BranchId = @BranchId,
+                                                Description = @Description,
+                                                UserUpdated = @UserUpdated,
+                                                DateUpdated = @DateUpdated
+                                               WHERE Id = @Id";
+
+        public const string STATUS_WARRANTY_UPDATE = @"UPDATE dbo.Warranty
+                                            SET WarrantyStatusId = @WarrantyStatusId,
+                                                UserUpdated = @UserUpdated,
+                                                DateUpdated = @DateUpdated
+                                               WHERE Id = @Id";
+
+        public const string WARRANTY_COMMENT_INSERT = @"INSERT dbo.WarrantyComment
+                                                        (
+                                                            WarrantyId,
+                                                            Comment,
+                                                            Type,
+                                                            UserIds,
+                                                            OldStatusId,
+                                                            NewStatusId,
+                                                            UserCreated,
+                                                            DateCreated,
+                                                            UserUpdated
+                                                        )
+                                                        VALUES
+                                                        (   @Warrantyd,
+                                                            @Comment,
+                                                            @Type,
+                                                            @OldStatusId,
+                                                            @NewStatusId,
+                                                            @UserIds,
+                                                            @UserCreated,
+                                                            @DateCreated,
+                                                            @UserUpdated;
+                                                        SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string WARRANTY_INSERT_COMMENT = @"INSERT dbo.WarrantyLog
+                                                  (
+                                                      WarrantyId,
+                                                      Comment,
+                                                      LogDate,
+                                                      UserId,
+                                                      Attachment,
+                                                      OldWarrantyStatusId,
+                                                      WarrantyStatusId,
+                                                      AttachmentName
+                                                  )
+                                                  VALUES
+                                                  (   @WarrantyId,         -- WarrantyId - int
+                                                      @Comment,       -- Comment - nvarchar(1500)
+                                                      GETDATE(), -- LogDate - datetime
+                                                      @UserId,         -- UserId - int
+                                                      N'',       -- Attachment - nvarchar(50)
+                                                      @WarrantyStatusId,         -- OldCWarrantyStatusId - int
+                                                      @WarrantyStatusId,         -- WarrantyStatusId - int
+                                                      N''        -- AttachmentName - nvarchar(300)
+                                                      );
+
+                                                  SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string WARRANTY_LOG_ATTACHMENT_INSERT = @"INSERT dbo.WarrantyLogAttachment
+                                                          (
+                                                              WarrantyLogId,
+                                                              Attachment,
+                                                              AttachmentName,
+                                                              UserCreated,
+                                                              DateCreated,
+                                                              UserUpdated,
+                                                              DateUpdated,
+                                                              IsDeleted
+                                                          )
+                                                          VALUES
+                                                          (   @WarrantyLogId,         -- WarrantyLogId - int
+                                                              @Attachment,       -- Attachment - nvarchar(max)
+                                                              @AttachmentName,       -- AttachmentName - nvarchar(max)
+                                                              @UserCreated,         -- UserCreated - int
+                                                              GETDATE(), -- DateCreated - datetime
+                                                              @UserUpdated,         -- UserUpdated - int
+                                                              GETDATE(), -- DateUpdated - datetime
+                                                              0       -- IsDeleted - bit
+                                                              )";
+
+        public const string WARRANTY_GET_LOGS = @"SELECT Id,
+                                                    WarrantyId,
+                                                    UserId,
+                                                    Comment,
+                                                    LogDate,
+                                                    OldWarrantyStatusId,
+                                                    CrmWarrantyId
+                                             FROM dbo.WarrantyLog
+                                             WHERE WarrantyId = @WarrantyId
+                                             ORDER BY LogDate DESC;";
+
+        public const string GET_WARRANTY_STATUS_IN_LOG = @"SELECT Id,
+                                                             Name
+                                                      FROM dbo.WarrantyStatus
+                                                      WHERE Id = @Id
+                                                            AND IsDeleted = 0;";
+
+        public const string GET_WARRANTY_ATTACHMENT_IN_LOG = @"SELECT Attachment,
+                                                                 AttachmentName
+                                                          FROM dbo.WarrantyLogAttachment
+                                                          WHERE WarrantyLogId = @WarrantyLogId;";
+
+        public const string GET_WARRANTY_USER_BY_WARRANTYID = @"SELECT * from dbo.WarrantyUser where WarrantyId = @CrmId AND Type=@Type AND IsDeleted=0";
+        public const string WARRANTY_USER_DELETE = @"UPDATE dbo.WarrantyUser SET IsDeleted = 1 WHERE WarrantyId = @WarrantyId AND UserId=@UserId AND Type=@Type";
+
+        public const string WARRANTY_USER_INSERT = @"INSERT dbo.WarrantyUser
+                                                        (
+                                                            WarrantyId,
+                                                            UserId,
+                                                            Type,
+                                                            UserCreated,
+                                                            DateCreated,
+                                                            UserUpdated,
+                                                            DateUpdated,
+                                                            IsDeleted
+                                                        )
+                                                        VALUES
+                                                        (   @WarrantyId,
+                                                            @UserId,
+                                                            @Type,
+                                                            @UserCreated,
+                                                            @DateCreated,
+                                                            @UserUpdated,
+                                                            @DateUpdated,
+                                                            0 );
+                                                        SELECT CAST(SCOPE_IDENTITY() as int);";
         #endregion
     }
 }

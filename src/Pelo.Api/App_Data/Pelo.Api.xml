@@ -1367,6 +1367,28 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyController.UpdateCrm(Pelo.Common.Dtos.Warranty.UpdateWarrantyRequest)">
+            <summary>
+                Update CRM
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyController.Comment(System.String,Microsoft.AspNetCore.Http.IFormFileCollection)">
+            <summary>
+                Them CRM Comment
+            </summary>
+            <param name="paras"></param>
+            <param name="files"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.WarrantyController.GetLog(System.Int32)">
+            <summary>
+                Lấy danh sách log crm
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.WarrantyDescriptionController.GetAll">
             <summary>
                 Lấy tất cả trạng thái bảo hành

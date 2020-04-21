@@ -29,7 +29,7 @@ namespace Pelo.Api.Controllers
 
         [HttpGet]
         [Route("api/warranty_description/all")]
-        public async Task<ActionResult<IEnumerable<GetWarrantyPagingResponse>>> GetAll()
+        public async Task<ActionResult<IEnumerable<WarrantyDescriptionSimpleModel>>> GetAll()
         {
             return Ok(await _warrantyService.GetAll(await GetUserId()));
         }
