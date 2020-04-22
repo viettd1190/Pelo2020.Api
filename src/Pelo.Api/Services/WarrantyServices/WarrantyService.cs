@@ -15,6 +15,10 @@ using Pelo.Common.Events.Warranty;
 using Pelo.Common.Kafka;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using System.IO;
+using Pelo.Common.Dtos;
 
 namespace Pelo.Api.Services.WarrantyServices
 {
@@ -47,16 +51,19 @@ namespace Pelo.Api.Services.WarrantyServices
         private readonly IRoleService _roleService;
 
         private readonly IUserService _userService;
+
+        private readonly IConfiguration _configuration;
         public WarrantyService(IDapperReadOnlyRepository readOnlyRepository, IDapperWriteRepository writeRepository, IHttpContextAccessor context, IRoleService roleService,
                               IUserService userService,
                               IProductService productService,
-                              IAppConfigService appConfigService, IBusPublisher busPublisher) : base(readOnlyRepository, writeRepository, context)
+                              IAppConfigService appConfigService, IBusPublisher busPublisher, IConfiguration configuration) : base(readOnlyRepository, writeRepository, context)
         {
             _roleService = roleService;
             _appConfigService = appConfigService;
             _userService = userService;
             _productService = productService;
             _busPublisher = busPublisher;
+            _configuration = configuration;
         }
         private async Task<string> BuildSqlQueryGetPaging(int userId,
                                                           GetWarrantyPagingRequest request)
@@ -557,9 +564,72 @@ namespace Pelo.Api.Services.WarrantyServices
             return 0;
         }
 
-        public Task<TResponse<IEnumerable<WarrantyLogResponse>>> GetLogs(int v, int id)
+        public async Task<TResponse<IEnumerable<WarrantyLogResponse>>> GetLogs(int userId, int id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = await ReadOnlyRepository.QueryAsync<WarrantyLogResponse>(SqlQuery.WARRANTY_GET_LOGS,
+                                                                                 new
+                                                                                 {
+                                                                                     WarrantyId = id
+                                                                                 });
+                if (result.IsSuccess)
+                {
+                    foreach (var log in result.Data)
+                    {
+                        var user = await ReadOnlyRepository.QueryFirstOrDefaultAsync<UserInLog>(SqlQuery.GET_USER_IN_LOG,
+                                                                                                new
+                                                                                                {
+                                                                                                    Id = log.UserId
+                                                                                                });
+                        if (user.IsSuccess
+                           && user.Data != null)
+                        {
+                            log.User = user.Data;
+                        }
+
+                        var oldCrmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<StatusInLog>(SqlQuery.GET_WARRANTY_STATUS_IN_LOG,
+                                                                                                             new
+                                                                                                             {
+                                                                                                                 Id = log.OldCrmStatusId
+                                                                                                             });
+                        if (oldCrmStatus.IsSuccess)
+                        {
+                            log.OldWarrantyStatus = oldCrmStatus.Data;
+                        }
+
+                        var crmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<StatusInLog>(SqlQuery.GET_WARRANTY_STATUS_IN_LOG,
+                                                                                                          new
+                                                                                                          {
+                                                                                                              Id = log.CrmStatusId
+                                                                                                          });
+                        if (crmStatus.IsSuccess)
+                        {
+                            log.WarrantyStatus = crmStatus.Data;
+                        }
+
+                        var attachments = await ReadOnlyRepository.QueryAsync<LogAttachment>(SqlQuery.GET_WARRANTY_ATTACHMENT_IN_LOG,
+                                                                                                new
+                                                                                                {
+                                                                                                    WarrantyLogId = log.Id
+                                                                                                });
+
+                        if (attachments.IsSuccess)
+                        {
+                            log.Attachments = attachments.Data.ToList();
+                        }
+                    }
+
+                    return await Ok(result.Data);
+                }
+
+                return await Fail<IEnumerable<WarrantyLogResponse>>(result.Message);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<IEnumerable<WarrantyLogResponse>>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(),
+                                                                             "GetWarrantyLog"));
+            }
         }
 
         public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateWarrantyRequest request)
@@ -849,9 +919,94 @@ namespace Pelo.Api.Services.WarrantyServices
             }
         }
         //TODO
-        public Task<TResponse<bool>> Comment(int v, CommentWarrantyRequest commentWarrantyRequest)
+        public async Task<TResponse<bool>> Comment(int userId, CommentWarrantyRequest request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var warranty = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyByIdResponse>(SqlQuery.WARRANTY_GET_BY_ID,
+                                                                                                new
+                                                                                                {
+                                                                                                    request.Id
+                                                                                                });
+                if (warranty.IsSuccess)
+                {
+                    if (warranty.Data != null)
+                    {
+                        var rs1 = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.STATUS_WARRANTY_UPDATE, new { request.Id, request.WarrantyStatusId });
+                        if (rs1.IsSuccess)
+                        {
+                            var rs = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.WARRANTY_INSERT_COMMENT,
+                                                                               new
+                                                                               {
+                                                                                   WarrantyId = request.Id,
+                                                                                   Comment = string.IsNullOrEmpty(request.Comment)
+                                                                                                         ? "đã đính kèm file"
+                                                                                                         : request.Comment,
+                                                                                   UserId = userId,
+                                                                                   warranty.Data.WarrantyStatusId,
+                                                                                   OldWarrantyStatusId = warranty.Data.WarrantyStatusId
+                                                                               });
+                            if (rs.IsSuccess)
+                            {
+                                if (request.Files != null
+                                   && request.Files.Any())
+                                {
+                                    var crmLogId = rs.Data;
+
+                                    var path = _configuration.GetValue<string>(WebHostDefaults.ContentRootKey) + "\\wwwroot\\Attachments";
+
+                                    if (!Directory.Exists(path))
+                                    {
+                                        Directory.CreateDirectory(path);
+                                    }
+
+                                    foreach (var file in request.Files)
+                                    {
+                                        var newFileName = RenameFile(file.FileName);
+
+                                        using (FileStream fileStream = File.Create(Path.Combine(path,
+                                                                                                newFileName) + Path.GetExtension(file.FileName)))
+                                        {
+                                            file.CopyTo(fileStream);
+                                            fileStream.Flush();
+
+                                            var result = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_LOG_ATTACHMENT_INSERT,
+                                                                                            new
+                                                                                            {
+                                                                                                WarrantyId = crmLogId,
+                                                                                                Attachment = $"{newFileName}{Path.GetExtension(file.FileName)}",
+                                                                                                AttachmentName = file.FileName,
+                                                                                                UserCreated = userId,
+                                                                                                UserUpdated = userId
+                                                                                            });
+                                        }
+                                    }
+
+                                    await _busPublisher.SendEventAsync(new WarrantyCommentSuccessEvent
+                                    {
+                                        Id = request.Id,
+                                        Code = warranty.Data.Code,
+                                        Comment = request.Comment,
+                                        HasAttachmentFile = request.Files != null && request.Files.Any(),
+                                        UserId = userId,
+                                        WarrantyStatusId = request.WarrantyStatusId
+                                    });
+
+                                    return await Ok(true);
+                                }
+
+                                return await Ok(true);
+                            }
+                        }                        
+                    }
+                }
+
+                return await Fail<bool>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+            }
+            catch (Exception)
+            {
+                return await Fail<bool>(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue());
+            }
         }
 
         private string RenameFile(string fileName)

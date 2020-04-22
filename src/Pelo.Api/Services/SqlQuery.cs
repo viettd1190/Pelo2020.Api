@@ -4809,7 +4809,6 @@ SELECT COUNT(*) FROM dbo.Role c
                                                       Comment,
                                                       LogDate,
                                                       UserId,
-                                                      Attachment,
                                                       OldWarrantyStatusId,
                                                       WarrantyStatusId,
                                                       AttachmentName
@@ -4819,10 +4818,8 @@ SELECT COUNT(*) FROM dbo.Role c
                                                       @Comment,       -- Comment - nvarchar(1500)
                                                       GETDATE(), -- LogDate - datetime
                                                       @UserId,         -- UserId - int
-                                                      N'',       -- Attachment - nvarchar(50)
-                                                      @WarrantyStatusId,         -- OldCWarrantyStatusId - int
+                                                      @OldWarrantyStatusId,         -- OldCWarrantyStatusId - int
                                                       @WarrantyStatusId,         -- WarrantyStatusId - int
-                                                      N''        -- AttachmentName - nvarchar(300)
                                                       );
 
                                                   SELECT CAST(SCOPE_IDENTITY() as int);";
