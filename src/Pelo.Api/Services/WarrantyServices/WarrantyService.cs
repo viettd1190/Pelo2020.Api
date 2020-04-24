@@ -78,28 +78,28 @@ namespace Pelo.Api.Services.WarrantyServices
             string whereCondition = string.Empty;
             if (!string.IsNullOrEmpty(request.CustomerName))
             {
-                whereBuilder.AppendFormat("{0}ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI",
+                whereBuilder.AppendFormat("{0} ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI",
                                           whereCondition);
                 whereCondition = " AND ";
             }
 
             if (!string.IsNullOrEmpty(request.CustomerPhone))
             {
-                whereBuilder.AppendFormat("{0}(ISNULL(c.Phone, '') LIKE @CustomerPhone OR ISNULL(c.Phone2, '') LIKE @CustomerPhone OR ISNULL(c.Phone3, '') LIKE @CustomerPhone)",
+                whereBuilder.AppendFormat("{0} (ISNULL(c.Phone, '') LIKE @CustomerPhone OR ISNULL(c.Phone2, '') LIKE @CustomerPhone OR ISNULL(c.Phone3, '') LIKE @CustomerPhone)",
                                           whereCondition);
                 whereCondition = " AND ";
             }
 
             if (!string.IsNullOrEmpty(request.Code))
             {
-                whereBuilder.AppendFormat("{0}w.Code LIKE @Code",
+                whereBuilder.AppendFormat("{0} w.Code LIKE @Code",
                                           whereCondition);
                 whereCondition = " AND ";
             }
 
             if (request.WarrantyStatusId > 0)
             {
-                whereBuilder.AppendFormat("{0}ISNULL(w.WarrantyStatusId, 0) = @WarrantyStatusId",
+                whereBuilder.AppendFormat("{0} ISNULL(w.WarrantyStatusId, 0) = @WarrantyStatusId",
                                           whereCondition);
                 whereCondition = " AND ";
             }
@@ -107,7 +107,7 @@ namespace Pelo.Api.Services.WarrantyServices
             var isDefaultWarrantyRoles = await _userService.IsBelongDefaultWarrantyRole(userId);
             if (!isDefaultWarrantyRoles.IsSuccess)
             {
-                whereBuilder.AppendFormat("{0}(w.UserCreated = @UserCreatedId)",
+                whereBuilder.AppendFormat("{0} (w.UserCreated = @UserCreatedId)",
                                           whereCondition);
                 whereCondition = " AND ";
             }
@@ -115,33 +115,32 @@ namespace Pelo.Api.Services.WarrantyServices
             {
                 if (request.UserCreatedId > 0)
                 {
-                    whereBuilder.AppendFormat("{0}w.UserCreated = @UserCreatedId",
+                    whereBuilder.AppendFormat("{0} w.UserCreated = @UserCreatedId",
                                               whereCondition);
                     whereCondition = " AND ";
                 }
                 if (request.UserCareId > 0)
                 {
-                    whereBuilder.AppendFormat("{0}uiw.UserId = @UserCareId",
+                    whereBuilder.AppendFormat("{0} uiw.UserId = @UserCareId",
                                               whereCondition);
                     whereCondition = " AND ";
                 }
             }
-
-            if (request.FromDate != null)
+            if (!string.IsNullOrEmpty(request.FromDate))
             {
-                whereBuilder.AppendFormat("{0}w.DateCreated >= @FromDate",
+                whereBuilder.AppendFormat("{0} w.DeliveryDate >= @FromDate",
                                           whereCondition);
                 whereCondition = " AND ";
             }
 
-            if (request.ToDate != null)
+            if (!string.IsNullOrEmpty(request.ToDate))
             {
-                whereBuilder.AppendFormat("{0}w.DateCreated <= @ToDate",
+                whereBuilder.AppendFormat("{0} w.DeliveryDate <= @ToDate",
                                           whereCondition);
                 whereCondition = " AND ";
             }
 
-            whereBuilder.AppendFormat("{0}w.IsDeleted = 0 AND c.IsDeleted = 0 AND uiw.IsDeleted = 0",
+            whereBuilder.AppendFormat("{0} w.IsDeleted = 0 AND c.IsDeleted = 0 AND uiw.IsDeleted = 0",
                                       whereCondition);
 
             if (!string.IsNullOrEmpty(whereBuilder.ToString()))
@@ -204,6 +203,15 @@ namespace Pelo.Api.Services.WarrantyServices
                     }
                     var sqlQuery = await BuildSqlQueryGetPaging(userId,
                                                                 request);
+                    string fromDate = string.Empty; string toDate = string.Empty;
+                    if (!string.IsNullOrEmpty(request.FromDate))
+                    {
+                        fromDate = string.Format("{0:yyyy-MM-dd} 00:00:00", DateTime.Parse(request.FromDate));
+                    }
+                    if (!string.IsNullOrEmpty(request.ToDate))
+                    {
+                        toDate = string.Format("{0:yyyy-MM-dd} 23:59:00", DateTime.Parse(request.ToDate));
+                    }
                     var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyPagingResponse, int>(sqlQuery,
                                                                                                               new
                                                                                                               {
