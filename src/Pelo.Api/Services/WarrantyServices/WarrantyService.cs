@@ -126,14 +126,14 @@ namespace Pelo.Api.Services.WarrantyServices
                     whereCondition = " AND ";
                 }
             }
-            if (!string.IsNullOrEmpty(request.FromDate))
+            if (request.FromDate.HasValue)
             {
                 whereBuilder.AppendFormat("{0} w.DeliveryDate >= @FromDate",
                                           whereCondition);
                 whereCondition = " AND ";
             }
 
-            if (!string.IsNullOrEmpty(request.ToDate))
+            if (request.ToDate.HasValue)
             {
                 whereBuilder.AppendFormat("{0} w.DeliveryDate <= @ToDate",
                                           whereCondition);
@@ -204,13 +204,13 @@ namespace Pelo.Api.Services.WarrantyServices
                     var sqlQuery = await BuildSqlQueryGetPaging(userId,
                                                                 request);
                     string fromDate = string.Empty; string toDate = string.Empty;
-                    if (!string.IsNullOrEmpty(request.FromDate))
+                    if (request.FromDate.HasValue)
                     {
-                        fromDate = string.Format("{0:yyyy-MM-dd} 00:00:00", DateTime.Parse(request.FromDate));
+                        fromDate = string.Format("{0:yyyy-MM-dd} 00:00:00", request.FromDate.Value);
                     }
-                    if (!string.IsNullOrEmpty(request.ToDate))
+                    if (request.ToDate.HasValue)
                     {
-                        toDate = string.Format("{0:yyyy-MM-dd} 23:59:00", DateTime.Parse(request.ToDate));
+                        toDate = string.Format("{0:yyyy-MM-dd} 23:59:00", request.ToDate.Value);
                     }
                     var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyPagingResponse, int>(sqlQuery,
                                                                                                               new
