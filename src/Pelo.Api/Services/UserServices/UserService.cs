@@ -37,6 +37,7 @@ namespace Pelo.Api.Services.UserServices
         Task<TResponse<bool>> IsBelongDefaultCrmRole(int userId);
 
         Task<TResponse<bool>> IsBelongDefaultInvoiceRole(int userId);
+        Task<TResponse<bool>> IsBelongDefaultReceiptRole(int userId);
 
         Task<TResponse<UserDisplaySimpleModel>> GetByUsername(string name);
 
@@ -366,6 +367,31 @@ namespace Pelo.Api.Services.UserServices
             try
             {
                 var canGetAllInvoice = await _appConfigService.GetByName("DefaultWarrantyAcceptRoles");
+                if (canGetAllInvoice.IsSuccess)
+                {
+                    var defaultRoles = canGetAllInvoice.Data.Split(" ");
+                    var currentRole = await _roleService.GetNameByUserId(userId);
+                    if (currentRole.IsSuccess
+                       && !string.IsNullOrEmpty(currentRole.Data)
+                       && defaultRoles.Contains(currentRole.Data))
+                    {
+                        return await Ok(true);
+                    }
+                }
+
+                return await Fail<bool>(string.Empty);
+            }
+            catch (Exception exception)
+            {
+                return await Fail<bool>(exception);
+            }
+        }
+
+        public async Task<TResponse<bool>> IsBelongDefaultReceiptRole(int userId)
+        {
+            try
+            {
+                var canGetAllInvoice = await _appConfigService.GetByName("DefaultReceiptAcceptRoles");
                 if (canGetAllInvoice.IsSuccess)
                 {
                     var defaultRoles = canGetAllInvoice.Data.Split(" ");

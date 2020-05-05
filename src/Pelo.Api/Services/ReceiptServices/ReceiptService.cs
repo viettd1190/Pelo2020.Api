@@ -8,10 +8,9 @@ using Pelo.Api.Services.BaseServices;
 using Pelo.Api.Services.MasterServices;
 using Pelo.Api.Services.UserServices;
 using Pelo.Common.Dtos.User;
-using Pelo.Common.Dtos.Warranty;
+using Pelo.Common.Dtos.Receipt;
 using Pelo.Common.Enums;
 using Pelo.Common.Extensions;
-using Pelo.Common.Events.Warranty;
 using Pelo.Common.Kafka;
 using Pelo.Common.Models;
 using Pelo.Common.Repositories;
@@ -19,28 +18,29 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Pelo.Common.Dtos;
+using Pelo.Common.Events.Receipt;
 
-namespace Pelo.Api.Services.WarrantyServices
+namespace Pelo.Api.Services.ReceiptServices
 {
-    public interface IWarrantyService
+    public interface IReceiptService
     {
-        Task<TResponse<PageResult<GetWarrantyPagingResponse>>> GetByCustomerId(int userId,
+        Task<TResponse<PageResult<GetReceiptPagingResponse>>> GetByCustomerId(int userId,
                                                                               int customerId,
                                                                               int page,
                                                                               int pageSize);
-        Task<TResponse<PageResult<GetWarrantyPagingResponse>>> GetPaging(int userId,
-                                                                        GetWarrantyPagingRequest request);
+        Task<TResponse<PageResult<GetReceiptPagingResponse>>> GetPaging(int userId,
+                                                                        GetReceiptPagingRequest request);
 
         Task<TResponse<bool>> Insert(int userId,
-                                     InsertWarrantyRequest request);
+                                     InsertReceiptRequest request);
 
-        Task<TResponse<GetWarrantyByIdResponse>> GetById(int userId,
+        Task<TResponse<GetReceiptByIdResponse>> GetById(int userId,
                                                         int id);
-        Task<TResponse<IEnumerable<WarrantyLogResponse>>> GetLogs(int v, int id);
-        Task<TResponse<bool>> UpdateCrm(int v, UpdateWarrantyRequest request);
-        Task<TResponse<bool>> Comment(int v, CommentWarrantyRequest commentWarrantyRequest);
+        Task<TResponse<IEnumerable<ReceiptLogResponse>>> GetLogs(int v, int id);
+        Task<TResponse<bool>> UpdateCrm(int v, UpdateReceiptRequest request);
+        Task<TResponse<bool>> Comment(int v, CommentReceiptRequest commentReceiptRequest);
     }
-    public class WarrantyService : BaseService, IWarrantyService
+    public class ReceiptService : BaseService, IReceiptService
     {
         private readonly IAppConfigService _appConfigService;
 
@@ -53,7 +53,7 @@ namespace Pelo.Api.Services.WarrantyServices
         private readonly IUserService _userService;
 
         private readonly IConfiguration _configuration;
-        public WarrantyService(IDapperReadOnlyRepository readOnlyRepository, IDapperWriteRepository writeRepository, IHttpContextAccessor context, IRoleService roleService,
+        public ReceiptService(IDapperReadOnlyRepository readOnlyRepository, IDapperWriteRepository writeRepository, IHttpContextAccessor context, IRoleService roleService,
                               IUserService userService,
                               IProductService productService,
                               IAppConfigService appConfigService, IBusPublisher busPublisher, IConfiguration configuration) : base(readOnlyRepository, writeRepository, context)
@@ -66,13 +66,13 @@ namespace Pelo.Api.Services.WarrantyServices
             _configuration = configuration;
         }
         private async Task<string> BuildSqlQueryGetPaging(int userId,
-                                                          GetWarrantyPagingRequest request)
+                                                          GetReceiptPagingRequest request)
         {
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.Append("DROP TABLE IF EXISTS #tmpWarranty; ");
-            sqlBuilder.Append("SELECT w.Id INTO #tmpWarranty FROM dbo.Warranty w ");
+            sqlBuilder.Append("DROP TABLE IF EXISTS #tmpReceipt; ");
+            sqlBuilder.Append("SELECT w.Id INTO #tmpReceipt FROM dbo.Receipt w ");
             sqlBuilder.Append("LEFT JOIN dbo.Customer c ON c.Id = w.CustomerId ");
-            sqlBuilder.Append("LEFT JOIN dbo.UserInWarranty uiw ON uiw.WarrantyId = w.Id ");
+            sqlBuilder.Append("LEFT JOIN dbo.UserInReceipt uiw ON uiw.ReceiptId = w.Id ");
 
             StringBuilder whereBuilder = new StringBuilder();
             string whereCondition = string.Empty;
@@ -97,15 +97,15 @@ namespace Pelo.Api.Services.WarrantyServices
                 whereCondition = " AND ";
             }
 
-            if (request.WarrantyStatusId > 0)
+            if (request.ReceiptStatusId > 0)
             {
-                whereBuilder.AppendFormat("{0} ISNULL(w.WarrantyStatusId, 0) = @WarrantyStatusId",
+                whereBuilder.AppendFormat("{0} ISNULL(w.ReceiptStatusId, 0) = @ReceiptStatusId",
                                           whereCondition);
                 whereCondition = " AND ";
             }
 
-            var isDefaultWarrantyRoles = await _userService.IsBelongDefaultWarrantyRole(userId);
-            if (!isDefaultWarrantyRoles.IsSuccess)
+            var isDefaultReceiptRoles = await _userService.IsBelongDefaultReceiptRole(userId);
+            if (!isDefaultReceiptRoles.IsSuccess)
             {
                 whereBuilder.AppendFormat("{0} (w.UserCreated = @UserCreatedId)",
                                           whereCondition);
@@ -151,8 +151,8 @@ namespace Pelo.Api.Services.WarrantyServices
 
             sqlBuilder.Append(@"SELECT w.Id,
                                        w.Code,
-                                       wns.Name AS WarrantyStatus,
-                                       wns.Color AS WarrantyStatusColor,
+                                       wns.Name AS ReceiptStatus,
+                                       wns.Color AS ReceiptStatusColor,
                                        c.Name AS CustomerName,
                                        c.Phone AS CustomerPhone1,
                                        c.Phone2 AS CustomerPhone2,
@@ -164,8 +164,8 @@ namespace Pelo.Api.Services.WarrantyServices
                                        u1.PhoneNumber AS UserCreatedPhone,
                                        w.DeliveryDate,
                                        w.DateCreated
-                                FROM #tmpWarranty tmp
-                                    INNER JOIN dbo.Warranty w
+                                FROM #tmpReceipt tmp
+                                    INNER JOIN dbo.Receipt w
                                         ON tmp.Id = w.Id
                                     LEFT JOIN dbo.Customer c
                                         ON c.Id = w.CustomerId
@@ -177,27 +177,27 @@ namespace Pelo.Api.Services.WarrantyServices
                                         ON w.Id = c.WardId
                                     LEFT JOIN dbo.Branch b
                                         ON b.Id = w.BranchId
-                                    LEFT JOIN dbo.WarrantyStatus wns
-                                        ON ins.Id = w.WarrantyStatusId
+                                    LEFT JOIN dbo.ReceiptStatus wns
+                                        ON ins.Id = w.ReceiptStatusId
                                     LEFT JOIN dbo.[User] u1
                                         ON u1.Id = w.UserCreated
                                 ORDER BY w.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
                                 SELECT COUNT(*)
-                                FROM #tmpWarranty;
-                                DROP TABLE #tmpWarranty;");
+                                FROM #tmpReceipt;
+                                DROP TABLE #tmpReceipt;");
 
             return sqlBuilder.ToString();
         }
-        public async Task<TResponse<PageResult<GetWarrantyPagingResponse>>> GetPaging(int userId, GetWarrantyPagingRequest request)
+        public async Task<TResponse<PageResult<GetReceiptPagingResponse>>> GetPaging(int userId, GetReceiptPagingRequest request)
         {
             try
-            //DefaultWarrantyAcceptRoles
+            //DefaultReceiptAcceptRoles
             {
                 var canGetPaging = await CanGetPaging(userId);
                 if (canGetPaging.IsSuccess)
                 {
-                    var isDefaultWarrantyRoles = await _userService.IsBelongDefaultWarrantyRole(userId);
-                    if (!isDefaultWarrantyRoles.IsSuccess)
+                    var isDefaultReceiptRoles = await _userService.IsBelongDefaultReceiptRole(userId);
+                    if (!isDefaultReceiptRoles.IsSuccess)
                     {
                         request.UserCreatedId = userId;
                     }
@@ -212,13 +212,13 @@ namespace Pelo.Api.Services.WarrantyServices
                     {
                         toDate = string.Format("{0:yyyy-MM-dd} 23:59:00", DateTime.Parse(request.ToDate));
                     }
-                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyPagingResponse, int>(sqlQuery,
+                    var result = await ReadOnlyRepository.QueryMultipleLFAsync<GetReceiptPagingResponse, int>(sqlQuery,
                                                                                                               new
                                                                                                               {
                                                                                                                   CustomerName = $"%{request.CustomerName}%",
                                                                                                                   CustomerPhone = $"%{request.CustomerPhone}%",
                                                                                                                   Code = $"%{request.Code}%",
-                                                                                                                  request.WarrantyStatusId,
+                                                                                                                  request.ReceiptStatusId,
                                                                                                                   request.UserCreatedId,
                                                                                                                   request.FromDate,
                                                                                                                   request.ToDate,
@@ -227,34 +227,34 @@ namespace Pelo.Api.Services.WarrantyServices
                                                                                                               });
                     if (result.IsSuccess)
                     {
-                        foreach (var warranty in result.Data.Item1)
+                        foreach (var Receipt in result.Data.Item1)
                         {
-                            warranty.Products = new List<ProductInWarrantySimple>();
-                            var products = await ReadOnlyRepository.QueryAsync<ProductInWarrantySimple>(SqlQuery.PRODUCTS_IN_INVOICE_GET_BY_INVOICE_ID,
+                            Receipt.Products = new List<ProductInReceiptSimple>();
+                            var products = await ReadOnlyRepository.QueryAsync<ProductInReceiptSimple>(SqlQuery.PRODUCTS_IN_INVOICE_GET_BY_INVOICE_ID,
                                                                                                             new
                                                                                                             {
-                                                                                                                WarrantyId = warranty.Id
+                                                                                                                ReceiptId = Receipt.Id
                                                                                                             });
                             if (products.IsSuccess
                                && products.Data != null)
                             {
-                                warranty.Products.AddRange(products.Data);
+                                Receipt.Products.AddRange(products.Data);
                             }
                         }
 
-                        return await Ok(new PageResult<GetWarrantyPagingResponse>(request.Page,
+                        return await Ok(new PageResult<GetReceiptPagingResponse>(request.Page,
                                                                                  request.PageSize,
                                                                                  result.Data.Item2,
                                                                                  result.Data.Item1));
                     }
-                    return await Fail<PageResult<GetWarrantyPagingResponse>>(result.Message);
+                    return await Fail<PageResult<GetReceiptPagingResponse>>(result.Message);
                 }
 
-                return await Fail<PageResult<GetWarrantyPagingResponse>>(canGetPaging.Message);
+                return await Fail<PageResult<GetReceiptPagingResponse>>(canGetPaging.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<PageResult<GetWarrantyPagingResponse>>(exception);
+                return await Fail<PageResult<GetReceiptPagingResponse>>(exception);
             }
         }
         private async Task<TResponse<bool>> CanGetPaging(int userId)
@@ -275,15 +275,15 @@ namespace Pelo.Api.Services.WarrantyServices
             }
         }
 
-        public async Task<TResponse<PageResult<GetWarrantyPagingResponse>>> GetByCustomerId(int userId, int customerId, int page, int pageSize)
+        public async Task<TResponse<PageResult<GetReceiptPagingResponse>>> GetByCustomerId(int userId, int customerId, int page, int pageSize)
         {
             try
             {
-                var result = new TResponse<(IEnumerable<GetWarrantyPagingResponse>, int)>();
+                var result = new TResponse<(IEnumerable<GetReceiptPagingResponse>, int)>();
 
                 bool canGetAll = false;
 
-                var canGetAllCrm = await _appConfigService.GetByName("DefaultWarrantyAcceptRoles");
+                var canGetAllCrm = await _appConfigService.GetByName("DefaultReceiptAcceptRoles");
                 if (canGetAllCrm.IsSuccess)
                 {
                     var defaultRoles = canGetAllCrm.Data.Split(" ");
@@ -298,7 +298,7 @@ namespace Pelo.Api.Services.WarrantyServices
 
                 if (canGetAll)
                 {
-                    result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyPagingResponse, int>(SqlQuery.WARRANTY_GET_BY_CUSTOMER_ID,
+                    result = await ReadOnlyRepository.QueryMultipleLFAsync<GetReceiptPagingResponse, int>(SqlQuery.RECEIPT_GET_BY_CUSTOMER_ID,
                                                                                                           new
                                                                                                           {
                                                                                                               CustomerId = customerId,
@@ -308,7 +308,7 @@ namespace Pelo.Api.Services.WarrantyServices
                 }
                 else
                 {
-                    result = await ReadOnlyRepository.QueryMultipleLFAsync<GetWarrantyPagingResponse, int>(SqlQuery.WARRANTY_GET_BY_CUSTOMER_ID_2,
+                    result = await ReadOnlyRepository.QueryMultipleLFAsync<GetReceiptPagingResponse, int>(SqlQuery.RECEIPT_GET_BY_CUSTOMER_ID_2,
                                                                                                           new
                                                                                                           {
                                                                                                               CustomerId = customerId,
@@ -320,36 +320,36 @@ namespace Pelo.Api.Services.WarrantyServices
 
                 if (result.IsSuccess)
                 {
-                    foreach (var warranty in result.Data.Item1)
+                    foreach (var Receipt in result.Data.Item1)
                     {
-                        warranty.Products = new List<ProductInWarrantySimple>();
-                        var products = await ReadOnlyRepository.QueryAsync<ProductInWarrantySimple>(SqlQuery.PRODUCTS_IN_WARRANTY_GET_BY_WARRANTY_ID,
+                        Receipt.Products = new List<ProductInReceiptSimple>();
+                        var products = await ReadOnlyRepository.QueryAsync<ProductInReceiptSimple>(SqlQuery.PRODUCTS_IN_RECEIPT_GET_BY_RECEIPT_ID,
                                                                                                         new
                                                                                                         {
-                                                                                                            WarrantyId = warranty.Id
+                                                                                                            ReceiptId = Receipt.Id
                                                                                                         });
                         if (products.IsSuccess
                            && products.Data != null)
                         {
-                            warranty.Products.AddRange(products.Data);
+                            Receipt.Products.AddRange(products.Data);
                         }
                     }
 
-                    return await Ok(new PageResult<GetWarrantyPagingResponse>(page,
+                    return await Ok(new PageResult<GetReceiptPagingResponse>(page,
                                                                              pageSize,
                                                                              result.Data.Item2,
                                                                              result.Data.Item1));
                 }
 
-                return await Fail<PageResult<GetWarrantyPagingResponse>>(result.Message);
+                return await Fail<PageResult<GetReceiptPagingResponse>>(result.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<PageResult<GetWarrantyPagingResponse>>(exception);
+                return await Fail<PageResult<GetReceiptPagingResponse>>(exception);
             }
         }
 
-        public async Task<TResponse<bool>> Insert(int userId, InsertWarrantyRequest request)
+        public async Task<TResponse<bool>> Insert(int userId, InsertReceiptRequest request)
         {
             try
             {
@@ -357,12 +357,12 @@ namespace Pelo.Api.Services.WarrantyServices
                 if (canInsert.IsSuccess)
                 {
                     var code = await BuildInvoiceCode(DateTime.Now);
-                    var warrantyStatusId = await GetDefaultWarrantyStatus();
-                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.WARRANTY_INSERT,
+                    var ReceiptStatusId = await GetDefaultReceiptStatus();
+                    var result = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.RECEIPT_INSERT,
                                                                                new
                                                                                {
                                                                                    Code = code,
-                                                                                   WarrantyStatusId = warrantyStatusId,
+                                                                                   ReceiptStatusId = ReceiptStatusId,
                                                                                    request.BranchId,
                                                                                    request.CustomerId,
                                                                                    request.Total,
@@ -375,26 +375,26 @@ namespace Pelo.Api.Services.WarrantyServices
 
                     if (result.IsSuccess)
                     {
-                        var warrantyId = result.Data;
+                        var ReceiptId = result.Data;
 
                         #region 1. Thêm sản phẩm
 
                         if (request.Products != null)
                         {
-                            foreach (var productIWarrantyRequest in request.Products)
+                            foreach (var productIReceiptRequest in request.Products)
                             {
-                                var product = await _productService.GetSimpleById(productIWarrantyRequest.Id);
+                                var product = await _productService.GetSimpleById(productIReceiptRequest.Id);
                                 if (product != null)
                                 {
-                                    var resultAddProduct = await WriteRepository.ExecuteAsync(SqlQuery.PRODUCT_IN_WARRANTY_INSERT,
+                                    var resultAddProduct = await WriteRepository.ExecuteAsync(SqlQuery.PRODUCT_IN_RECEIPT_INSERT,
                                                                                               new
                                                                                               {
-                                                                                                  ProductId = productIWarrantyRequest.Id,
-                                                                                                  WarrantyId = warrantyId,
+                                                                                                  ProductId = productIReceiptRequest.Id,
+                                                                                                  ReceiptId = ReceiptId,
                                                                                                   ProductName = product.Name,
-                                                                                                  productIWarrantyRequest.Description,
-                                                                                                  productIWarrantyRequest.WarrantyDescriptionId,
-                                                                                                  productIWarrantyRequest.SerialNumber,
+                                                                                                  productIReceiptRequest.Description,
+                                                                                                  productIReceiptRequest.ReceiptDescriptionId,
+                                                                                                  productIReceiptRequest.SerialNumber,
                                                                                                   UserCreated = userId,
                                                                                                   UserUpdated = userId
                                                                                               });
@@ -406,11 +406,11 @@ namespace Pelo.Api.Services.WarrantyServices
 
                         #region 2. Thêm thông báo
 
-                        await _busPublisher.SendEventAsync(new WarrantyInsertSuccessEvent
+                        await _busPublisher.SendEventAsync(new ReceiptInsertSuccessEvent
                         {
-                            Id = warrantyId,
+                            Id = ReceiptId,
                             Code = code,
-                            WarrantyStatusId = warrantyStatusId,
+                            ReceiptStatusId = ReceiptStatusId,
                             UserId = userId,
                             CustomerId = request.CustomerId
                         });
@@ -431,11 +431,11 @@ namespace Pelo.Api.Services.WarrantyServices
             }
         }
 
-        public async Task<TResponse<GetWarrantyByIdResponse>> GetById(int userId, int id)
+        public async Task<TResponse<GetReceiptByIdResponse>> GetById(int userId, int id)
         {
             try
             {
-                var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyByIdResponse>(SqlQuery.WARRANTY_GET_BY_ID, new
+                var result = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetReceiptByIdResponse>(SqlQuery.RECEIPT_GET_BY_ID, new
                 {
                     Id = id
                 });
@@ -443,55 +443,55 @@ namespace Pelo.Api.Services.WarrantyServices
                 {
                     if (result.Data != null)
                     {
-                        var warranty = result.Data;
+                        var Receipt = result.Data;
 
-                        warranty.Products = new List<ProductInWarranty>();
-                        warranty.UsersCare = new List<UserDisplaySimpleModel>();
-                        warranty.UsersInCharge = new List<UserDisplaySimpleModel>();
+                        Receipt.Products = new List<ProductInReceipt>();
+                        Receipt.UsersCare = new List<UserDisplaySimpleModel>();
+                        Receipt.UsersInCharge = new List<UserDisplaySimpleModel>();
 
-                        var products = await ReadOnlyRepository.QueryAsync<ProductInWarranty>(SqlQuery.GET_PRODUCTS_IN_WARRANTY, new
+                        var products = await ReadOnlyRepository.QueryAsync<ProductInReceipt>(SqlQuery.GET_PRODUCTS_IN_RECEIPT, new
                         {
-                            WarrantyId = id
+                            ReceiptId = id
                         });
                         if (products.IsSuccess
                            && products.Data != null)
                         {
-                            warranty.Products.AddRange(products.Data);
+                            Receipt.Products.AddRange(products.Data);
                         }
 
-                        var userCares = await ReadOnlyRepository.QueryAsync<UserDisplaySimpleModel>(SqlQuery.GET_USERS_IN_WARRANTY, new
+                        var userCares = await ReadOnlyRepository.QueryAsync<UserDisplaySimpleModel>(SqlQuery.GET_USERS_IN_RECEIPT, new
                         {
-                            WarrantyId = id,
+                            ReceiptId = id,
                             Type = 1
                         });
                         if (userCares.IsSuccess
                            && userCares.Data != null)
                         {
-                            warranty.UsersCare.AddRange(userCares.Data);
+                            Receipt.UsersCare.AddRange(userCares.Data);
                         }
 
-                        var userIncharge = await ReadOnlyRepository.QueryAsync<UserDisplaySimpleModel>(SqlQuery.GET_USERS_IN_WARRANTY, new
+                        var userIncharge = await ReadOnlyRepository.QueryAsync<UserDisplaySimpleModel>(SqlQuery.GET_USERS_IN_RECEIPT, new
                         {
-                            WarrantyId = id,
+                            ReceiptId = id,
                             Type = 0
                         });
                         if (userIncharge.IsSuccess
                            && userIncharge.Data != null)
                         {
-                            warranty.UsersInCharge.AddRange(userIncharge.Data);
+                            Receipt.UsersInCharge.AddRange(userIncharge.Data);
                         }
 
-                        return await Ok(warranty);
+                        return await Ok(Receipt);
                     }
 
-                    return await Fail<GetWarrantyByIdResponse>("Not found");
+                    return await Fail<GetReceiptByIdResponse>("Not found");
                 }
 
-                return await Fail<GetWarrantyByIdResponse>(result.Message);
+                return await Fail<GetReceiptByIdResponse>(result.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<GetWarrantyByIdResponse>(exception);
+                return await Fail<GetReceiptByIdResponse>(exception);
             }
         }
 
@@ -517,20 +517,20 @@ namespace Pelo.Api.Services.WarrantyServices
         {
             try
             {
-                var warrantyPrefixResponse = await _appConfigService.GetByName("WarrantyPrefix");
-                string warrantyPrefix = "BH";
-                if (warrantyPrefixResponse.IsSuccess)
+                var ReceiptPrefixResponse = await _appConfigService.GetByName("ReceiptPrefix");
+                string ReceiptPrefix = "BH";
+                if (ReceiptPrefixResponse.IsSuccess)
                 {
-                    warrantyPrefix = warrantyPrefixResponse.Data;
+                    ReceiptPrefix = ReceiptPrefixResponse.Data;
                 }
 
-                if (string.IsNullOrEmpty(warrantyPrefix))
+                if (string.IsNullOrEmpty(ReceiptPrefix))
                 {
-                    warrantyPrefix = "BH";
+                    ReceiptPrefix = "BH";
                 }
 
-                var code = $"{warrantyPrefix}{(date.Year % 100):00}{date.Month:00}{date.Day:00}";
-                var countResponses = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.WARRANTY_COUNT_BY_DATE,
+                var code = $"{ReceiptPrefix}{(date.Year % 100):00}{date.Month:00}{date.Day:00}";
+                var countResponses = await ReadOnlyRepository.QueryFirstOrDefaultAsync<int>(SqlQuery.RECEIPT_COUNT_BY_DATE,
                                                                                             new
                                                                                             {
                                                                                                 Code = $"{code}%"
@@ -550,17 +550,17 @@ namespace Pelo.Api.Services.WarrantyServices
             return string.Empty;
         }
 
-        private async Task<int> GetDefaultWarrantyStatus()
+        private async Task<int> GetDefaultReceiptStatus()
         {
             try
             {
-                var defaultWarrantyStatus = await _appConfigService.GetByName("DefaultWarrantyStatus");
-                int warrantyStatusId = 0;
-                if (defaultWarrantyStatus.IsSuccess)
+                var defaultReceiptStatus = await _appConfigService.GetByName("DefaultReceiptStatus");
+                int ReceiptStatusId = 0;
+                if (defaultReceiptStatus.IsSuccess)
                 {
-                    if (int.TryParse(defaultWarrantyStatus.Data, out warrantyStatusId))
+                    if (int.TryParse(defaultReceiptStatus.Data, out ReceiptStatusId))
                     {
-                        return warrantyStatusId;
+                        return ReceiptStatusId;
                     }
                 }
             }
@@ -572,14 +572,14 @@ namespace Pelo.Api.Services.WarrantyServices
             return 0;
         }
 
-        public async Task<TResponse<IEnumerable<WarrantyLogResponse>>> GetLogs(int userId, int id)
+        public async Task<TResponse<IEnumerable<ReceiptLogResponse>>> GetLogs(int userId, int id)
         {
             try
             {
-                var result = await ReadOnlyRepository.QueryAsync<WarrantyLogResponse>(SqlQuery.WARRANTY_GET_LOGS,
+                var result = await ReadOnlyRepository.QueryAsync<ReceiptLogResponse>(SqlQuery.RECEIPT_GET_LOGS,
                                                                                  new
                                                                                  {
-                                                                                     WarrantyId = id
+                                                                                     ReceiptId = id
                                                                                  });
                 if (result.IsSuccess)
                 {
@@ -596,30 +596,30 @@ namespace Pelo.Api.Services.WarrantyServices
                             log.User = user.Data;
                         }
 
-                        var oldCrmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<StatusInLog>(SqlQuery.GET_WARRANTY_STATUS_IN_LOG,
+                        var oldCrmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<StatusInLog>(SqlQuery.GET_RECEIPT_STATUS_IN_LOG,
                                                                                                              new
                                                                                                              {
-                                                                                                                 Id = log.OldWarrantyStatusId
+                                                                                                                 Id = log.OldReceiptStatusId
                                                                                                              });
                         if (oldCrmStatus.IsSuccess)
                         {
-                            log.OldWarrantyStatus = oldCrmStatus.Data;
+                            log.OldReceiptStatus = oldCrmStatus.Data;
                         }
 
-                        var crmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<StatusInLog>(SqlQuery.GET_WARRANTY_STATUS_IN_LOG,
+                        var crmStatus = await ReadOnlyRepository.QueryFirstOrDefaultAsync<StatusInLog>(SqlQuery.GET_RECEIPT_STATUS_IN_LOG,
                                                                                                           new
                                                                                                           {
-                                                                                                              Id = log.WarrantyStatusId
+                                                                                                              Id = log.ReceiptStatusId
                                                                                                           });
                         if (crmStatus.IsSuccess)
                         {
-                            log.WarrantyStatus = crmStatus.Data;
+                            log.ReceiptStatus = crmStatus.Data;
                         }
 
-                        var attachments = await ReadOnlyRepository.QueryAsync<LogAttachment>(SqlQuery.GET_WARRANTY_ATTACHMENT_IN_LOG,
+                        var attachments = await ReadOnlyRepository.QueryAsync<LogAttachment>(SqlQuery.GET_RECEIPT_ATTACHMENT_IN_LOG,
                                                                                                 new
                                                                                                 {
-                                                                                                    WarrantyLogId = log.Id
+                                                                                                    ReceiptLogId = log.Id
                                                                                                 });
 
                         if (attachments.IsSuccess)
@@ -631,16 +631,16 @@ namespace Pelo.Api.Services.WarrantyServices
                     return await Ok(result.Data);
                 }
 
-                return await Fail<IEnumerable<WarrantyLogResponse>>(result.Message);
+                return await Fail<IEnumerable<ReceiptLogResponse>>(result.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<IEnumerable<WarrantyLogResponse>>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(),
-                                                                             "GetWarrantyLog"));
+                return await Fail<IEnumerable<ReceiptLogResponse>>(string.Format(ErrorEnum.SQL_QUERY_CAN_NOT_EXECUTE.GetStringValue(),
+                                                                             "GetReceiptLog"));
             }
         }
 
-        public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateWarrantyRequest request)
+        public async Task<TResponse<bool>> UpdateCrm(int userId, UpdateReceiptRequest request)
         {
             try
             {
@@ -648,7 +648,7 @@ namespace Pelo.Api.Services.WarrantyServices
                                                      request);
                 if (oldInformation.IsSuccess)
                 {
-                    var result = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_UPDATE,
+                    var result = await WriteRepository.ExecuteAsync(SqlQuery.RECEIPT_UPDATE,
                                                                     new
                                                                     {
                                                                         request.Id,
@@ -664,17 +664,17 @@ namespace Pelo.Api.Services.WarrantyServices
                     {
                         if (result.Data > 0)
                         {
-                            var warrantyId = request.Id;
-                            var warrantyCareUser = await ReadOnlyRepository.QueryAsync<WarrantyUserResponse>(SqlQuery.GET_WARRANTY_USER_BY_WARRANTYID,
+                            var ReceiptId = request.Id;
+                            var ReceiptCareUser = await ReadOnlyRepository.QueryAsync<ReceiptUserResponse>(SqlQuery.GET_RECEIPT_USER_BY_RECEIPTID,
                                                                                                new
                                                                                                {
-                                                                                                   WarrantyId = warrantyId,
+                                                                                                   ReceiptId = ReceiptId,
                                                                                                    Type = 0
                                                                                                });
-                            var warrantyRelativeUser = await ReadOnlyRepository.QueryAsync<WarrantyUserResponse>(SqlQuery.GET_WARRANTY_USER_BY_WARRANTYID,
+                            var ReceiptRelativeUser = await ReadOnlyRepository.QueryAsync<ReceiptUserResponse>(SqlQuery.GET_RECEIPT_USER_BY_RECEIPTID,
                                                                                                new
                                                                                                {
-                                                                                                   WarrantyId = warrantyId,
+                                                                                                   ReceiptId = ReceiptId,
                                                                                                    Type = 1
                                                                                                });
                             if (request.UserCareIds == null)
@@ -682,15 +682,15 @@ namespace Pelo.Api.Services.WarrantyServices
                                 request.UserCareIds = new List<int>();
                             }
 
-                            if (warrantyCareUser.Data.Any()
+                            if (ReceiptCareUser.Data.Any()
                                || request.UserCareIds.Any())
                             {
-                                if (warrantyCareUser.Data.Any()
+                                if (ReceiptCareUser.Data.Any()
                                    && (request.UserCareIds == null || !request.UserCareIds.Any()))
                                 {
                                 }
                                 else if (request.UserCareIds.Any()
-                                        && (warrantyCareUser.Data == null || !warrantyCareUser.Data.Any()))
+                                        && (ReceiptCareUser.Data == null || !ReceiptCareUser.Data.Any()))
                                 {
                                 }
                             }
@@ -699,34 +699,34 @@ namespace Pelo.Api.Services.WarrantyServices
                                 request.UserRelativeIds = new List<int>();
                             }
 
-                            if (warrantyRelativeUser.Data.Any()
+                            if (ReceiptRelativeUser.Data.Any()
                                || request.UserRelativeIds.Any())
                             {
-                                if (warrantyRelativeUser.Data.Any()
+                                if (ReceiptRelativeUser.Data.Any()
                                    && (request.UserRelativeIds == null || !request.UserRelativeIds.Any()))
                                 {
                                 }
                                 else if (request.UserRelativeIds.Any()
-                                        && (warrantyRelativeUser.Data == null || !warrantyRelativeUser.Data.Any()))
+                                        && (ReceiptRelativeUser.Data == null || !ReceiptRelativeUser.Data.Any()))
                                 {
                                 }
                             }
 
                             List<int> userCareIds = new List<int>();
                             List<int> userRelativeIds = new List<int>();
-                            if (warrantyCareUser != null)
+                            if (ReceiptCareUser != null)
                             {
                                 if (request.UserCareIds.Any())
                                 {
-                                    WarrantyUserResponse[] warrantyUserResponse = warrantyCareUser.Data.Where(c => c.WarrantyId == request.Id && !request.UserCareIds.Contains(c.UserId))
+                                    ReceiptUserResponse[] ReceiptUserResponse = ReceiptCareUser.Data.Where(c => c.ReceiptId == request.Id && !request.UserCareIds.Contains(c.UserId))
                                                                                .ToArray();
-                                    userCareIds.AddRange(warrantyUserResponse.Select(c => c.UserId));
-                                    foreach (var item in warrantyUserResponse)
+                                    userCareIds.AddRange(ReceiptUserResponse.Select(c => c.UserId));
+                                    foreach (var item in ReceiptUserResponse)
                                     {
-                                        await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_DELETE,
+                                        await WriteRepository.ExecuteAsync(SqlQuery.RECEIPT_USER_DELETE,
                                                                            new
                                                                            {
-                                                                               WarrantyId = request.Id,
+                                                                               ReceiptId = request.Id,
                                                                                UserId = item.UserId,
                                                                                Type = 0
                                                                            });
@@ -734,10 +734,10 @@ namespace Pelo.Api.Services.WarrantyServices
 
                                     foreach (var user in request.UserCareIds)
                                     {
-                                        var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_INSERT,
+                                        var rs = await WriteRepository.ExecuteAsync(SqlQuery.RECEIPT_USER_INSERT,
                                                                                     new
                                                                                     {
-                                                                                        WarrantyId = request.Id,
+                                                                                        ReceiptId = request.Id,
                                                                                         UserId = user,
                                                                                         Type = 0,
                                                                                         UserUpdated = userId,
@@ -749,14 +749,14 @@ namespace Pelo.Api.Services.WarrantyServices
                                 }
                                 else
                                 {
-                                    if (warrantyCareUser.IsSuccess)
+                                    if (ReceiptCareUser.IsSuccess)
                                     {
-                                        foreach (var item in warrantyCareUser.Data)
+                                        foreach (var item in ReceiptCareUser.Data)
                                         {
-                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_DELETE,
+                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.RECEIPT_USER_DELETE,
                                                                                         new
                                                                                         {
-                                                                                            WarrantyId = request.Id,
+                                                                                            ReceiptId = request.Id,
                                                                                             UserId = item.Id,
                                                                                             Type = 0
                                                                                         });
@@ -768,10 +768,10 @@ namespace Pelo.Api.Services.WarrantyServices
                             {
                                 foreach (var user in request.UserCareIds)
                                 {
-                                    var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_INSERT,
+                                    var rs = await WriteRepository.ExecuteAsync(SqlQuery.RECEIPT_USER_INSERT,
                                                                                 new
                                                                                 {
-                                                                                    WarrantyId = request.Id,
+                                                                                    ReceiptId = request.Id,
                                                                                     UserId = user,
                                                                                     Type = 0,
                                                                                     UserUpdated = userId,
@@ -781,19 +781,19 @@ namespace Pelo.Api.Services.WarrantyServices
                                                                                 });
                                 }
                             }
-                            if (warrantyRelativeUser != null)
+                            if (ReceiptRelativeUser != null)
                             {
                                 if (request.UserRelativeIds.Any())
                                 {
-                                    WarrantyUserResponse[] warrantyUserResponse = warrantyRelativeUser.Data.Where(c => c.WarrantyId == request.Id && !request.UserRelativeIds.Contains(c.UserId))
+                                    ReceiptUserResponse[] ReceiptUserResponse = ReceiptRelativeUser.Data.Where(c => c.ReceiptId == request.Id && !request.UserRelativeIds.Contains(c.UserId))
                                                                                .ToArray();
-                                    userRelativeIds.AddRange(warrantyUserResponse.Select(c => c.UserId));
-                                    foreach (var item in warrantyUserResponse)
+                                    userRelativeIds.AddRange(ReceiptUserResponse.Select(c => c.UserId));
+                                    foreach (var item in ReceiptUserResponse)
                                     {
-                                        await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_DELETE,
+                                        await WriteRepository.ExecuteAsync(SqlQuery.RECEIPT_USER_DELETE,
                                                                            new
                                                                            {
-                                                                               WarrantyId = request.Id,
+                                                                               ReceiptId = request.Id,
                                                                                UserId = item.UserId,
                                                                                Type = 1
                                                                            });
@@ -801,10 +801,10 @@ namespace Pelo.Api.Services.WarrantyServices
 
                                     foreach (var user in request.UserRelativeIds)
                                     {
-                                        var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_INSERT,
+                                        var rs = await WriteRepository.ExecuteAsync(SqlQuery.RECEIPT_USER_INSERT,
                                                                                     new
                                                                                     {
-                                                                                        WarrantyId = request.Id,
+                                                                                        ReceiptId = request.Id,
                                                                                         UserId = user,
                                                                                         Type = 1,
                                                                                         UserUpdated = userId,
@@ -816,14 +816,14 @@ namespace Pelo.Api.Services.WarrantyServices
                                 }
                                 else
                                 {
-                                    if (warrantyRelativeUser.IsSuccess)
+                                    if (ReceiptRelativeUser.IsSuccess)
                                     {
-                                        foreach (var item in warrantyRelativeUser.Data)
+                                        foreach (var item in ReceiptRelativeUser.Data)
                                         {
-                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_DELETE,
+                                            var rs = await WriteRepository.ExecuteAsync(SqlQuery.RECEIPT_USER_DELETE,
                                                                                         new
                                                                                         {
-                                                                                            WarrantyId = request.Id,
+                                                                                            ReceiptId = request.Id,
                                                                                             UserId = item.Id,
                                                                                             Type = 1
                                                                                         });
@@ -835,10 +835,10 @@ namespace Pelo.Api.Services.WarrantyServices
                             {
                                 foreach (var user in request.UserCareIds)
                                 {
-                                    var rs = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_USER_INSERT,
+                                    var rs = await WriteRepository.ExecuteAsync(SqlQuery.RECEIPT_USER_INSERT,
                                                                                 new
                                                                                 {
-                                                                                    WarrantyId = request.Id,
+                                                                                    ReceiptId = request.Id,
                                                                                     UserId = user,
                                                                                     Type = 0,
                                                                                     UserUpdated = userId,
@@ -848,21 +848,21 @@ namespace Pelo.Api.Services.WarrantyServices
                                                                                 });
                                 }
                             }
-                            await _busPublisher.SendEventAsync(new WarrantyUpdateSuccessEvent
+                            await _busPublisher.SendEventAsync(new ReceiptUpdateSuccessEvent
                             {
                                 Id = oldInformation.Data.Id,
                                 Code = oldInformation.Data.Code,
-                                BeforeUpdated = new WarrantyUpdateSuccessModel
+                                BeforeUpdated = new ReceiptUpdateSuccessModel
                                 {
-                                    WarrantyStatusId = oldInformation.Data.WarrantyStatusId,
+                                    ReceiptStatusId = oldInformation.Data.ReceiptStatusId,
                                     DeliveryDate = oldInformation.Data.DeliveryDate,
                                     Description = oldInformation.Data.Description,
                                     UserCareIds = userCareIds,
                                     UserRelativeIds = userRelativeIds
                                 },
-                                AfterUpdated = new WarrantyUpdateSuccessModel
+                                AfterUpdated = new ReceiptUpdateSuccessModel
                                 {
-                                    WarrantyStatusId = oldInformation.Data.WarrantyStatusId,
+                                    ReceiptStatusId = oldInformation.Data.ReceiptStatusId,
                                     DeliveryDate = request.DeliveryDate,
                                     Description = request.Description,
                                     UserRelativeIds = request.UserRelativeIds,
@@ -888,8 +888,8 @@ namespace Pelo.Api.Services.WarrantyServices
             }
         }
 
-        private async Task<TResponse<GetWarrantyByIdResponse>> CanUpdate(int userId,
-                                                                    UpdateWarrantyRequest request)
+        private async Task<TResponse<GetReceiptByIdResponse>> CanUpdate(int userId,
+                                                                    UpdateReceiptRequest request)
         {
             try
             {
@@ -898,10 +898,10 @@ namespace Pelo.Api.Services.WarrantyServices
                 {
                     if (request.Id == 0)
                     {
-                        return await Fail<GetWarrantyByIdResponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<GetReceiptByIdResponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
                     }
 
-                    var checkIdInvalid = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyByIdResponse>(SqlQuery.WARRANTY_GET_BY_ID,
+                    var checkIdInvalid = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetReceiptByIdResponse>(SqlQuery.RECEIPT_GET_BY_ID,
                                                                                                                new
                                                                                                                {
                                                                                                                    request.Id
@@ -913,46 +913,46 @@ namespace Pelo.Api.Services.WarrantyServices
                             return await Ok(checkIdInvalid.Data);
                         }
 
-                        return await Fail<GetWarrantyByIdResponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
+                        return await Fail<GetReceiptByIdResponse>(ErrorEnum.CRM_HAS_NOT_EXIST.GetStringValue());
                     }
 
-                    return await Fail<GetWarrantyByIdResponse>(checkIdInvalid.Message);
+                    return await Fail<GetReceiptByIdResponse>(checkIdInvalid.Message);
                 }
 
-                return await Fail<GetWarrantyByIdResponse>(checkPermission.Message);
+                return await Fail<GetReceiptByIdResponse>(checkPermission.Message);
             }
             catch (Exception exception)
             {
-                return await Fail<GetWarrantyByIdResponse>(exception);
+                return await Fail<GetReceiptByIdResponse>(exception);
             }
         }
         //TODO
-        public async Task<TResponse<bool>> Comment(int userId, CommentWarrantyRequest request)
+        public async Task<TResponse<bool>> Comment(int userId, CommentReceiptRequest request)
         {
             try
             {
-                var warranty = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetWarrantyByIdResponse>(SqlQuery.WARRANTY_GET_BY_ID,
+                var Receipt = await ReadOnlyRepository.QueryFirstOrDefaultAsync<GetReceiptByIdResponse>(SqlQuery.RECEIPT_GET_BY_ID,
                                                                                                 new
                                                                                                 {
                                                                                                     request.Id
                                                                                                 });
-                if (warranty.IsSuccess)
+                if (Receipt.IsSuccess)
                 {
-                    if (warranty.Data != null)
+                    if (Receipt.Data != null)
                     {
-                        var rs1 = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.STATUS_WARRANTY_UPDATE, new { request.Id, request.WarrantyStatusId });
+                        var rs1 = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.STATUS_RECEIPT_UPDATE, new { request.Id, request.ReceiptStatusId });
                         if (rs1.IsSuccess)
                         {
-                            var rs = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.WARRANTY_INSERT_COMMENT,
+                            var rs = await WriteRepository.ExecuteScalarAsync<int>(SqlQuery.RECEIPT_INSERT_COMMENT,
                                                                                new
                                                                                {
-                                                                                   WarrantyId = request.Id,
+                                                                                   ReceiptId = request.Id,
                                                                                    Comment = string.IsNullOrEmpty(request.Comment)
                                                                                                          ? "đã đính kèm file"
                                                                                                          : request.Comment,
                                                                                    UserId = userId,
-                                                                                   warranty.Data.WarrantyStatusId,
-                                                                                   OldWarrantyStatusId = warranty.Data.WarrantyStatusId
+                                                                                   Receipt.Data.ReceiptStatusId,
+                                                                                   OldReceiptStatusId = Receipt.Data.ReceiptStatusId
                                                                                });
                             if (rs.IsSuccess)
                             {
@@ -978,10 +978,10 @@ namespace Pelo.Api.Services.WarrantyServices
                                             file.CopyTo(fileStream);
                                             fileStream.Flush();
 
-                                            var result = await WriteRepository.ExecuteAsync(SqlQuery.WARRANTY_LOG_ATTACHMENT_INSERT,
+                                            var result = await WriteRepository.ExecuteAsync(SqlQuery.RECEIPT_LOG_ATTACHMENT_INSERT,
                                                                                             new
                                                                                             {
-                                                                                                WarrantyId = crmLogId,
+                                                                                                ReceiptId = crmLogId,
                                                                                                 Attachment = $"{newFileName}{Path.GetExtension(file.FileName)}",
                                                                                                 AttachmentName = file.FileName,
                                                                                                 UserCreated = userId,
@@ -990,14 +990,14 @@ namespace Pelo.Api.Services.WarrantyServices
                                         }
                                     }
 
-                                    await _busPublisher.SendEventAsync(new WarrantyCommentSuccessEvent
+                                    await _busPublisher.SendEventAsync(new ReceiptCommentSuccessEvent
                                     {
                                         Id = request.Id,
-                                        Code = warranty.Data.Code,
+                                        Code = Receipt.Data.Code,
                                         Comment = request.Comment,
                                         HasAttachmentFile = request.Files != null && request.Files.Any(),
                                         UserId = userId,
-                                        WarrantyStatusId = request.WarrantyStatusId
+                                        ReceiptStatusId = request.ReceiptStatusId
                                     });
 
                                     return await Ok(true);

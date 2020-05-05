@@ -901,6 +901,49 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptController.GetByPaging(Pelo.Common.Dtos.Receipt.GetReceiptPagingRequest)">
+            <summary>
+                Lấy danh sách  bao hanh có phân trang
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptController.Insert(Pelo.Common.Dtos.Receipt.InsertReceiptRequest)">
+            <summary>
+                Thêm mới bao hanh
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptController.GetById(System.Int32)">
+            <summary>
+            Lấy chi tiết bao hanh
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptController.UpdateCrm(Pelo.Common.Dtos.Receipt.UpdateReceiptRequest)">
+            <summary>
+                Update CRM
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptController.Comment(System.String,Microsoft.AspNetCore.Http.IFormFileCollection)">
+            <summary>
+                Them CRM Comment
+            </summary>
+            <param name="paras"></param>
+            <param name="files"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Pelo.Api.Controllers.ReceiptController.GetLog(System.Int32)">
+            <summary>
+                Lấy danh sách log crm
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:Pelo.Api.Controllers.ReceiptDescriptionController.GetAll">
             <summary>
                 Lấy tất cả trạng thái receipt description
@@ -1581,6 +1624,16 @@
             </summary>
         </member>
         <member name="F:Pelo.Api.Services.SqlQuery.WARRANTY_GET_BY_PAGING_2">
+            <summary>
+                Lấy danh sách Warranty có điều kiện UserCareId
+            </summary>
+        </member>
+        <member name="F:Pelo.Api.Services.SqlQuery.RECEIPT_GET_BY_PAGING">
+            <summary>
+                Lấy danh sách Warranty ko có điều kiện UserCareId
+            </summary>
+        </member>
+        <member name="F:Pelo.Api.Services.SqlQuery.RECEIPT_GET_BY_PAGING_2">
             <summary>
                 Lấy danh sách Warranty có điều kiện UserCareId
             </summary>

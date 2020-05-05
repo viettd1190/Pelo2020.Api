@@ -4695,8 +4695,8 @@ SELECT COUNT(*) FROM dbo.Role c
                                                                    ON c.Id = w.CustomerId
                                                                INNER JOIN dbo.Branch b
                                                                    ON b.Id = w.BranchId
-                                                               INNER JOIN dbo.InvoiceStatus ins
-                                                                   ON ins.Id = w.InvoiceStatusId
+                                                               INNER JOIN dbo.WarrantyStatus ins
+                                                                   ON ins.Id = w.WarrantyStatusId
                                                                INNER JOIN dbo.[User] u2
                                                                    ON u2.Id = w.UserCreated
                                                            WHERE w.CustomerId = @CustomerId
@@ -4732,12 +4732,12 @@ SELECT COUNT(*) FROM dbo.Role c
                                                                      ON c.Id = w.CustomerId
                                                                  INNER JOIN dbo.Branch b
                                                                      ON b.Id = w.BranchId
-                                                                 INNER JOIN dbo.InvoiceStatus ins
-                                                                     ON ins.Id = w.InvoiceStatusId
+                                                                 INNER JOIN dbo.WarrantyStatus ins
+                                                                     ON ins.Id = w.WarrantyStatusId
                                                                  INNER JOIN dbo.[User] u2
                                                                      ON u2.Id = w.UserCreated
                                                                  LEFT JOIN dbo.UserInWarranty uiw
-                                                                     ON c.Id = uiw.InvoiceId
+                                                                     ON c.Id = uiw.WarrantyId
                                                              WHERE w.CustomerId = @CustomerId
                                                                    AND
                                                                    (
@@ -4852,7 +4852,7 @@ SELECT COUNT(*) FROM dbo.Role c
                                                     Comment,
                                                     LogDate,
                                                     OldWarrantyStatusId,
-                                                    CrmWarrantyId
+                                                    WarrantyStatusId
                                              FROM dbo.WarrantyLog
                                              WHERE WarrantyId = @WarrantyId
                                              ORDER BY LogDate DESC;";
@@ -4884,6 +4884,495 @@ SELECT COUNT(*) FROM dbo.Role c
                                                         )
                                                         VALUES
                                                         (   @WarrantyId,
+                                                            @UserId,
+                                                            @Type,
+                                                            @UserCreated,
+                                                            @DateCreated,
+                                                            @UserUpdated,
+                                                            @DateUpdated,
+                                                            0 );
+                                                        SELECT CAST(SCOPE_IDENTITY() as int);";
+        #endregion
+
+        #region RECEIPT
+        /// <summary>
+        ///     Lấy danh sách Warranty ko có điều kiện UserCareId
+        /// </summary>
+
+        public const string RECEIPT_GET_BY_PAGING = @"DROP TABLE IF EXISTS #tmpReceipt;
+
+                                                      SELECT w.Id
+                                                      INTO #tmpReceipt
+                                                      FROM dbo.Receipt w
+                                                          LEFT JOIN Customer c
+                                                              ON c.Id = w.CustomerId
+                                                      WHERE ISNULL(c.Code, '') LIKE @CustomerCode
+                                                            AND ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI
+                                                            AND
+                                                            (
+                                                                ISNULL(c.Phone, '') LIKE @CustomerPhone
+                                                                OR ISNULL(c.Phone2, '') LIKE @CustomerPhone
+                                                                OR ISNULL(c.Phone3, '') LIKE @CustomerPhone
+                                                            )
+                                                            AND w.Code LIKE @Code
+                                                            AND
+                                                            (
+                                                                @ReceiptStatusId = 0
+                                                                OR ISNULL(w.ReceiptStatusId, 0) = @ReceiptStatusId
+                                                            )
+                                                            AND
+                                                            (
+                                                                @UserCreatedId = 0
+                                                                OR w.UserCreated = @UserCreatedId
+                                                            )
+                                                            AND
+                                                            (
+                                                                @UserCreatedId = 0
+                                                                OR w.UserCreatedId = @UserCreatedId
+                                                            )
+                                                            AND
+                                                            (
+                                                                @FromDate IS NULL
+                                                                OR w.DateCreated >= @FromDate
+                                                            )
+                                                            AND
+                                                            (
+                                                                @ToDate IS NULL
+                                                                OR w.DateCreated <= @ToDate
+                                                            )
+                                                            AND w.IsDeleted = 0
+                                                            AND c.IsDeleted = 0;
+
+
+                                                      SELECT w.Id,
+                                                             w.Code,
+                                                             ws.Name AS ReceiptStatus,
+                                                             ws.Color AS ReceiptStatusColor,
+                                                             c.Name AS CustomerName,
+                                                             c.Phone AS CustomerPhone1,
+                                                             c.Phone2 AS CustomerPhone2,
+                                                             c.Phone3 AS CustomerPhone3,
+                                                             c.CustomerAddress,
+                                                             c.Code AS CustomerCode,
+                                                             b.Name AS Branch,
+                                                             u1.DisplayName AS UserCreated,
+                                                             u1.PhoneNumber AS UserCreatedPhone,
+                                                             w.DeliveryDate,
+                                                             w.DateCreated
+                                                      FROM #tmpReceipt tmp
+                                                          INNER JOIN dbo.Receipt w
+                                                              ON tmp.Id = w.Id
+                                                          LEFT JOIN dbo.Customer c
+                                                              ON c.Id = w.CustomerId
+                                                          LEFT JOIN dbo.Branch b
+                                                              ON b.Id = w.BranchId
+                                                          LEFT JOIN dbo.ReceiptStatus ws
+                                                              ON ws.Id = w.ReceiptStatusId
+                                                          LEFT JOIN dbo.[User] u1
+                                                              ON u1.Id = w.UserCreated
+                                                      ORDER BY w.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+
+                                                      SELECT COUNT(*)
+                                                      FROM #tmpReceipt;
+                                                      DROP TABLE #tmpReceipt;";
+
+        /// <summary>
+        ///     Lấy danh sách Warranty có điều kiện UserCareId
+        /// </summary>
+
+        public const string RECEIPT_GET_BY_PAGING_2 = @"DROP TABLE IF EXISTS #tmpReceipt;
+
+                                                        SELECT w.Id
+                                                        INTO #tmpReceipt
+                                                        FROM dbo.Receipt w
+                                                            LEFT JOIN Customer c
+                                                                ON c.Id = w.CustomerId
+                                                        WHERE ISNULL(c.Code, '') LIKE @CustomerCode
+                                                              AND ISNULL(c.Name, '') COLLATE Latin1_General_CI_AI LIKE @CustomerName COLLATE Latin1_General_CI_AI
+                                                              AND
+                                                              (
+                                                                  ISNULL(c.Phone, '') LIKE @CustomerPhone
+                                                                  OR ISNULL(c.Phone2, '') LIKE @CustomerPhone
+                                                                  OR ISNULL(c.Phone3, '') LIKE @CustomerPhone
+                                                              )
+                                                              AND w.Code LIKE @Code
+                                                              AND
+                                                              (
+                                                                  @ReceiptStatusId = 0
+                                                                  OR ISNULL(w.ReceiptStatusId, 0) = @ReceiptStatusId
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @UserCreatedId = 0
+                                                                  OR w.UserCreated = @UserCreatedId
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @FromDate IS NULL
+                                                                  OR w.DateCreated >= @FromDate
+                                                              )
+                                                              AND
+                                                              (
+                                                                  @ToDate IS NULL
+                                                                  OR w.DateCreated <= @ToDate
+                                                              )
+                                                              AND w.IsDeleted = 0
+                                                              AND c.IsDeleted = 0;
+                         
+                         
+                                                        SELECT w.Id,
+                                                               w.Code,
+                                                               ws.Name AS ReceiptStatus,
+                                                               ws.Color AS ReceiptStatusColor,
+                                                               c.Name AS CustomerName,
+                                                               c.Phone AS CustomerPhone1,
+                                                               c.Phone2 AS CustomerPhone2,
+                                                               c.Phone3 AS CustomerPhone3,
+                                                               c.CustomerAddress,
+                                                               c.Code AS CustomerCode,
+                                                               b.Name AS Branch,
+                                                               u1.DisplayName AS UserCreated,
+                                                               u1.PhoneNumber AS UserCreatedPhone,
+                                                               w.DeliveryDate,
+                                                               w.DateCreated                                                                                    FROM #tmpWarranty tmp
+                                                            INNER JOIN dbo.Receipt w
+                                                                ON tmp.Id = w.Id
+                                                            LEFT JOIN dbo.Customer c
+                                                                ON c.Id = w.CustomerId
+                                                            LEFT JOIN dbo.Province p
+                                                                ON p.Id = c.ProvinceId
+                                                            LEFT JOIN dbo.District d
+                                                                ON d.Id = c.DistrictId
+                                                            LEFT JOIN dbo.Ward w
+                                                                ON w.Id = c.WardId
+                                                            LEFT JOIN dbo.Branch b
+                                                                ON b.Id = w.BranchId
+                                                            LEFT JOIN dbo.ReceiptStatus ws
+                                                                ON ws.Id = w.ReceiptStatusId
+                                                            LEFT JOIN dbo.[User] u1
+                                                                ON u1.Id = w.UserCreated
+                                                        ORDER BY w.DateCreated DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                         
+                                                        SELECT COUNT(*)
+                                                        FROM #tmpReceipt;
+                                                        DROP TABLE #tmpReceipt;";
+
+        public const string GET_PRODUCTS_IN_RECEIPT = @"SELECT piw.ProductId AS Id,
+                                                               piw.ProductName AS Name,
+                                                               piw.Description,
+                                                               piw.SerialNumber,
+                                                               wd.Name AS ReceiptDescription
+                                                        FROM dbo.ProductInReceipt AS piw
+                                                            LEFT JOIN dbo.ReceiptDescription wd
+                                                                ON wd.Id = piw.ReceiptStatusId
+                                                        WHERE ReceiptId = @ReceiptId
+                                                              AND IsDeleted = 0;";
+
+        public const string PRODUCTS_IN_RECEIPT_GET_BY_RECEIPT_ID = @"SELECT Id,
+                                                                             ProductName AS Name,
+                                                                             Description
+                                                                      FROM dbo.ProductInReceipt
+                                                                      WHERE ReceiptId = @ReceiptId
+                                                                            AND IsDeleted = 0;";
+
+        public const string GET_USERS_IN_RECEIPT = @"SELECT u.DisplayName,
+                                                            u.PhoneNumber
+                                                     FROM dbo.UserInReceipt i
+                                                         INNER JOIN dbo.[User] u
+                                                             ON i.UserId = u.Id
+                                                                AND i.IsDeleted = 0
+                                                                AND i.Type = @Type
+                                                                AND i.ReceiptId = @ReceiptId;";
+
+        public const string RECEIPT_INSERT = @"INSERT dbo.Warranty
+                                               (
+                                                   Code,
+                                                   ReceiptStatusId,
+                                                   BranchId,
+                                                   CustomerId,
+                                                   Total,
+                                                   Deposit,
+                                                   DeliveryDate,
+                                                   Description,
+                                                   UserCreated,
+                                                   DateCreated,
+                                                   UserUpdated,
+                                                   DateUpdated,
+                                                   IsDeleted
+                                               )
+                                               VALUES
+                                               (   @Code,       -- Code - nvarchar(50)
+                                                   @ReceiptStatusId,         -- ReceiptStatusId - int
+                                                   @BranchId,         -- BranchId - int
+                                                   @CustomerId,         -- CustomerId - int
+                                                   @Total,         -- Total - bigint
+                                                   @Deposit,         -- Deposit - bigint
+                                                   @DeliveryDate, -- DeliveryDate - datetime
+                                                   @Description,       -- Description - nvarchar(max)
+                                                   @UserCreated,         -- UserCreated - int
+                                                   GETDATE(), -- DateCreated - datetime
+                                                   @UserUpdated,         -- UserUpdated - int
+                                                   GETDATE(), -- DateUpdated - datetime
+                                                   0       -- IsDeleted - bit
+                                                   );
+
+                                               SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string RECEIPT_COUNT_BY_DATE = @"SELECT COUNT(*) FROM dbo.Warranty WHERE Code LIKE @Code";
+
+        public const string PRODUCT_IN_RECEIPT_INSERT = @"INSERT dbo.ProductInReceipt
+                                                          (
+                                                              ProductId,
+                                                              ReceiptId,
+                                                              ProductName,
+                                                              Description,
+                                                              ReceiptDescriptionId,
+                                                              SerialNumber,
+                                                              UserCreated,
+                                                              DateCreated,
+                                                              UserUpdated,
+                                                              DateUpdated,
+                                                              IsDeleted
+                                                          )
+                                                          VALUES
+                                                          (   @ProductId,         -- ProductId - int
+                                                              @ReceiptId,         -- ReceiptId - int
+                                                              @ProductName,        --- ProductName nvarchar(250)
+                                                              @Description,         -- Description - int
+                                                              @ReceiptDescriptionId,         -- ReceiptDescriptionId - int
+                                                              @SerialNumber,       -- SerialNumber - nvarchar(2000)
+                                                              @UserCreated,         -- UserCreated - int
+                                                              GETDATE(), -- DateCreated - datetime
+                                                              @UserUpdated,         -- UserUpdated - int
+                                                              GETDATE(), -- DateUpdated - datetime
+                                                              0       -- IsDeleted - bit
+                                                              )";
+
+        public const string RECEIPT_GET_BY_ID = @"SELECT w.Id,
+                                                         w.Code,
+                                                         w.DateCreated,
+                                                         w.CustomerId,
+                                                         w.DeliveryDate,
+                                                         w.Total,
+                                                         w.Deposit,
+                                                         w.ReceiptStatusId,
+                                                         w.Description,
+                                                         u1.DisplayName AS UserCreated,
+                                                         u1.PhoneNumber AS UserCreatedPhone,
+                                                  FROM dbo.Receipt w
+                                                      INNER JOIN dbo.[User] u1
+                                                          ON u1.Id = w.UserCreated
+                                                  WHERE i.Id = @Id AND i.IsDeleted = 0;";
+
+        public const string RECEIPT_GET_BY_CUSTOMER_ID = @"SELECT i.Id,
+                                                                  ws.Name AS ReceiptStatus,
+                                                                  ws.Color AS ReceiptStatusColor,
+                                                                  w.Code,
+                                                                  c.Name AS CustomerName,
+                                                                  c.Phone AS CustomerPhone1,
+                                                                  c.Phone2 AS CustomerPhone2,
+                                                                  c.Phone3 AS CustomerPhone3,
+                                                                  c.Address AS CustomerAddress,
+                                                                  c.Code AS CustomerCode,
+                                                                  b.Name AS Branch,
+                                                                  u2.DisplayName AS UserCreated,
+                                                                  u2.PhoneNumber AS UserCreatedPhone,
+                                                                  w.DeliveryDate,
+                                                                  w.DateCreated
+                                                           FROM dbo.Receipt w
+                                                               INNER JOIN dbo.Customer c
+                                                                   ON c.Id = w.CustomerId
+                                                               INNER JOIN dbo.Branch b
+                                                                   ON b.Id = w.BranchId
+                                                               INNER JOIN dbo.ReceiptStatus ins
+                                                                   ON ins.Id = w.ReceiptStatusId
+                                                               INNER JOIN dbo.[User] u2
+                                                                   ON u2.Id = w.UserCreated
+                                                           WHERE w.CustomerId = @CustomerId
+                                                                 AND w.IsDeleted = 0
+                                                                 AND c.IsDeleted = 0
+                                                           ORDER BY i.Id DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                    
+                                                           SELECT COUNT(*)
+                                                           FROM dbo.Receipt w
+                                                               INNER JOIN dbo.Customer c
+                                                                   ON c.Id = w.CustomerId
+                                                           WHERE w.CustomerId = @CustomerId
+                                                                 AND w.IsDeleted = 0
+                                                                 AND c.IsDeleted = 0;";
+
+        public const string RECEIPT_GET_BY_CUSTOMER_ID_2 = @"SELECT w.Id,
+                                                                    ws.Name AS ReceiptStatus,
+                                                                    ws.Color AS ReceiptStatusColor,
+                                                                    w.Code,
+                                                                    c.Name AS CustomerName,
+                                                                    c.Phone AS CustomerPhone,
+                                                                    c.Phone2 AS CustomerPhone2,
+                                                                    c.Phone3 AS CustomerPhone3,
+                                                                    c.Address AS CustomerAddress,
+                                                                    c.Code AS CustomerCode,
+                                                                    b.Name AS Branch,
+                                                                    u2.DisplayName AS UserCreated,
+                                                                    u2.PhoneNumber AS UserCreatedPhone,
+                                                                    w.DeliveryDate,
+                                                                    w.DateCreated
+                                                             FROM dbo.Receipt w
+                                                                 INNER JOIN dbo.Customer c
+                                                                     ON c.Id = w.CustomerId
+                                                                 INNER JOIN dbo.Branch b
+                                                                     ON b.Id = w.BranchId
+                                                                 INNER JOIN dbo.ReceiptStatus ins
+                                                                     ON ins.Id = w.ReceiptStatusId
+                                                                 INNER JOIN dbo.[User] u2
+                                                                     ON u2.Id = w.UserCreated
+                                                                 LEFT JOIN dbo.UserInReceipt uiw
+                                                                     ON c.Id = uiw.ReceiptId
+                                                             WHERE w.CustomerId = @CustomerId
+                                                                   AND
+                                                                   (
+                                                                       w.UserCreated = @UserId
+                                                                       OR uiw.UserId = @UserId
+                                                                   )
+                                                                   AND w.IsDeleted = 0
+                                                                   AND c.IsDeleted = 0
+                                                             ORDER BY w.Id DESC OFFSET @Skip ROWS FETCH NEXT @Take ROWS ONLY;
+                        
+                                                             SELECT COUNT(*)
+                                                             FROM dbo.Receipt w
+                                                                 INNER JOIN dbo.Customer c
+                                                                     ON c.Id = w.CustomerId
+                                                                 LEFT JOIN dbo.UserInReceipt uiw
+                                                                     ON c.Id = uiw.ReceiptId
+                                                             WHERE w.CustomerId = @CustomerId
+                                                                   AND
+                                                                   (
+                                                                       w.UserCreated = @UserId
+                                                                       OR uiw.UserId = @UserId
+                                                                   )
+                                                                   AND w.IsDeleted = 0
+                                                                   AND c.IsDeleted = 0;";
+
+        public const string RECEIPT_UPDATE = @"UPDATE dbo.Receipt
+                                            SET DeleveryDate = @DeleveryDate,
+                                                Total = @Total,
+                                                Deposit = @Deposit,
+                                                BranchId = @BranchId,
+                                                Description = @Description,
+                                                UserUpdated = @UserUpdated,
+                                                DateUpdated = @DateUpdated
+                                               WHERE Id = @Id";
+
+        public const string STATUS_RECEIPT_UPDATE = @"UPDATE dbo.Receipt
+                                            SET ReceiptStatusId = @ReceiptStatusId,
+                                                UserUpdated = @UserUpdated,
+                                                DateUpdated = @DateUpdated
+                                               WHERE Id = @Id";
+
+        public const string RECEIPT_COMMENT_INSERT = @"INSERT dbo.ReceiptComment
+                                                        (
+                                                            ReceiptId,
+                                                            Comment,
+                                                            Type,
+                                                            UserIds,
+                                                            OldStatusId,
+                                                            NewStatusId,
+                                                            UserCreated,
+                                                            DateCreated,
+                                                            UserUpdated
+                                                        )
+                                                        VALUES
+                                                        (   @ReceiptId,
+                                                            @Comment,
+                                                            @Type,
+                                                            @OldStatusId,
+                                                            @NewStatusId,
+                                                            @UserIds,
+                                                            @UserCreated,
+                                                            @DateCreated,
+                                                            @UserUpdated;
+                                                        SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string RECEIPT_INSERT_COMMENT = @"INSERT dbo.ReceiptLog
+                                                  (
+                                                      ReceiptId,
+                                                      Comment,
+                                                      LogDate,
+                                                      UserId,
+                                                      OldReceiptStatusId,
+                                                      ReceiptStatusId,
+                                                      AttachmentName
+                                                  )
+                                                  VALUES
+                                                  (   @ReceiptId,         -- ReceiptId - int
+                                                      @Comment,       -- Comment - nvarchar(1500)
+                                                      GETDATE(), -- LogDate - datetime
+                                                      @UserId,         -- UserId - int
+                                                      @OldWarrantyStatusId,         -- OldReceiptStatusId - int
+                                                      @ReceiptStatusId,         -- ReceiptStatusId - int
+                                                      );
+
+                                                  SELECT CAST(SCOPE_IDENTITY() as int);";
+
+        public const string RECEIPT_LOG_ATTACHMENT_INSERT = @"INSERT dbo.ReceiptLogAttachment
+                                                          (
+                                                              ReceiptLogId,
+                                                              Attachment,
+                                                              AttachmentName,
+                                                              UserCreated,
+                                                              DateCreated,
+                                                              UserUpdated,
+                                                              DateUpdated,
+                                                              IsDeleted
+                                                          )
+                                                          VALUES
+                                                          (   @ReceiptLogId,         -- ReceiptLogId - int
+                                                              @Attachment,       -- Attachment - nvarchar(max)
+                                                              @AttachmentName,       -- AttachmentName - nvarchar(max)
+                                                              @UserCreated,         -- UserCreated - int
+                                                              GETDATE(), -- DateCreated - datetime
+                                                              @UserUpdated,         -- UserUpdated - int
+                                                              GETDATE(), -- DateUpdated - datetime
+                                                              0       -- IsDeleted - bit
+                                                              )";
+
+        public const string RECEIPT_GET_LOGS = @"SELECT Id,
+                                                    ReceiptId,
+                                                    UserId,
+                                                    Comment,
+                                                    LogDate,
+                                                    OldReceiptStatusId,
+                                                    ReceiptStatusId
+                                             FROM dbo.ReceiptLog
+                                             WHERE ReceiptId = @ReceiptId
+                                             ORDER BY LogDate DESC;";
+
+        public const string GET_RECEIPT_STATUS_IN_LOG = @"SELECT Id,
+                                                             Name
+                                                      FROM dbo.WarrantyStatus
+                                                      WHERE Id = @Id
+                                                            AND IsDeleted = 0;";
+
+        public const string GET_RECEIPT_ATTACHMENT_IN_LOG = @"SELECT Attachment,
+                                                                 AttachmentName
+                                                          FROM dbo.ReceiptLogAttachment
+                                                          WHERE ReceiptLogId = @ReceiptLogId;";
+
+        public const string GET_RECEIPT_USER_BY_RECEIPTID = @"SELECT * from dbo.ReceiptUser where ReceiptId = @ReceiptId AND Type=@Type AND IsDeleted=0";
+        public const string RECEIPT_USER_DELETE = @"UPDATE dbo.ReceiptUser SET IsDeleted = 1 WHERE ReceiptId = @ReceiptId AND UserId=@UserId AND Type=@Type";
+
+        public const string RECEIPT_USER_INSERT = @"INSERT dbo.ReceiptUser
+                                                        (
+                                                            ReceiptId,
+                                                            UserId,
+                                                            Type,
+                                                            UserCreated,
+                                                            DateCreated,
+                                                            UserUpdated,
+                                                            DateUpdated,
+                                                            IsDeleted
+                                                        )
+                                                        VALUES
+                                                        (   @ReceiptId,
                                                             @UserId,
                                                             @Type,
                                                             @UserCreated,
