@@ -81,7 +81,7 @@ namespace Pelo.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/candidate/log/{id}")]
-        public async Task<ActionResult<bool>> GetLog(int id)
+        public async Task<ActionResult<TResponse<IEnumerable<CandidateLogResponse>>>> GetLog(int id)
         {
             return Ok(await _CandidateService.GetLogs(await GetUserId(), id));
         }

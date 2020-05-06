@@ -931,7 +931,7 @@
         </member>
         <member name="M:Pelo.Api.Controllers.ReceiptController.Comment(System.String,Microsoft.AspNetCore.Http.IFormFileCollection)">
             <summary>
-                Them CRM Comment
+                Them bien nhan Comment
             </summary>
             <param name="paras"></param>
             <param name="files"></param>
@@ -939,7 +939,7 @@
         </member>
         <member name="M:Pelo.Api.Controllers.ReceiptController.GetLog(System.Int32)">
             <summary>
-                Lấy danh sách log crm
+                Lấy danh sách log bien nhan
             </summary>
             <param name="id"></param>
             <returns></returns>
@@ -1412,14 +1412,14 @@
         </member>
         <member name="M:Pelo.Api.Controllers.WarrantyController.UpdateCrm(Pelo.Common.Dtos.Warranty.UpdateWarrantyRequest)">
             <summary>
-                Update CRM
+                Update bao hanh
             </summary>
             <param name="request"></param>
             <returns></returns>
         </member>
         <member name="M:Pelo.Api.Controllers.WarrantyController.Comment(System.String,Microsoft.AspNetCore.Http.IFormFileCollection)">
             <summary>
-                Them CRM Comment
+                Them bao hanh Comment
             </summary>
             <param name="paras"></param>
             <param name="files"></param>
@@ -1427,7 +1427,7 @@
         </member>
         <member name="M:Pelo.Api.Controllers.WarrantyController.GetLog(System.Int32)">
             <summary>
-                Lấy danh sách log crm
+                Lấy danh sách log bao hanh
             </summary>
             <param name="id"></param>
             <returns></returns>

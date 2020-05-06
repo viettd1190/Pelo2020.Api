@@ -75,15 +75,15 @@ namespace Pelo.Api.Controllers
         {
             return Ok(await _warrantyService.Update(await GetUserId(), request));
         }
-        /// <summary>
-        ///     delete trạng thái bảo hành
-        /// </summary>
-        /// <returns></returns>
-        [HttpDelete]
-        [Route("api/warranty_status/{id}")]
-        public async Task<ActionResult<bool>> Delete(int id)
-        {
-            return Ok(await _warrantyService.Delete(await GetUserId(), id));
-        }
+        ///// <summary>
+        /////     delete trạng thái bảo hành
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpDelete]
+        //[Route("api/warranty_status/{id}")]
+        //public async Task<ActionResult<bool>> Delete(int id)
+        //{
+        //    return Ok(await _warrantyService.Delete(await GetUserId(), id));
+        //}
     }
 }

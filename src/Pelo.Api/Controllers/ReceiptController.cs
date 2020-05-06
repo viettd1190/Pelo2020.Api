@@ -27,7 +27,7 @@ namespace Pelo.Api.Controllers
             _receiptService = receiptService;
         }
         [HttpGet]
-        [Route("api/Receipt/get_by_customer")]
+        [Route("api/receipt/get_by_customer")]
         public async Task<ActionResult<PageResult<GetReceiptPagingResponse>>> GetByCustomerId(int customerId,
                                                                                               int page,
                                                                                               int pageSize)
@@ -44,7 +44,7 @@ namespace Pelo.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Receipt")]
+        [Route("api/receipt")]
         public async Task<ActionResult<GetReceiptPagingResponse>> GetByPaging([FromQuery] GetReceiptPagingRequest request)
         {
             return Ok(await _receiptService.GetPaging(await GetUserId(),
@@ -57,7 +57,7 @@ namespace Pelo.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("api/Receipt")]
+        [Route("api/receipt")]
         public async Task<ActionResult<TResponse<bool>>> Insert(InsertReceiptRequest request)
         {
             return Ok(await _receiptService.Insert(await GetUserId(), request));
@@ -69,7 +69,7 @@ namespace Pelo.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/Receipt/{id}")]
+        [Route("api/receipt/{id}")]
         public async Task<ActionResult<TResponse<GetReceiptByIdResponse>>> GetById(int id)
         {
             return Ok(await _receiptService.GetById(await GetUserId(), id));
@@ -81,7 +81,7 @@ namespace Pelo.Api.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("api/Receipt")]
+        [Route("api/receipt")]
         public async Task<ActionResult<bool>> UpdateCrm([FromBody] UpdateReceiptRequest request)
         {
             return Ok(await _receiptService.UpdateCrm(await GetUserId(),
@@ -89,13 +89,13 @@ namespace Pelo.Api.Controllers
         }
 
         /// <summary>
-        ///     Them CRM Comment
+        ///     Them bien nhan Comment
         /// </summary>
         /// <param name="paras"></param>
         /// <param name="files"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("api/Receipt/comment")]
+        [Route("api/receipt/comment")]
         //public async Task<ActionResult<bool>> Comment([FromForm] CommentCrmRequest request)
         public async Task<ActionResult<bool>> Comment([FromForm] string paras, [FromForm] IFormFileCollection files)
         {
@@ -119,17 +119,17 @@ namespace Pelo.Api.Controllers
                                                 }));
         }
 
-        /// <summary>
-        ///     Lấy danh sách log crm
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("api/crm/log/{id}")]
-        public async Task<ActionResult<TResponse<IEnumerable<ReceiptLogResponse>>>> GetLog([FromRoute] int id)
-        {
-            return Ok(await _receiptService.GetLogs(await GetUserId(), id));
-        }
+        ///// <summary>
+        /////     Lấy danh sách log bien nhan
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <returns></returns>
+        //[HttpGet]
+        //[Route("api/receipt/receipt_log/{id}")]
+        //public async Task<ActionResult<TResponse<IEnumerable<ReceiptLogResponse>>>> GetLog(int id)
+        //{
+        //    return Ok(await _receiptService.GetLogs(await GetUserId(), id));
+        //}
     }   
     
 }

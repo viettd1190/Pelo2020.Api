@@ -53,10 +53,15 @@ namespace Pelo.Api.Services.WarrantyServices
         private readonly IUserService _userService;
 
         private readonly IConfiguration _configuration;
-        public WarrantyService(IDapperReadOnlyRepository readOnlyRepository, IDapperWriteRepository writeRepository, IHttpContextAccessor context, IRoleService roleService,
-                              IUserService userService,
-                              IProductService productService,
-                              IAppConfigService appConfigService, IBusPublisher busPublisher, IConfiguration configuration) : base(readOnlyRepository, writeRepository, context)
+        public WarrantyService(IDapperReadOnlyRepository readOnlyRepository,
+                          IDapperWriteRepository writeRepository,
+                          IHttpContextAccessor context,
+                          IRoleService roleService,
+                          IAppConfigService appConfigService,
+                          IUserService userService,
+                          IProductService productService,
+                          IConfiguration configuration,
+                          IBusPublisher busPublisher) : base(readOnlyRepository, writeRepository, context)
         {
             _roleService = roleService;
             _appConfigService = appConfigService;

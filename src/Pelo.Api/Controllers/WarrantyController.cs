@@ -75,7 +75,7 @@ namespace Pelo.Api.Controllers
         }
 
         /// <summary>
-        ///     Update CRM
+        ///     Update bao hanh
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
@@ -88,14 +88,13 @@ namespace Pelo.Api.Controllers
         }
 
         /// <summary>
-        ///     Them CRM Comment
+        ///     Them bao hanh Comment
         /// </summary>
         /// <param name="paras"></param>
         /// <param name="files"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("api/warranty/comment")]
-        //public async Task<ActionResult<bool>> Comment([FromForm] CommentCrmRequest request)
         public async Task<ActionResult<bool>> Comment([FromForm] string paras, [FromForm] IFormFileCollection files)
         {
             //var parametes = paras.Split('&');
@@ -119,16 +118,16 @@ namespace Pelo.Api.Controllers
         }
 
         /// <summary>
-        ///     Lấy danh sách log crm
+        ///     Lấy danh sách log bao hanh
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("api/crm/log/{id}")]
-        public async Task<ActionResult<TResponse<IEnumerable<WarrantyLogResponse>>>> GetLog([FromRoute] int id)
+        [Route("api/warranty/warranty_log/{id}")]
+        public async Task<ActionResult<TResponse<IEnumerable<WarrantyLogResponse>>>> GetLog(int id)
         {
             return Ok(await _warrantySerivce.GetLogs(await GetUserId(), id));
         }
-    }   
-    
+    }
+
 }
